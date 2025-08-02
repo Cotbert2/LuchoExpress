@@ -68,7 +68,7 @@ public class CategoryService {
         return categories.stream()
                 .map(category -> {
                     CategoryResponse categoryResponse = categoryMapper.toResponse(category);
-                    List<ProductResponse> products = productRepository.findByCategoryIdWithCategory(category.getId())
+                    List<ProductResponse> products = productRepository.findByCategoryId(category.getId())
                             .stream()
                             .map(productMapper::toResponse)
                             .collect(Collectors.toList());
@@ -85,7 +85,7 @@ public class CategoryService {
             throw new CategoryNotFoundException("Category with ID " + categoryId + " not found");
         }
         
-        return productRepository.findByCategoryIdWithCategory(categoryId)
+        return productRepository.findByCategoryId(categoryId)
                 .stream()
                 .map(productMapper::toResponse)
                 .collect(Collectors.toList());
