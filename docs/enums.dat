@@ -6,6 +6,7 @@ OrderStatusEnum {
 }
 
 RoleEnum {
+    ROOT
     ADMIN
     USER
 }

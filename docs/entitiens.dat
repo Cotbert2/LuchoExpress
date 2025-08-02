@@ -32,6 +32,7 @@ Order {
     status: OrderStatusEnum
     orderDate: Date
     estimatedDeliveryDate: Date
+    totalAmount: decimal
     createdAt: Date
     updatedAt: Date
 }
@@ -39,7 +40,25 @@ Order {
 OrderProduct {
     id: UUID
     orderId: UUID
-    productName: string
+    productId: UUID
     quantity: int
-    unitPrice: decimal
+}
+
+Product {
+    id: UUID
+    categoryId: UUID
+    name: string
+    imageUrl: string
+    description: string
+    price: decimal
+    createdAt: Date
+    updatedAt: Date
+}
+
+Category {
+    id: UUID
+    name: string
+    description: string
+    createdAt: Date
+    updatedAt: Date
 }

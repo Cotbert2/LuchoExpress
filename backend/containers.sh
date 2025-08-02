@@ -19,4 +19,12 @@ docker run --name auth-postgres \
   -d postgres:latest
 
 
-# Container for 
+# Container for products microservice
+
+docker run --name lucho-express-mysql \
+  -e MYSQL_DATABASE=product_db \
+  -e MYSQL_USER=admin \
+  -e MYSQL_PASSWORD=admin \
+  -e MYSQL_ROOT_PASSWORD=admin \
+  -p 3306:3306 \
+  -d mysql:8

@@ -1,0 +1,56 @@
+i Microservicio: product-service
+ Tecnología: Spring Boot + Spring Data JPA + Spring Security + REST
+
+ Entidades:
+ Product {
+   UUID id;
+   UUID categoryId;
+   String name;
+   String imageUrl;
+   String description;
+   BigDecimal price;
+   LocalDateTime createdAt;
+   LocalDateTime updatedAt;
+ }
+
+ Category {
+   UUID id;
+   String name;
+   String description;
+   LocalDateTime createdAt;
+   LocalDateTime updatedAt;
+ }
+
+ Requisitos funcionales:
+ - No se permite eliminar ni productos ni categorías (sin borrado lógico ni físico)
+ - Todos los endpoints están protegidos por roles usando Spring Security OAuth2 (fijate en el microservicio auth)
+
+ ENDPOINTS Y ACCESO:
+
+ == CATEGORÍAS ==
+ [POST]   /api/categories           → Crear categoría          (ROL: ADMIN o ROOT)
+ [PATCH]    /api/categories/{id}      → Editar categoría         (ROL: ADMIN o ROOT)
+ [GET]    /api/categories           → Listar todas             (PÚBLICO)
+ [GET]    /api/categories-with-products  → Categorías + productos (PÚBLICO)
+ [GET]    /api/categories/{id}/products  → Productos por categoría (ROL: ADMIN)
+
+ == PRODUCTOS ==
+ [POST]   /api/products             → Crear producto           (ROL: ADMIN o ROOT)
+ [PATCH]    /api/products/{id}        → Editar producto          (ROL: ADMIN o ROOT)
+
+ Reglas adicionales:
+ - createdAt y updatedAt se asignan automáticamente con JPA
+ - usa lombok
+ - Validar existencia de categoryId al crear un producto
+ - price debe ser mayor que cero
+ - name no puede estar vacío y debe ser menor a 100 caracteres
+ - description debe ser menor a 500 caracteres
+    - imageUrl debe ser una URL válida (expresiones regulares)
+ - Todas las respuestas deben ir en formato JSON
+
+ Base de datos mysql: 
+ Spring JPA debe mapear correctamente relaciones (Category → Product)
+ Incluir DTOs separados de las entidades para control de exposición
+ Incluir @Valid para validaciones
+
+Emplea la misma aruitectura que se ha implementado en el microservicio auth y customers
