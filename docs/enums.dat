@@ -1,0 +1,6 @@
+OrderStatusEnum {
+    PENDING
+    SHIPPED
+    DELIVERED
+    CANCELLED
+}
