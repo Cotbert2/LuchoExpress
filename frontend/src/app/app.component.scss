@@ -1,0 +1,132 @@
+// Only keeping classes that might be used elsewhere in the application
+// Most utility classes have been replaced with Tailwind equivalents
+
+.productos{
+    font-weight: 100;
+    font-size: 3rem;
+    text-align: center;
+}
+
+.main-image {
+    width: 100%;
+
+    img {
+        width: 100%;
+        height: 45em;
+        /* crop image*/
+        object-fit: cover;
+    }
+}
+
+.item-splice{
+    img{
+        width: 100%;
+         height: 20em;
+        object-fit: cover;
+    }
+}
+
+/*titles-over-image*/
+.titles-over-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.titles-over-image h2 {
+    font-size: 3rem;
+    transition: opacity 1s ease-in-out;
+}
+
+.about-us-panel {
+    max-width: 600px;
+    margin: 2rem auto;
+    border-radius: 10px;
+
+    .about-us-content {
+        padding: 2rem;
+        background-color: #f4f4f9;
+        border-radius: 10px;
+
+        .about-description {
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .team-info {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            color: #555;
+
+            h4 {
+                font-weight: 600;
+                color: #3f51b5;
+            }
+        }
+    }
+}
+
+.footer {
+    background-color: #2e2e2e;
+    color: white;
+    padding: 2rem 0;
+    font-family: 'Arial', sans-serif;
+  
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+  
+      .footer-section {
+        flex: 1;
+        margin: 0 1rem;
+  
+        h4 {
+          font-size: 1.2rem;
+          margin-bottom: 1rem;
+          color: #f0f0f0;
+          font-weight: 600;
+        }
+  
+        p, ul {
+          font-size: 1rem;
+          color: #ccc;
+        }
+  
+        a {
+          color: #ccc;
+          text-decoration: none;
+          &:hover {
+            color: #f0f0f0;
+          }
+        }
+  
+        ul {
+          list-style: none;
+          padding: 0;
+  
+          li {
+            margin-bottom: 0.5rem;
+          }
+        }
+      }
+    }
+  
+    .footer-bottom {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+  
+    .pi {
+      margin-right: 0.5rem;
+    }
+  }

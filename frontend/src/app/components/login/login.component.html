@@ -1,0 +1,148 @@
+<p-toast></p-toast>
+
+<div class="full-container flex items-center justify-center p-4">
+    <p-panel class="w-full max-w-md bg-white/95 backdrop-blur-sm shadow-2xl">
+        <div *ngIf="currentUser?.id">
+            <h3 class="text-xl font-semibold mb-4 text-center">
+                Welcome back, {{ currentUser?.username }}!
+            </h3>
+            <div class="text-center mb-4">
+                <p class="text-gray-600">{{ currentUser?.email }}</p>
+                <p class="text-sm text-gray-500">Role: {{ currentUser?.role }}</p>
+            </div>
+            <div class="w-full flex items-center justify-center">
+                <p-button severity="danger" label="Log out" (onClick)="handleLogOut()"></p-button>
+            </div>
+        </div>
+
+        <div *ngIf="!currentUser?.id">
+            <h3 class="text-xl font-semibold mb-6 text-center">
+                {{ isLogin ? 'Welcome Back!' : 'Let\'s Create something cool!' }}
+            </h3>
+    
+            <!-- Registration Form -->
+            <form *ngIf="!isLogin" [formGroup]="registerForm" (ngSubmit)="handleSignUp()">
+                <p-floatlabel variant="in" class="mb-4">
+                    <input 
+                        pInputText 
+                        id="registerUsername" 
+                        formControlName="username"
+                        [class.ng-invalid]="registerUsername?.invalid && registerUsername?.touched"
+                    />
+                    <label for="registerUsername">
+                        <i class="pi pi-user"></i>
+                        Username
+                    </label>
+                </p-floatlabel>
+                <small class="text-red-500" *ngIf="registerUsername?.invalid && registerUsername?.touched">
+                    <span *ngIf="registerUsername?.errors?.['required']">Username is required</span>
+                    <span *ngIf="registerUsername?.errors?.['minlength']">Username must be at least 3 characters</span>
+                    <span *ngIf="registerUsername?.errors?.['maxlength']">Username cannot exceed 50 characters</span>
+                </small>
+
+                <p-floatlabel variant="in" class="mb-4">
+                    <input 
+                        pInputText 
+                        id="registerEmail" 
+                        formControlName="email"
+                        [class.ng-invalid]="registerEmail?.invalid && registerEmail?.touched"
+                    />
+                    <label for="registerEmail">
+                        <i class="pi pi-envelope"></i>
+                        Email
+                    </label>
+                </p-floatlabel>
+                <small class="text-red-500" *ngIf="registerEmail?.invalid && registerEmail?.touched">
+                    <span *ngIf="registerEmail?.errors?.['required']">Email is required</span>
+                    <span *ngIf="registerEmail?.errors?.['email']">Please enter a valid email</span>
+                    <span *ngIf="registerEmail?.errors?.['maxlength']">Email cannot exceed 100 characters</span>
+                </small>
+
+                <p-floatlabel variant="in" class="mb-4">
+                    <input 
+                        pInputText 
+                        type="password" 
+                        id="registerPassword" 
+                        formControlName="password"
+                        [class.ng-invalid]="registerPassword?.invalid && registerPassword?.touched"
+                    />
+                    <label for="registerPassword">
+                        <i class="pi pi-lock"></i>
+                        Password
+                    </label>
+                </p-floatlabel>
+                <small class="text-red-500" *ngIf="registerPassword?.invalid && registerPassword?.touched">
+                    <span *ngIf="registerPassword?.errors?.['required']">Password is required</span>
+                    <span *ngIf="registerPassword?.errors?.['minlength']">Password must be at least 6 characters</span>
+                    <span *ngIf="registerPassword?.errors?.['maxlength']">Password cannot exceed 100 characters</span>
+                </small>
+
+                <p-floatlabel variant="in" class="mb-6">
+                    <input 
+                        pInputText 
+                        type="password" 
+                        id="registerConfirmPassword" 
+                        formControlName="confirmPassword"
+                        [class.ng-invalid]="registerConfirmPassword?.invalid && registerConfirmPassword?.touched"
+                    />
+                    <label for="registerConfirmPassword">
+                        <i class="pi pi-lock"></i>
+                        Confirm Password
+                    </label>
+                </p-floatlabel>
+                <small class="text-red-500" *ngIf="registerConfirmPassword?.invalid && registerConfirmPassword?.touched">
+                    <span *ngIf="registerConfirmPassword?.errors?.['required']">Please confirm your password</span>
+                    <span *ngIf="registerConfirmPassword?.errors?.['passwordMismatch']">Passwords do not match</span>
+                </small>
+
+                <div class="flex items-center justify-between gap-4">
+                    <p-button type="submit" [disabled]="registerForm.invalid">Sign me Up</p-button>
+                    <p-button type="button" (onClick)="switchToSignUp()">Login Instead</p-button>
+                </div>
+            </form>
+
+            <!-- Login Form -->
+            <form *ngIf="isLogin" [formGroup]="loginForm" (ngSubmit)="handleLogIn()">
+                <p-floatlabel variant="in" class="mb-4">
+                    <input 
+                        pInputText 
+                        id="loginUsername" 
+                        formControlName="username"
+                        [class.ng-invalid]="loginUsername?.invalid && loginUsername?.touched"
+                    />
+                    <label for="loginUsername">
+                        <i class="pi pi-user"></i>
+                        Username
+                    </label>
+                </p-floatlabel>
+                <small class="text-red-500" *ngIf="loginUsername?.invalid && loginUsername?.touched">
+                    <span *ngIf="loginUsername?.errors?.['required']">Username is required</span>
+                    <span *ngIf="loginUsername?.errors?.['minlength']">Username must be at least 3 characters</span>
+                </small>
+
+                <p-floatlabel variant="in" class="mb-6">
+                    <input 
+                        pInputText 
+                        type="password" 
+                        id="loginPassword" 
+                        formControlName="password"
+                        [class.ng-invalid]="loginPassword?.invalid && loginPassword?.touched"
+                    />
+                    <label for="loginPassword">
+                        <i class="pi pi-lock"></i>
+                        Password
+                    </label>
+                </p-floatlabel>
+                <small class="text-red-500" *ngIf="loginPassword?.invalid && loginPassword?.touched">
+                    <span *ngIf="loginPassword?.errors?.['required']">Password is required</span>
+                    <span *ngIf="loginPassword?.errors?.['minlength']">Password must be at least 6 characters</span>
+                </small>
+
+                <div class="flex items-center justify-between gap-4">
+                    <p-button type="submit" [disabled]="loginForm.invalid">Log In</p-button>
+                    <p-button type="button" (onClick)="switchToSignUp()">Sign up Instead</p-button>
+                </div>
+            </form>
+        </div>
+    </p-panel>
+</div>

@@ -1,0 +1,8 @@
+// Keeping only the background class since it uses a custom image
+.full-container{
+    height: 100vh;
+    background-image: url('./../../../../public/login-wallpaper.jpg');
+    background-size: cover;
+}
+
+// All other styles are now handled by Tailwind classes in the HTML

@@ -9,13 +9,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(
+    origins = {"http://localhost:4200", "http://127.0.0.1:4200"}, 
+    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE, RequestMethod.OPTIONS},
+    allowedHeaders = {"Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"},
+    allowCredentials = "true"
+)
 @RequiredArgsConstructor
 public class AuthController {
     
