@@ -46,7 +46,7 @@ public class CustomerService {
     
     @Transactional(readOnly = true)
     public List<CustomerResponse> getAllCustomers() {
-        return customerRepository.findAllEnabled()
+        return customerRepository.findByEnabledTrue()
                 .stream()
                 .map(customerMapper::toResponse)
                 .collect(Collectors.toList());
@@ -54,7 +54,7 @@ public class CustomerService {
     
     @Transactional(readOnly = true)
     public CustomerResponse getCustomerById(UUID id) {
-        Customer customer = customerRepository.findByIdAndEnabled(id)
+        Customer customer = customerRepository.findByIdAndEnabledTrue(id)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer with ID " + id + " not found"));
         
         return customerMapper.toResponse(customer);
@@ -69,7 +69,7 @@ public class CustomerService {
     }
     
     public CustomerResponse updateCustomer(UUID id, UpdateCustomerRequest request) {
-        Customer customer = customerRepository.findByIdAndEnabled(id)
+        Customer customer = customerRepository.findByIdAndEnabledTrue(id)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer with ID " + id + " not found"));
         
         // Verificar unicidad de email y documentId si se están actualizando
@@ -91,7 +91,7 @@ public class CustomerService {
     }
     
     public void deleteCustomer(UUID id) {
-        Customer customer = customerRepository.findByIdAndEnabled(id)
+        Customer customer = customerRepository.findByIdAndEnabledTrue(id)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer with ID " + id + " not found"));
         
         customer.disable();
@@ -100,6 +100,6 @@ public class CustomerService {
     
     @Transactional(readOnly = true)
     public boolean customerExists(UUID id) {
-        return customerRepository.findByIdAndEnabled(id).isPresent();
+        return customerRepository.findByIdAndEnabledTrue(id).isPresent();
     }
 }

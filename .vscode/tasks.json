@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Order Service",
+			"type": "shell",
+			"command": "cd /home/cotbert/Development/LuchoExpress/backend/ms-order && ./mvnw clean compile",
+			"group": "build",
+			"problemMatcher": [
+				"$gcc"
+			]
+		}
+	]
+}

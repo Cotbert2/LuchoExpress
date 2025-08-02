@@ -28,3 +28,8 @@ docker run --name lucho-express-mysql \
   -e MYSQL_ROOT_PASSWORD=admin \
   -p 3306:3306 \
   -d mysql:8
+
+# Container for tracking microservice
+docker run --name redis-tracking \
+  -p 6379:6379 \
+  -d redis:7-alpine
