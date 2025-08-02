@@ -2,7 +2,6 @@
 
 # This script is used to manage Docker containers for the application.
 
-# Container for auth microservice
 docker run --name customer-postgres \
   -e POSTGRES_USER=admin \
   -e POSTGRES_PASSWORD=admin \
@@ -12,12 +11,11 @@ docker run --name customer-postgres \
 
 
 
-# Container for customer microservice
-docker run --name customer-postgres \
+docker run --name auth-postgres \
   -e POSTGRES_USER=admin \
   -e POSTGRES_PASSWORD=admin \
-  -e POSTGRES_DB=admin_db \
-  -p 5432:5432 \
+  -e POSTGRES_DB=auth_db \
+  -p 5433:5432 \
   -d postgres:latest
 
 

@@ -4,3 +4,8 @@ OrderStatusEnum {
     DELIVERED
     CANCELLED
 }
+
+RoleEnum {
+    ADMIN
+    USER
+}
