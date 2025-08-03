@@ -1,15 +1,15 @@
 <div class="full-container df ai-center jc-center">
     <div class="df item">
         <p-panel>
-            <p-image [src]="product.image" [preview]="true">
+            <p-image [src]="product.imageUrl" [preview]="true">
                 <ng-template #indicator>
                     <i class="pi pi-search"></i>
                 </ng-template>
                 <ng-template #image>
-                    <img [src]="product.image" alt="image" width="720" />
+                    <img [src]="product.imageUrl" alt="image" width="720" />
                 </ng-template>
                 <ng-template #preview let-style="style" let-previewCallback="previewCallback">
-                    <img [src]="product.image" alt="image" [style]="style" (click)="previewCallback()" />
+                    <img [src]="product.imageUrl" alt="image" [style]="style" (click)="previewCallback()" />
                 </ng-template>
             </p-image>
 
@@ -20,25 +20,11 @@
             <div class="space-betwwen-items">
 
                 <h3>Descripcion:</h3>
-                
-                <p-table [value]="tableData">
-                    <ng-template pTemplate="header">
-                      <tr>
-                        <th>Item</th>
-                        <th>Description</th>
-                      </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-row>
-                      <tr>
-                        <td>{{ row.key }}</td>
-                        <td>{{ row.value }}</td>
-                      </tr>
-                    </ng-template>
-                  </p-table>
+                <p>{{product.description}}</p>
             </div>
 
             <div class="space-betwwen-items">
-                <p>{{product.stock + ' items avaibale!'}}</p>
+                <p>{{stock + ' items available!'}}</p>
 
             </div>
 

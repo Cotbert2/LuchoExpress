@@ -55,6 +55,9 @@
             <p-button
                 icon="pi pi-shopping-cart"
                 styleClass="ml-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full"
+                (click)="goToProduct(product)"
+                [attr.aria-label]="'Ver producto ' + product.name"
+                title="Ver producto"
             ></p-button>
         </div>
     </div>

@@ -34,9 +34,11 @@ export class ProductComponent implements OnInit {
 
 
   rating: number = 3;
+  stock: number = 10;
 
   ngOnInit(): void {
-    this.rating = this.generateRandomNumber();
+    this.rating = this.generateRandomNumber(3,5);
+    this.stock = this.generateRandomNumber(1,50);
     console.log('product: ',this.product);
     this.productDescription = JSON.parse(this.product.description);
     console.log('productDescription: ',this.productDescription);
@@ -53,8 +55,9 @@ export class ProductComponent implements OnInit {
   }
 
 
-  generateRandomNumber(): number {
-    return Math.floor(Math.random() * (5 - 3 + 1)) + 3;
+  generateRandomNumber(min : number = 1, max: number = 5): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+  
 
 }

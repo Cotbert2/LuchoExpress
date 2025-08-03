@@ -3,6 +3,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { CarouselModule } from 'primeng/carousel';
 import { ProductsService } from '../../services/products.service';
+import { Router } from '@angular/router';
 
 //ngstyle
 import { CommonModule } from '@angular/common';
@@ -20,8 +21,8 @@ import { CommonModule } from '@angular/common';
 })
 export class HomeComponent implements OnInit {
   constructor(
-
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private router: Router
   ) {}
 
 
@@ -78,6 +79,17 @@ export class HomeComponent implements OnInit {
     }, 2000);
   }
 
-  
+  /**
+   * Navegar a la vista de productos con el producto seleccionado
+   */
+  goToProduct(product: any): void {
+    if (product && product.id) {
+      this.router.navigate(['/products', product.id]);
+    } else {
+      // Si no hay ID, ir a la vista general de productos
+      this.router.navigate(['/products']);
+    }
+  }
 
+  
 }
