@@ -4,50 +4,21 @@ import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.application.
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.application.dto.CustomerResponse;
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.application.dto.UpdateCustomerRequest;
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.domain.Customer;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
-@Component
-public class CustomerMapper {
+@Mapper(componentModel = "spring")
+public interface CustomerMapper {
     
-    public Customer toEntity(CreateCustomerRequest request) {
-        return new Customer(
-            request.getDocumentId(),
-            request.getName(),
-            request.getEmail(),
-            request.getPhone(),
-            request.getAddress()
-        );
-    }
+    Customer toEntity(CreateCustomerRequest request);
     
-    public CustomerResponse toResponse(Customer customer) {
-        return new CustomerResponse(
-            customer.getId(),
-            customer.getDocumentId(),
-            customer.getName(),
-            customer.getEmail(),
-            customer.getPhone(),
-            customer.getAddress(),
-            customer.getCreatedAt(),
-            customer.getUpdatedAt(),
-            customer.isEnabled()
-        );
-    }
+    CustomerResponse toResponse(Customer customer);
     
-    public void updateEntityFromRequest(Customer customer, UpdateCustomerRequest request) {
-        if (request.getDocumentId() != null) {
-            customer.setDocumentId(request.getDocumentId());
-        }
-        if (request.getName() != null) {
-            customer.setName(request.getName());
-        }
-        if (request.getEmail() != null) {
-            customer.setEmail(request.getEmail());
-        }
-        if (request.getPhone() != null) {
-            customer.setPhone(request.getPhone());
-        }
-        if (request.getAddress() != null) {
-            customer.setAddress(request.getAddress());
-        }
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "documentId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "enabled", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntityFromRequest(@MappingTarget Customer customer, UpdateCustomerRequest request);
 }

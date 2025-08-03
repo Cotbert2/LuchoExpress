@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface CreateCustomerRequest {
+  userId: string;
   documentId: string;
   name: string;
   email: string;
@@ -14,6 +15,7 @@ export interface CreateCustomerRequest {
 
 export interface CustomerResponse {
   id: string;
+  userId: string;
   documentId: string;
   name: string;
   email: string;
@@ -82,6 +84,16 @@ export class CustomerService {
    */
   getCustomerByEmail(email: string): Observable<CustomerResponse> {
     return this.http.get<CustomerResponse>(`${this.baseUrl}/email/${encodeURIComponent(email)}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Get customer by user ID
+   */
+  getCustomerByUserId(userId: string): Observable<CustomerResponse> {
+    return this.http.get<CustomerResponse>(`${this.baseUrl}/by-user/${userId}`)
       .pipe(
         catchError(this.handleError)
       );

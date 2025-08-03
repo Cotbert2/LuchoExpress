@@ -7,8 +7,9 @@ import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.application.
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.domain.Customer;
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.infraestructure.exceptions.CustomerAlreadyExistsException;
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.infraestructure.exceptions.CustomerNotFoundException;
+import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.infraestructure.exceptions.UserAlreadyHasCustomerException;
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.persistance.repositories.CustomerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,23 +19,24 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CustomerService {
     
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     
-    @Autowired
-    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper) {
-        this.customerRepository = customerRepository;
-        this.customerMapper = customerMapper;
-    }
-    
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
-        // Verificar si ya existe un cliente con el mismo email o documentId
+        // Verificar si ya existe un cliente con el mismo userId
+        if (customerRepository.existsByUserId(request.getUserId())) {
+            throw new UserAlreadyHasCustomerException("User with ID " + request.getUserId() + " already has a customer profile");
+        }
+        
+        // Verificar si ya existe un cliente con el mismo email
         if (customerRepository.existsByEmail(request.getEmail())) {
             throw new CustomerAlreadyExistsException("Customer with email " + request.getEmail() + " already exists");
         }
         
+        // Verificar si ya existe un cliente con el mismo documentId
         if (customerRepository.existsByDocumentId(request.getDocumentId())) {
             throw new CustomerAlreadyExistsException("Customer with document ID " + request.getDocumentId() + " already exists");
         }
@@ -61,6 +63,14 @@ public class CustomerService {
     }
     
     @Transactional(readOnly = true)
+    public CustomerResponse getCustomerByUserId(UUID userId) {
+        Customer customer = customerRepository.findByUserIdAndEnabledTrue(userId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with user ID " + userId + " not found"));
+        
+        return customerMapper.toResponse(customer);
+    }
+    
+    @Transactional(readOnly = true)
     public CustomerResponse getCustomerByEmail(String email) {
         Customer customer = customerRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer with email " + email + " not found"));
@@ -68,20 +78,27 @@ public class CustomerService {
         return customerMapper.toResponse(customer);
     }
     
+    @Transactional(readOnly = true)
+    public CustomerResponse getCustomerByDocumentId(String documentId) {
+        Customer customer = customerRepository.findByDocumentId(documentId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with document ID " + documentId + " not found"));
+        
+        return customerMapper.toResponse(customer);
+    }
+    
+    @Transactional(readOnly = true)
+    public boolean existsByDocumentId(String documentId) {
+        return customerRepository.existsByDocumentId(documentId);
+    }
+    
     public CustomerResponse updateCustomer(UUID id, UpdateCustomerRequest request) {
         Customer customer = customerRepository.findByIdAndEnabledTrue(id)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer with ID " + id + " not found"));
         
-        // Verificar unicidad de email y documentId si se están actualizando
+        // Verificar unicidad de email si se está actualizando
         if (request.getEmail() != null && !request.getEmail().equals(customer.getEmail())) {
-            if (customerRepository.existsByEmail(request.getEmail())) {
+            if (customerRepository.existsByEmailAndIdNot(request.getEmail(), id)) {
                 throw new CustomerAlreadyExistsException("Customer with email " + request.getEmail() + " already exists");
-            }
-        }
-        
-        if (request.getDocumentId() != null && !request.getDocumentId().equals(customer.getDocumentId())) {
-            if (customerRepository.existsByDocumentId(request.getDocumentId())) {
-                throw new CustomerAlreadyExistsException("Customer with document ID " + request.getDocumentId() + " already exists");
             }
         }
         

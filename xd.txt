@@ -1,0 +1,53 @@
+ Verifica lo que falta el microservicio de customer
+
+ ✅ ENTIDAD PRINCIPAL: Customer
+ - UUID id
+ - UUID userId (vincula con MS-AUTH)
+ - String documentId (único)
+ - String name
+ - String email
+ - String phone
+ - String address
+ - LocalDateTime createdAt
+ - LocalDateTime updatedAt
+ - boolean enabled
+
+ ✅ RESTRICCIONES Y VALIDACIONES:
+ - documentId debe ser único
+ - userId debe ser único (1 usuario solo puede tener un Customer) y se debe verificar la existencia del usuario en MS-AUTH
+ - Validaciones de formato en email y phone
+
+ ✅ ENDPOINTS REQUERIDOS (REST):
+ - GET /api/customers/{id} → obtener un cliente por ID
+ - GET /api/customers/by-user/{userId} → obtener cliente por userId
+ - POST /api/customers → crear cliente (verifica que documentId no exista y que userId no esté asociado)
+ - PUT /api/customers/{id} → actualizar datos del cliente existente
+ - GET /api/customers/document/{documentId} → verificar existencia por cédula
+
+ ✅ CONTROL DE ERRORES:
+ - Si documentId ya existe asociado a otro userId → devolver 409 Conflict
+ - Si userId ya tiene un Customer → devolver 409 Conflict
+
+ ✅ LÓGICA DE NEGOCIO:
+ - Al crear cliente, validar unicidad de documentId y userId
+ - Al actualizar, no permitir cambiar documentId
+ - El servicio debe permitir precargar datos del cliente para el proceso de checkout
+
+ ✅ TECNOLOGÍAS:
+ - Spring Boot 3
+ - Spring Data JPA
+ - PostgreSQL
+ - lombok
+ - JPA para ORM
+ - UUID como identificador
+ - MapStruct (opcional) para conversión de DTOs
+ - Validación con javax.validation
+ - lombok para reducir codigo
+
+ ✅ OTROS:
+ - Clase CustomerDTO para entrada/salida
+ - Manejo global de errores (ControllerAdvice)
+ - Configurar índices únicos en el esquema DDL
+
+ Manten la estructura de carpetas (clean arquitecture) que se estaba llevando en el ms-auth
+ NO SE DEBE USAR SQL todo debe ser manipulado por ORM y repositorios de Spring Data JPA.

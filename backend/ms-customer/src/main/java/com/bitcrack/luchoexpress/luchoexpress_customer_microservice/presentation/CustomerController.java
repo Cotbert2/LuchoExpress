@@ -5,7 +5,7 @@ import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.application.
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.application.dto.UpdateCustomerRequest;
 import com.bitcrack.luchoexpress.luchoexpress_customer_microservice.application.service.CustomerService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +16,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/customers")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class CustomerController {
     
     private final CustomerService customerService;
-    
-    @Autowired
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
-    }
     
     @PostMapping
     public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CreateCustomerRequest request) {
@@ -43,9 +39,27 @@ public class CustomerController {
         return ResponseEntity.ok(customer);
     }
     
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<CustomerResponse> getCustomerByUserId(@PathVariable UUID userId) {
+        CustomerResponse customer = customerService.getCustomerByUserId(userId);
+        return ResponseEntity.ok(customer);
+    }
+    
     @GetMapping("/email/{email}")
     public ResponseEntity<CustomerResponse> getCustomerByEmail(@PathVariable String email) {
         CustomerResponse customer = customerService.getCustomerByEmail(email);
+        return ResponseEntity.ok(customer);
+    }
+    
+    @GetMapping("/document/{documentId}")
+    public ResponseEntity<ExistsResponse> checkDocumentIdExists(@PathVariable String documentId) {
+        boolean exists = customerService.existsByDocumentId(documentId);
+        return ResponseEntity.ok(new ExistsResponse(exists));
+    }
+    
+    @GetMapping("/document/{documentId}/customer")
+    public ResponseEntity<CustomerResponse> getCustomerByDocumentId(@PathVariable String documentId) {
+        CustomerResponse customer = customerService.getCustomerByDocumentId(documentId);
         return ResponseEntity.ok(customer);
     }
     

@@ -19,6 +19,7 @@ CREATE DATABASE customers_db;
 /*
 CREATE TABLE customers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL UNIQUE,
     document_id VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -30,7 +31,13 @@ CREATE TABLE customers (
 );
 
 -- Índices para mejorar rendimiento
+CREATE INDEX idx_customers_user_id ON customers(user_id);
 CREATE INDEX idx_customers_email ON customers(email);
 CREATE INDEX idx_customers_document_id ON customers(document_id);
 CREATE INDEX idx_customers_enabled ON customers(enabled);
+
+-- Restricciones de unicidad adicionales
+ALTER TABLE customers ADD CONSTRAINT uk_customers_user_id UNIQUE (user_id);
+ALTER TABLE customers ADD CONSTRAINT uk_customers_document_id UNIQUE (document_id);
+ALTER TABLE customers ADD CONSTRAINT uk_customers_email UNIQUE (email);
 */

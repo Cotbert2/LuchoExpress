@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CartService, CartItem, CartSummary } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
-import { CustomerService, CreateCustomerRequest } from '../../services/customer.service';
+import { CustomerService, CreateCustomerRequest, CustomerResponse } from '../../services/customer.service';
+import { UserResponse } from '../../interfaces/auth.interface';
 import { Subscription } from 'rxjs';
 
 // PrimeNG imports
@@ -54,6 +55,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   showCheckoutStepper: boolean = false;
   activeStepIndex: number = 0;
   
+  // User and Customer data
+  currentUser: UserResponse | null = null;
+  existingCustomer: CustomerResponse | null = null;
+  
   // Forms
   personalInfoForm!: FormGroup;
   shippingInfoForm!: FormGroup;
@@ -88,7 +93,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loadCart();
+    this.loadUserAndCart();
   }
 
   ngOnDestroy(): void {
@@ -119,8 +124,89 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Load cart data
+   * Load user data and cart
    */
+  private loadUserAndCart(): void {
+    // Get current user first
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.currentUser = user;
+        this.checkExistingCustomer(user.id);
+      } else {
+        // If no user in observable, fetch from server
+        this.authService.getCurrentUser().subscribe({
+          next: (fetchedUser) => {
+            this.currentUser = fetchedUser;
+            this.checkExistingCustomer(fetchedUser.id);
+          },
+          error: (error) => {
+            console.error('Error fetching user:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'User Error',
+              detail: 'Could not load user information',
+              life: 3000
+            });
+          }
+        });
+      }
+    });
+
+    this.loadCart();
+  }
+
+  /**
+   * Check if user already has a customer profile
+   */
+  private checkExistingCustomer(userId: string): void {
+    this.customerService.getCustomerByUserId(userId).subscribe({
+      next: (customer) => {
+        this.existingCustomer = customer;
+        this.preloadCustomerData(customer);
+      },
+      error: (error) => {
+        // Customer doesn't exist yet, which is fine
+        console.log('No existing customer found for user:', userId);
+        this.existingCustomer = null;
+      }
+    });
+  }
+
+  /**
+   * Preload customer data into forms
+   */
+  private preloadCustomerData(customer: CustomerResponse): void {
+    // Preload personal information
+    this.personalInfoForm.patchValue({
+      documentId: customer.documentId,
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone || ''
+    });
+
+    // If customer has address, try to parse it for shipping form
+    if (customer.address) {
+      this.parseAndLoadAddress(customer.address);
+    }
+  }
+
+  /**
+   * Parse address string and load into shipping form
+   * This is a simple implementation - you might want to enhance it based on your address format
+   */
+  private parseAndLoadAddress(address: string): void {
+    // Simple parsing - you might want to enhance this based on your address format
+    const parts = address.split(', ');
+    if (parts.length >= 4) {
+      this.shippingInfoForm.patchValue({
+        address: parts[0] || '',
+        city: parts[1] || '',
+        state: parts[2] || '',
+        zipCode: parts[3] || '',
+        country: parts[4] || ''
+      });
+    }
+  }
   private loadCart(): void {
     this.cartSubscription = this.cartService.cartItems$.subscribe(items => {
       this.cartItems = items;
@@ -221,6 +307,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Show the checkout stepper
     this.showCheckoutStepper = true;
     this.activeStepIndex = 0;
+
+    // Show message if customer data was preloaded
+    if (this.existingCustomer) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Customer Information Loaded',
+        detail: 'Your saved customer information has been preloaded. You can modify it if needed.',
+        life: 5000
+      });
+    }
   }
 
   /**
@@ -345,10 +441,35 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.currentUser) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'User Error',
+        detail: 'User information is not available',
+        life: 3000
+      });
+      return;
+    }
+
     this.isLoading = true;
     
-    // Create customer data from forms
+    if (this.existingCustomer) {
+      // Update existing customer if data has changed
+      this.updateExistingCustomerAndCompleteOrder();
+    } else {
+      // Create new customer
+      this.createNewCustomerAndCompleteOrder();
+    }
+  }
+
+  /**
+   * Create new customer and complete order
+   */
+  private createNewCustomerAndCompleteOrder(): void {
+    if (!this.currentUser) return;
+
     const customerData: CreateCustomerRequest = {
+      userId: this.currentUser.id,
       documentId: this.personalInfoForm.get('documentId')?.value,
       name: this.personalInfoForm.get('name')?.value,
       email: this.personalInfoForm.get('email')?.value,
@@ -356,32 +477,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       address: this.buildFullAddress()
     };
 
-    // Create customer first, then process order
     this.customerService.createCustomer(customerData).subscribe({
       next: (customer) => {
         console.log('Customer created successfully:', customer);
-        
-        // Simulate order processing
-        setTimeout(() => {
-          this.isLoading = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Order Placed Successfully!',
-            detail: `Thank you ${customer.name}! Your order has been placed and will be shipped to your address.`,
-            life: 5000
-          });
-          
-          // Clear cart after successful order
-          this.cartService.clearCart();
-          
-          // Reset stepper state and forms
-          this.resetCheckoutState();
-          
-          // Redirect to home or order confirmation page
-          setTimeout(() => {
-            this.router.navigate(['/home']);
-          }, 2000);
-        }, 2000);
+        this.completeOrderProcess(customer);
       },
       error: (error) => {
         this.isLoading = false;
@@ -394,6 +493,64 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  /**
+   * Update existing customer and complete order
+   */
+  private updateExistingCustomerAndCompleteOrder(): void {
+    if (!this.existingCustomer) return;
+
+    const updateData = {
+      name: this.personalInfoForm.get('name')?.value,
+      email: this.personalInfoForm.get('email')?.value,
+      phone: this.personalInfoForm.get('phone')?.value,
+      address: this.buildFullAddress()
+    };
+
+    this.customerService.updateCustomer(this.existingCustomer.id, updateData).subscribe({
+      next: (customer) => {
+        console.log('Customer updated successfully:', customer);
+        this.completeOrderProcess(customer);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error updating customer:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Order Failed',
+          detail: error.message || 'There was an error processing your order. Please try again.',
+          life: 5000
+        });
+      }
+    });
+  }
+
+  /**
+   * Complete the order process after customer is created/updated
+   */
+  private completeOrderProcess(customer: CustomerResponse): void {
+    // Simulate order processing
+    setTimeout(() => {
+      this.isLoading = false;
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Order Placed Successfully!',
+        detail: `Thank you ${customer.name}! Your order has been placed and will be shipped to your address.`,
+        life: 5000
+      });
+      
+      // Clear cart after successful order
+      this.cartService.clearCart();
+      
+      // Reset stepper state and forms
+      this.resetCheckoutState();
+      
+      // Redirect to home or order confirmation page
+      setTimeout(() => {
+        this.router.navigate(['/home']);
+      }, 2000);
+    }, 2000);
   }
 
   /**
@@ -419,6 +576,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.activeStepIndex = 0;
     this.personalInfoForm.reset();
     this.shippingInfoForm.reset();
+    // Note: We don't clear existingCustomer here as it should persist for the session
   }
 
   /**
