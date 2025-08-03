@@ -1,3 +1,5 @@
+<p-toast position="top-right"></p-toast>
+
 <div class="full-container df ai-center jc-center">
     <div class="df item">
         <p-panel>
@@ -46,7 +48,7 @@
             </div>
 
 
-            <p-inputnumber [(ngModel)]="cuantity" prefix="↑ " inputId="Cuantity" suffix="units" [min]="1" [max]="product.stock" /> <br>
+            <p-inputnumber [(ngModel)]="cuantity" prefix="↑ " inputId="Cuantity" suffix="units" [min]="1" [max]="33" /> <br>
 
             <p-button icon="pi pi-shopping-cart"  label="Buy Now!" (onClick)="addToCart()"></p-button>
 

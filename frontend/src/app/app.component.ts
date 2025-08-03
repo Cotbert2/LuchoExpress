@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -12,7 +12,9 @@ import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from "./components/shared/footer/footer.component";
 import { AuthService } from './services/auth.service';
+import { CartService } from './services/cart.service';
 import { MessageService } from 'primeng/api';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -33,17 +35,30 @@ import { MessageService } from 'primeng/api';
   providers: [MessageService]
 })
 
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  title = 'Lucho Express';
+  itemInCart: any[] = [];
+  private cartSubscription?: Subscription;
+
   constructor(
     private router: Router,
     private authService: AuthService,
+    private cartService: CartService,
     private messageService: MessageService
   ) {}
   
   ngOnInit(): void {
+    // Subscribe to cart changes
+    this.cartSubscription = this.cartService.cartItems$.subscribe(items => {
+      this.itemInCart = items;
+    });
   }
-  
-  title = 'Lucho Express';
+
+  ngOnDestroy(): void {
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
+    }
+  }
 
   changeView(view: string): void {
     console.log('Navigating to:', view);
@@ -71,8 +86,5 @@ export class AppComponent implements OnInit {
   isUserLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }
-
-  itemInCart: any = [];
-  
 
 }

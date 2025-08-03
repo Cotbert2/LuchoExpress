@@ -51,7 +51,7 @@ export class HomeComponent implements OnInit {
 
 
   title = 'Lucho Express';
-  titles: string[] = ["We create", "We build", "We innovate", "We are Jackson Store"];
+  titles: string[] = ["We create", "We build", "We innovate", "We are Lucho Express"];
   currentTitle: string = this.titles[0];
   currentIndex: number = 0;
 
