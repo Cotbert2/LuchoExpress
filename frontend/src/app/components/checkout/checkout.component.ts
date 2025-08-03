@@ -17,7 +17,6 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { StepperModule } from 'primeng/stepper';
 import { DataViewModule } from 'primeng/dataview';
 import { RadioButtonModule } from 'primeng/radiobutton';
 
@@ -25,7 +24,6 @@ import { RadioButtonModule } from 'primeng/radiobutton';
   selector: 'app-checkout',
   imports: [
     CommonModule,
-    StepperModule,
     DataViewModule,
     RadioButtonModule,
     CardModule,
@@ -46,6 +44,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   cartSummary: CartSummary = { items: [], totalItems: 0, totalAmount: 0 };
   isLoading: boolean = false;
+  showCheckoutStepper: boolean = false;
+  activeStepIndex: number = 0;
   private cartSubscription?: Subscription;
 
   constructor(
@@ -181,6 +181,41 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Show the checkout stepper
+    this.showCheckoutStepper = true;
+    this.activeStepIndex = 0;
+  }
+
+  /**
+   * Go back to cart view
+   */
+  backToCart(): void {
+    this.showCheckoutStepper = false;
+    this.activeStepIndex = 0;
+  }
+
+  /**
+   * Move to next step in checkout process
+   */
+  nextStep(): void {
+    if (this.activeStepIndex < 2) {
+      this.activeStepIndex++;
+    }
+  }
+
+  /**
+   * Move to previous step in checkout process
+   */
+  previousStep(): void {
+    if (this.activeStepIndex > 0) {
+      this.activeStepIndex--;
+    }
+  }
+
+  /**
+   * Complete checkout process
+   */
+  completeCheckout(): void {
     this.isLoading = true;
     
     // Simulate checkout process
@@ -195,6 +230,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       
       // Clear cart after successful order
       this.cartService.clearCart();
+      
+      // Reset stepper state
+      this.showCheckoutStepper = false;
+      this.activeStepIndex = 0;
       
       // Redirect to home or order confirmation page
       setTimeout(() => {

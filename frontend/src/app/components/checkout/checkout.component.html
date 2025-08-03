@@ -40,6 +40,181 @@
     </p-toolbar>
   </div>
 
+  <!-- Checkout Stepper -->
+  <div *ngIf="showCheckoutStepper" class="checkout-stepper mb-6">
+    
+    <!-- Stepper Header -->
+    <div class="stepper-header mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-4">
+          
+          <!-- Step 1 -->
+          <div class="flex items-center">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300"
+                 [class]="activeStepIndex >= 0 ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 text-gray-400'">
+              <i class="pi pi-user"></i>
+            </div>
+            <span class="ml-2 text-sm font-medium" 
+                  [class]="activeStepIndex >= 0 ? 'text-blue-600' : 'text-gray-400'">
+              Personal Info
+            </span>
+          </div>
+
+          <!-- Connector 1 -->
+          <div class="flex-1 h-0.5 mx-4"
+               [class]="activeStepIndex >= 1 ? 'bg-blue-500' : 'bg-gray-300'">
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flex items-center">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300"
+                 [class]="activeStepIndex >= 1 ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 text-gray-400'">
+              <i class="pi pi-map-marker"></i>
+            </div>
+            <span class="ml-2 text-sm font-medium"
+                  [class]="activeStepIndex >= 1 ? 'text-blue-600' : 'text-gray-400'">
+              Shipping
+            </span>
+          </div>
+
+          <!-- Connector 2 -->
+          <div class="flex-1 h-0.5 mx-4"
+               [class]="activeStepIndex >= 2 ? 'bg-blue-500' : 'bg-gray-300'">
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flex items-center">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300"
+                 [class]="activeStepIndex >= 2 ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 text-gray-400'">
+              <i class="pi pi-check"></i>
+            </div>
+            <span class="ml-2 text-sm font-medium"
+                  [class]="activeStepIndex >= 2 ? 'text-blue-600' : 'text-gray-400'">
+              Confirmation
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step Content -->
+    <p-card styleClass="shadow-lg">
+      
+      <!-- Step 1: Personal Information -->
+      <div *ngIf="activeStepIndex === 0" class="step-content">
+        <div class="p-6">
+          <h3 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">Personal Information</h3>
+          <p class="text-gray-600 dark:text-gray-300 mb-6">Please provide your personal details for the order.</p>
+          
+          <!-- Placeholder for personal information form -->
+          <div class="bg-gray-50 dark:bg-gray-700 p-8 rounded-lg text-center border-2 border-dashed border-gray-300 dark:border-gray-600">
+            <i class="pi pi-user text-5xl text-gray-400 mb-4"></i>
+            <h4 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">Personal Information Form</h4>
+            <p class="text-sm text-gray-400">
+              This section will contain fields for:<br/>
+              • Full Name<br/>
+              • Email Address<br/>
+              • Phone Number<br/>
+              • Date of Birth (optional)
+            </p>
+          </div>
+
+          <div class="flex pt-6 justify-between">
+            <p-button 
+              label="Back to Cart" 
+              severity="secondary" 
+              icon="pi pi-arrow-left"
+              (onClick)="backToCart()">
+            </p-button>
+            <p-button 
+              label="Continue to Shipping" 
+              icon="pi pi-arrow-right" 
+              iconPos="right"
+              (onClick)="nextStep()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Shipping Information -->
+      <div *ngIf="activeStepIndex === 1" class="step-content">
+        <div class="p-6">
+          <h3 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">Shipping Information</h3>
+          <p class="text-gray-600 dark:text-gray-300 mb-6">Please provide your shipping address details.</p>
+          
+          <!-- Placeholder for shipping information form -->
+          <div class="bg-gray-50 dark:bg-gray-700 p-8 rounded-lg text-center border-2 border-dashed border-gray-300 dark:border-gray-600">
+            <i class="pi pi-map-marker text-5xl text-gray-400 mb-4"></i>
+            <h4 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">Shipping Information Form</h4>
+            <p class="text-sm text-gray-400">
+              This section will contain fields for:<br/>
+              • Street Address<br/>
+              • City, State, ZIP Code<br/>
+              • Country<br/>
+              • Delivery Instructions (optional)
+            </p>
+          </div>
+
+          <div class="flex pt-6 justify-between">
+            <p-button 
+              label="Back to Personal Info" 
+              severity="secondary" 
+              icon="pi pi-arrow-left"
+              (onClick)="previousStep()">
+            </p-button>
+            <p-button 
+              label="Review Order" 
+              icon="pi pi-arrow-right" 
+              iconPos="right"
+              (onClick)="nextStep()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirmation -->
+      <div *ngIf="activeStepIndex === 2" class="step-content">
+        <div class="p-6">
+          <h3 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">Order Confirmation</h3>
+          <p class="text-gray-600 dark:text-gray-300 mb-6">Please review your order details before completing the purchase.</p>
+          
+          <!-- Placeholder for order confirmation -->
+          <div class="bg-gray-50 dark:bg-gray-700 p-8 rounded-lg text-center border-2 border-dashed border-gray-300 dark:border-gray-600">
+            <i class="pi pi-check-circle text-5xl text-gray-400 mb-4"></i>
+            <h4 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">Order Confirmation</h4>
+            <p class="text-sm text-gray-400">
+              This section will display:<br/>
+              • Order Summary<br/>
+              • Personal & Shipping Details<br/>
+              • Payment Method<br/>
+              • Total Amount
+            </p>
+          </div>
+
+          <div class="flex pt-6 justify-between">
+            <p-button 
+              label="Back to Shipping" 
+              severity="secondary" 
+              icon="pi pi-arrow-left"
+              (onClick)="previousStep()">
+            </p-button>
+            <p-button 
+              label="Place Order" 
+              icon="pi pi-credit-card"
+              severity="success"
+              [loading]="isLoading"
+              loadingIcon="pi pi-spin pi-spinner"
+              (onClick)="completeCheckout()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Cart Content (hidden when stepper is shown) -->
+  <div *ngIf="!showCheckoutStepper">
+
   <!-- Empty Cart State -->
   <div *ngIf="cartItems.length === 0" class="empty-cart-state text-center py-16">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 max-w-md mx-auto">
@@ -224,4 +399,6 @@
       </div>
     </div>
   </div>
+
+  </div> <!-- End Cart Content -->
 </div>
