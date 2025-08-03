@@ -348,7 +348,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     } else if (this.activeStepIndex === 1) {
       // Validate shipping info form before proceeding
       if (this.shippingInfoForm.valid) {
-        this.activeStepIndex++;
+        // Update customer address when moving from step 1 to step 2
+        this.updateCustomerAddress();
       } else {
         this.markFormGroupTouched(this.shippingInfoForm);
         this.messageService.add({
@@ -483,6 +484,57 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Update customer address when moving from shipping step
+   */
+  private updateCustomerAddress(): void {
+    if (!this.existingCustomer) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Customer Error',
+        detail: 'Customer information is not available. Please go back to the personal information step.',
+        life: 3000
+      });
+      return;
+    }
+
+    this.isLoading = true;
+
+    const updateData = {
+      name: this.existingCustomer.name,
+      email: this.existingCustomer.email,
+      phone: this.existingCustomer.phone,
+      address: this.buildFullAddress()
+    };
+
+    this.customerService.updateCustomer(this.existingCustomer.id, updateData).subscribe({
+      next: (customer) => {
+        this.isLoading = false;
+        this.existingCustomer = customer;
+        this.activeStepIndex++;
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Address Updated',
+          detail: 'Your shipping address has been saved successfully.',
+          life: 3000
+        });
+        
+        console.log('Customer address updated successfully:', customer);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error updating customer address:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Address Update Failed',
+          detail: error.message || 'There was an error saving your shipping address. Please try again.',
+          life: 5000
+        });
+      }
+    });
+  }
+
+  /**
    * Mark all fields in a form group as touched to trigger validation messages
    */
   private markFormGroupTouched(formGroup: FormGroup): void {
@@ -574,40 +626,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     
-    // Update customer address with shipping information before completing order
-    this.updateCustomerAddressAndCompleteOrder();
-  }
-
-  /**
-   * Update customer address with shipping information and complete order
-   */
-  private updateCustomerAddressAndCompleteOrder(): void {
-    if (!this.existingCustomer) return;
-
-    const updateData = {
-      name: this.personalInfoForm.get('name')?.value,
-      email: this.personalInfoForm.get('email')?.value,
-      phone: this.personalInfoForm.get('phone')?.value,
-      address: this.buildFullAddress()
-    };
-
-    this.customerService.updateCustomer(this.existingCustomer.id, updateData).subscribe({
-      next: (customer) => {
-        console.log('Customer address updated successfully:', customer);
-        this.existingCustomer = customer;
-        this.completeOrderProcess(customer);
-      },
-      error: (error) => {
-        this.isLoading = false;
-        console.error('Error updating customer address:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Order Failed',
-          detail: error.message || 'There was an error processing your order. Please try again.',
-          life: 5000
-        });
-      }
-    });
+    // Complete the order process directly since customer and address are already updated
+    this.completeOrderProcess(this.existingCustomer);
   }
 
   /**

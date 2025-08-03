@@ -353,7 +353,8 @@
               label="Review Order" 
               icon="pi pi-arrow-right" 
               iconPos="right"
-              [disabled]="isLoading"
+              [loading]="isLoading"
+              loadingIcon="pi pi-spin pi-spinner"
               (onClick)="nextStep()">
             </p-button>
           </div>
