@@ -10,12 +10,13 @@ import { CardModule } from 'primeng/card';
 import { CarouselModule } from 'primeng/carousel';
 import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
+import { FooterComponent } from "./components/shared/footer/footer.component";
 
 
 @Component({
   selector: 'app-root',
   imports: [RouterModule, ButtonModule,
-        CommonModule,
+    CommonModule,
     ButtonModule,
     ToolbarModule,
     AvatarModule,
@@ -24,8 +25,7 @@ import { FormsModule } from '@angular/forms';
     CardModule,
     CarouselModule,
     TagModule,
-    FormsModule
-  ],
+    FormsModule, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
