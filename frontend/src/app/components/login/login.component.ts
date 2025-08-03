@@ -168,8 +168,6 @@ export class LoginComponent implements OnInit, OnDestroy {
             summary: 'Success',
             detail: 'Login successful!'
           });
-          // Navigate to dashboard or home page
-          // this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           console.error('Login error:', error);

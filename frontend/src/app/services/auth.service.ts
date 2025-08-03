@@ -13,12 +13,28 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    this.loadUserFromStorage();
+    this.initializeAuth();
   }
 
-  /**
-   * Login with username and password
-   */
+
+  private initializeAuth(): void {
+    const token = this.getToken();
+    if (token && !this.isTokenExpired(token)) {
+      this.loadUserFromStorage();
+      this.getCurrentUser().subscribe({
+        next: (data) => {
+          console.log('User loaded successfully from token', data);
+        },
+        error: (err) => {
+          console.error('Invalid token, clearing storage',err);
+          this.logout();
+        }
+      });
+    } else {
+      this.logout();
+    }
+  }
+
   login(loginRequest: LoginRequest): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(`${this.API_URL}/token`, loginRequest)
       .pipe(
@@ -29,17 +45,13 @@ export class AuthService {
       );
   }
 
-  /**
-   * Register a new user
-   */
   register(registerRequest: RegisterRequest): Observable<UserResponse> {
     return this.http.post<UserResponse>(`${this.API_URL}/register`, registerRequest);
   }
 
-  /**
-   * Get current authenticated user
-   */
+
   getCurrentUser(): Observable<UserResponse> {
+    console.log('Fetching current user from server');
     return this.http.get<UserResponse>(`${this.API_URL}/me`)
       .pipe(
         tap((user: UserResponse) => {
@@ -49,13 +61,9 @@ export class AuthService {
       );
   }
 
-  /**
-   * Logout user
-   */
+
   logout(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('current_user');
-    this.currentUserSubject.next(null);
+    this.clearStorage();
   }
 
   /**
@@ -66,46 +74,42 @@ export class AuthService {
     return !!token && !this.isTokenExpired(token);
   }
 
-  /**
-   * Get stored token
-   */
+
   getToken(): string | null {
     return localStorage.getItem('access_token');
   }
 
-  /**
-   * Set token in localStorage
-   */
   private setToken(token: string): void {
     localStorage.setItem('access_token', token);
   }
 
-  /**
-   * Set user data in localStorage
-   */
   private setUserInStorage(user: UserResponse): void {
     localStorage.setItem('current_user', JSON.stringify(user));
   }
 
-  /**
-   * Load user from localStorage on service initialization
-   */
   private loadUserFromStorage(): void {
     const userStr = localStorage.getItem('current_user');
-    if (userStr) {
+    const token = this.getToken();
+    
+    if (userStr && token && !this.isTokenExpired(token)) {
       try {
         const user = JSON.parse(userStr);
         this.currentUserSubject.next(user);
       } catch (e) {
         console.error('Error parsing user from localStorage', e);
-        localStorage.removeItem('current_user');
+        this.clearStorage();
       }
+    } else {
+      this.clearStorage();
     }
   }
 
-  /**
-   * Check if token is expired
-   */
+  private clearStorage(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('current_user');
+    this.currentUserSubject.next(null);
+  }
+
   private isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
@@ -116,9 +120,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Get authorization headers
-   */
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders({

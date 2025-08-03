@@ -162,9 +162,15 @@ public class UserService {
     }
     
     private String extractUsernameFromToken(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof String username) {
+            return username;
+        }
         if (authentication.getPrincipal() instanceof Jwt jwt) {
             return jwt.getClaimAsString("username");
         }
-        throw new InvalidCredentialsException("Invalid token format");
+        if (authentication.getName() != null) {
+            return authentication.getName();
+        }
+        throw new InvalidCredentialsException("Invalid authentication format");
     }
 }
