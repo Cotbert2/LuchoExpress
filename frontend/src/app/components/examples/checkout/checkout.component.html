@@ -1,0 +1,400 @@
+<div *ngIf="!isCheckoutSuccess">
+
+<p-stepper [value]="1" [linear]="false" class="stepper">
+    <p-step-item [value]="1">
+        <p-step>Log In</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col h-48">
+                    <div class="container-step">
+                        <h3>Log In</h3>
+
+                        <div *ngIf="session.id" class="loginstatus">
+                            <p>Your are already logged {{session.name}}!</p>
+                        </div>
+
+                        <div *ngIf="!session.id" class="loginstatus">
+                            <p>You neeed to Log In to your jackson's account</p>
+                            <p-button icon="pi pi-sign-in" label="Log In" severity="info"
+                                (onClick)="changeCurrentView('login')"></p-button>
+                        </div>
+
+                        <div class="right-button">
+                            <p-button icon="pi pi-arrow-right" [disabled]="!session.id" label="Next"
+                                (onClick)="activateCallback(2)" />
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+
+    <p-step-item [value]="2">
+        <p-step>Bill Info</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col h-48">
+                    <div
+                        class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">
+                        <div class="container-step">
+                            <h3>Let us know your Billing information</h3>
+
+                            <div class="form-customer">
+                                <p-floatlabel variant="in">
+                                    <input pInputText id="name" autocomplete="off" [(ngModel)]="customerData.name"
+                                        [disabled]="customerCreated" />
+                                    <label for="name">
+                                        <i class="pi pi-pen-to-square"></i>
+                                        {{'Your Full Name'}}</label>
+                                </p-floatlabel>
+
+                                <!--phone-->
+
+                                <p-floatlabel variant="in">
+                                    <input pInputText id="phone" autocomplete="off" [(ngModel)]="customerData.phone"
+                                        [disabled]="customerCreated" />
+                                    <label for="phone">
+                                        <i class="pi pi-phone"></i>
+                                        {{'Your phone'}}</label>
+                                </p-floatlabel>
+
+                                <!--indentification-->
+
+                                <p-floatlabel variant="in">
+                                    <input pInputText id="identification" autocomplete="off"
+                                        [disabled]="customerCreated" [(ngModel)]="customerData.identification" />
+                                    <label for="identification">
+                                        <i class="pi pi-id-card"></i>
+                                        {{'Your identification'}}</label>
+                                </p-floatlabel>
+
+                            </div>
+                            <div class="right-button">
+                                <p-button label="Back" severity="secondary" (onClick)="activateCallback(1)" />
+                                <div *ngIf="!customerCreated">
+                                    <p-button label="Set" [disabled]="!validateCustomerData()"
+                                        (onClick)="createCustomer()" />
+                                </div>
+
+                                <div *ngIf="customerCreated">
+                                    <p-button label="Next" [disabled]="!validateCustomerData()"
+                                        (onClick)="activateCallback(3)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+
+    <p-step-item [value]="3">
+        <p-step>Shipping Address</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col h-48">
+                    <div
+                        class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">
+                        <div class="container-step shipping">
+                            <h3>We need information about your shipping address</h3>
+
+                            <div class="form-shipping-addess">
+                                <div class="combox-address">
+
+                                    <p-select [options]="countryComboConfig" [(ngModel)]="placesId.countryId"
+                                        placeholder="Select a country" [filter]="true" filterBy="label"
+                                        [showClear]="true">
+                                        <ng-template #dropdownicon>
+                                            <i class="pi pi-map"></i>
+                                        </ng-template>
+                                    </p-select>
+
+                                    <p-select [options]="placesId.countryId" [(ngModel)]="placesId.stateId"
+                                        [disabled]="!placesId.countryId" placeholder="Select a State" [filter]="true"
+                                        filterBy="label" [showClear]="true">
+                                        <ng-template #dropdownicon>
+                                            <i class="pi pi-map"></i>
+                                        </ng-template>
+                                    </p-select>
+
+                                    <p-select [options]="placesId.stateId" [(ngModel)]="placesId.cityId"
+                                        [disabled]="!placesId.stateId" placeholder="Select a City" [filter]="true"
+                                        filterBy="label" [showClear]="true">
+                                        <ng-template #dropdownicon>
+                                            <i class="pi pi-map"></i>
+                                        </ng-template>
+                                    </p-select>
+                                </div>
+                            </div>
+
+                            <!--zip code-->
+
+                            <p-floatlabel variant="in">
+                                <input pInputText id="zipCode" autocomplete="off" [(ngModel)]="shippingData.zipCode" />
+                                <label for="zipCode">
+                                    <i class="pi pi-map"></i>
+                                    {{'Your Zip Code'}}</label>
+                            </p-floatlabel>
+
+
+                            <!--Street 1-->
+
+                            <p-floatlabel variant="in">
+                                <input pInputText id="street1" autocomplete="off" [(ngModel)]="shippingData.street1" />
+                                <label for="street1">
+                                    <i class="pi pi-map"></i>
+                                    {{'Your Street 1'}}</label>
+                            </p-floatlabel>
+
+                            <!--Street 2-->
+
+                            <p-floatlabel variant="in">
+                                <input pInputText id="street2" autocomplete="off" [(ngModel)]="shippingData.street2" />
+                                <label for="street2">
+                                    <i class="pi pi-map"></i>
+                                    {{'Your Street 2'}}</label>
+                            </p-floatlabel>
+
+                            <!--Reference-->
+
+                            <p-floatlabel variant="in">
+                                <input pInputText id="reference" autocomplete="off"
+                                    [(ngModel)]="shippingData.reference" />
+                                <label for="reference">
+                                    <i class="pi pi-map"></i>
+                                    {{'Your Reference'}}</label>
+                            </p-floatlabel>
+                            <div class="right-button">
+                                <p-button label="Back" severity="secondary" (onClick)="activateCallback(2)" />
+                                <p-button label="Next" [disabled]="!validateShippingData()"
+                                    (onClick)="activateCallback(4)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+
+
+
+
+
+
+
+
+    <p-step-item [value]="4">
+        <p-step>Products Selected</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col h-48">
+                    <div
+                        class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">
+
+
+                        <div class="container-step">
+                            <p-dataview #dv [value]="cartItems">
+                                <ng-template #list let-items>
+                                    <div *ngFor="let item of items" class="p-col-12 p">
+                                        <div class="w-100 w-full df ai-center jc-space-between p-4">
+                                            <div class="df ai-center">
+                                                <div class="image-container">
+
+                                                    <img [src]="item.product.image">
+                                                </div>
+                                                <div class="m-1">
+                                                    <h3>{{item.product.name}}</h3>
+                                                    <p>{{"$" + item.product.price}}</p>
+                                                </div>
+                                            </div>
+                                            <div class="df ai-center jc-space-between">
+                                                <div class="m-1">
+                                                    <p>
+                                                        total : {{item.product.price * item.cuantity}} $
+                                                    </p>
+                                                </div>
+                                                <div class="df m-1">
+                                                    <p-inputnumber [(ngModel)]="item.cuantity" prefix="↑ "
+                                                        inputId="Cuantity" suffix="units" [min]="1"
+                                                        [max]="item.product.stock" /> <br>
+
+                                                    <p-button icon="pi pi-trash" severity="danger"
+                                                        (onClick)="removeItem(item)" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <p-divider />
+
+                            </p-dataview>
+
+
+                            <div class="right-button">
+                                <p-button label="Back" severity="secondary" (onClick)="activateCallback(3)" />
+                                <p-button label="Next" [disabled]="!cartItems.length" (onClick)="activateCallback(5)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+
+
+    <p-step-item [value]="5">
+        <p-step>Payment Methods</p-step>
+        <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+                <div class="flex flex-col h-48">
+                    <div
+                        class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">
+
+                        <div class="container-step payment">
+                            <h3>We almost done</h3>
+
+                            <div class="flex items-center" *ngFor="let option of userPaymentMethods.paymentMethods">
+                                <div *ngIf="option.paymentMethod == 'credit-card'" class="item-payment">
+                                    <p-radiobutton name="card" [value]="option" inputId="card" [(ngModel)]="selectedPaymentMethod" />
+                                    <label for="ingredient1" class="ml-2"> Card ended with {{getLast6Digits(option.creditCardNumber)}}</label>
+                                </div>
+
+
+                                <div *ngIf="option.paymentMethod == 'gift-card'" class="item-payment">
+                                    <p-radiobutton name="gift-card" [value]="option" inputId="gift-card" [(ngModel)]="selectedPaymentMethod"/>
+                                    <label for="gift-card" class="ml-2">{{option.giftCardAmount}} $ GiftCard</label>
+                                </div>
+                            </div>
+
+                            
+
+                            <!--divider-->
+
+                            <p-divider />
+
+
+                            <p>Add a new payment method instead</p>
+
+
+                            <p-select placeholder="Select a Payment method" [options]="paymentOptions"
+                                [(ngModel)]="currentPayment">
+                                <ng-template #dropdownicon>
+                                    <i class="pi pi-money-bill"></i>
+                                </ng-template>
+                            </p-select>
+
+                            <div class="payment-options" *ngIf="currentPayment == 'card'">
+
+                                <div class="df">
+
+                                    <!--Card name-->
+
+                                    <p-floatlabel variant="in">
+                                        <input pInputText id="cardName" autocomplete="off"
+                                            [(ngModel)]="cardData.name" />
+                                        <label for="cardName">
+                                            <i class="pi pi-credit-card"></i>
+                                            {{'Your Card Name'}}</label>
+                                    </p-floatlabel>
+
+
+                                    <!--Card number-->
+
+                                    <p-floatlabel variant="in">
+                                        <input pInputText id="cardNumber" autocomplete="off"
+                                            [(ngModel)]="cardData.number" />
+                                        <label for="cardNumber">
+                                            <i class="pi pi-credit-card"></i>
+                                            {{'Your Card Number'}}</label>
+
+
+                                    </p-floatlabel>
+                                </div>
+
+
+                                <div class="df">
+
+
+                                    <!--Card expiration-->
+                                    <p-floatlabel variant="in">
+                                        <input pInputText id="cardExpiration" autocomplete="off"
+                                            [(ngModel)]="cardData.expiration" />
+                                        <label for="cardExpiration">
+                                            <i class="pi pi-credit-card"></i>
+                                            {{'Your Card Expiration'}}</label>
+                                    </p-floatlabel>
+
+                                    <!--Card cvv-->
+
+
+
+                                    <p-floatlabel variant="in">
+                                        <input pInputText id="cardCvv" autocomplete="off" [(ngModel)]="cardData.cvv" />
+                                        <label for="cardCvv">
+                                            <i class="pi pi-credit-card"></i>
+                                            {{'Your Card CVV'}}</label>
+                                    </p-floatlabel>
+
+                                </div>
+
+                                <div class="w-100 df jc-center">
+                                    <p-button label="Register Card" icon="pi pi-credit-card"
+                                        [disabled]="!validateCardData()" (onClick)="registerCard()"></p-button>
+                                </div>
+
+
+
+
+                            </div>
+
+                            <div class="payment-options" *ngIf="currentPayment == 'giftCard'">
+
+                                <div>
+                                    <p class="ta-center">Advice: Gift card are not accumulative, so you need to use a
+                                        gift card with an
+                                        amount greater or equal to the shipping order</p>
+
+
+                                    <div class="df ai-center jc-center">
+
+                                        <p-floatlabel variant="in">
+                                            <input pInputText id="giftCard" autocomplete="off" [(ngModel)]="giftCard" />
+                                            <label for="giftCard">
+                                                <i class="pi pi-credit-card"></i>
+                                                {{'Your Gift Card'}}</label>
+                                        </p-floatlabel>
+                                        <p-button label="Validate Gift Card" icon="pi pi-credit-card"
+                                            [disabled]="!validateGiftCard()" (onClick)="registerGiftCard()"></p-button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="payment-options" *ngIf="currentPayment == 'paypal'">
+                                <p-button label="Pay with Paypal" icon="pi pi-paypal"
+                                    (onClick)="payWithPaypal()"></p-button>
+                            </div>
+
+
+                            <div class="df jc-center">
+                                <p-button label="Pay!" icon="pi pi-credit-card"
+                                    [disabled]="validatePaymentData" (onClick)="pay()"></p-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-step-panel>
+    </p-step-item>
+</p-stepper>
+
+
+</div>
+
+<div *ngIf="isCheckoutSuccess" class="success-checkout">
+    <div>
+        <p class="title">Congrats!</p>
+        <p>Your order has been placed successfully</p>
+        <i class="pi pi-verified"></i>
+    </div>
+</div>

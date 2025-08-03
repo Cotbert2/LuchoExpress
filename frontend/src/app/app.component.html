@@ -11,22 +11,32 @@
 
     <ng-template #end>
       <div class="flex items-center">
-        <button class="text-2xl text-gray-600 cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors" (click)="changeView('checkout')">
+        <button 
+          class="toolbar-button text-2xl text-gray-600 cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors" 
+          (click)="handleCartClick()"
+          [title]="isUserLoggedIn() ? 'Ir al carrito' : 'Iniciar sesión para ver carrito'">
           <i class="pi pi-shopping-cart text-xl"></i>
         </button>
 
-        <div class="bg-red-500 relative -left-8 -top-4 px-1 py-0.5 rounded-full text-xs text-white" *ngIf="itemInCart.length > 0">
-          <p class="text-xs text-white">{{itemInCart.length}}</p>
+        <div class="items-container" *ngIf="itemInCart.length > 0">
+          <p class="items-in-cart">{{itemInCart.length}}</p>
         </div>
-        <button class="text-2xl text-gray-600 cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors" (click)="changeView('login')">
+
+        <button 
+          class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"
+          [class.text-green-600]="isUserLoggedIn()"
+          [class.text-gray-600]="!isUserLoggedIn()"
+          (click)="changeView('login')"
+          [title]="isUserLoggedIn() ? 'Usuario conectado - Ir a perfil' : 'Iniciar sesión'">
           <i class="pi pi-user text-xl"></i>
+          <span *ngIf="isUserLoggedIn()" class="user-status-indicator"></span>
         </button>
       </div>
     </ng-template>
   </p-toolbar>
 
+<p-toast position="top-right"></p-toast>
+
 <router-outlet></router-outlet>
-
-
 
 <app-footer/>
