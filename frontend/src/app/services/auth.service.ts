@@ -36,11 +36,21 @@ export class AuthService {
   }
 
   login(loginRequest: LoginRequest): Observable<TokenResponse> {
+    console.log('Login request:', loginRequest);
     return this.http.post<TokenResponse>(`${this.API_URL}/token`, loginRequest)
       .pipe(
         tap((response: TokenResponse) => {
+          console.log('Login response received:', response);
           this.setToken(response.accessToken);
-          this.getCurrentUser().subscribe();
+          console.log('Token saved to localStorage');
+          this.getCurrentUser().subscribe({
+            next: (user) => {
+              console.log('User loaded after login:', user);
+            },
+            error: (err) => {
+              console.error('Error loading user after login:', err);
+            }
+          });
         })
       );
   }
@@ -52,9 +62,24 @@ export class AuthService {
 
   getCurrentUser(): Observable<UserResponse> {
     console.log('Fetching current user from server');
-    return this.http.get<UserResponse>(`${this.API_URL}/me`)
+    const token = this.getToken();
+    console.log('Token exists:', !!token);
+    console.log('Token (first 50 chars):', token ? token.substring(0, 50) + '...' : 'null');
+    
+    if (!token) {
+      console.error('No token available for request');
+    }
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    console.log('Request headers:', headers);
+    
+    return this.http.get<UserResponse>(`${this.API_URL}/me`, { headers })
       .pipe(
         tap((user: UserResponse) => {
+          console.log('User received from server:', user);
           this.currentUserSubject.next(user);
           this.setUserInStorage(user);
         })
