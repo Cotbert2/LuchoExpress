@@ -17,11 +17,17 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { StepperModule } from 'primeng/stepper';
+import { DataViewModule } from 'primeng/dataview';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @Component({
   selector: 'app-checkout',
   imports: [
     CommonModule,
+    StepperModule,
+    DataViewModule,
+    RadioButtonModule,
     CardModule,
     ButtonModule,
     InputNumberModule,
