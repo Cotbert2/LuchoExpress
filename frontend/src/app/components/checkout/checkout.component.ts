@@ -334,7 +334,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     if (this.activeStepIndex === 0) {
       // Validate personal info form before proceeding
       if (this.personalInfoForm.valid) {
-        this.activeStepIndex++;
+        // Create or update customer when moving from step 0 to step 1
+        this.createOrUpdateCustomer();
       } else {
         this.markFormGroupTouched(this.personalInfoForm);
         this.messageService.add({
@@ -369,6 +370,116 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     if (this.activeStepIndex > 0) {
       this.activeStepIndex--;
     }
+  }
+
+  /**
+   * Create or update customer when moving from personal info step
+   */
+  private createOrUpdateCustomer(): void {
+    if (!this.currentUser) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'User Error',
+        detail: 'User information is not available',
+        life: 3000
+      });
+      return;
+    }
+
+    this.isLoading = true;
+
+    if (this.existingCustomer) {
+      // Update existing customer
+      this.updateCustomerData();
+    } else {
+      // Create new customer
+      this.createNewCustomer();
+    }
+  }
+
+  /**
+   * Create new customer
+   */
+  private createNewCustomer(): void {
+    if (!this.currentUser) return;
+
+    const customerData: CreateCustomerRequest = {
+      userId: this.currentUser.id,
+      documentId: this.personalInfoForm.get('documentId')?.value,
+      name: this.personalInfoForm.get('name')?.value,
+      email: this.personalInfoForm.get('email')?.value,
+      phone: this.personalInfoForm.get('phone')?.value,
+      address: '' // Address will be updated in step 2
+    };
+
+    this.customerService.createCustomer(customerData).subscribe({
+      next: (customer) => {
+        this.isLoading = false;
+        this.existingCustomer = customer;
+        this.activeStepIndex++;
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Customer Created',
+          detail: 'Your customer information has been saved successfully.',
+          life: 3000
+        });
+        
+        console.log('Customer created successfully:', customer);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error creating customer:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Customer Creation Failed',
+          detail: error.message || 'There was an error saving your customer information. Please try again.',
+          life: 5000
+        });
+      }
+    });
+  }
+
+  /**
+   * Update existing customer data
+   */
+  private updateCustomerData(): void {
+    if (!this.existingCustomer) return;
+
+    const updateData = {
+      name: this.personalInfoForm.get('name')?.value,
+      email: this.personalInfoForm.get('email')?.value,
+      phone: this.personalInfoForm.get('phone')?.value,
+      // Keep existing address if available, will be updated in step 2
+      address: this.existingCustomer.address || ''
+    };
+
+    this.customerService.updateCustomer(this.existingCustomer.id, updateData).subscribe({
+      next: (customer) => {
+        this.isLoading = false;
+        this.existingCustomer = customer;
+        this.activeStepIndex++;
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Customer Updated',
+          detail: 'Your customer information has been updated successfully.',
+          life: 3000
+        });
+        
+        console.log('Customer updated successfully:', customer);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error updating customer:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Customer Update Failed',
+          detail: error.message || 'There was an error updating your customer information. Please try again.',
+          life: 5000
+        });
+      }
+    });
   }
 
   /**
@@ -451,54 +562,26 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.existingCustomer) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Customer Error',
+        detail: 'Customer information is not available',
+        life: 3000
+      });
+      return;
+    }
+
     this.isLoading = true;
     
-    if (this.existingCustomer) {
-      // Update existing customer if data has changed
-      this.updateExistingCustomerAndCompleteOrder();
-    } else {
-      // Create new customer
-      this.createNewCustomerAndCompleteOrder();
-    }
+    // Update customer address with shipping information before completing order
+    this.updateCustomerAddressAndCompleteOrder();
   }
 
   /**
-   * Create new customer and complete order
+   * Update customer address with shipping information and complete order
    */
-  private createNewCustomerAndCompleteOrder(): void {
-    if (!this.currentUser) return;
-
-    const customerData: CreateCustomerRequest = {
-      userId: this.currentUser.id,
-      documentId: this.personalInfoForm.get('documentId')?.value,
-      name: this.personalInfoForm.get('name')?.value,
-      email: this.personalInfoForm.get('email')?.value,
-      phone: this.personalInfoForm.get('phone')?.value,
-      address: this.buildFullAddress()
-    };
-
-    this.customerService.createCustomer(customerData).subscribe({
-      next: (customer) => {
-        console.log('Customer created successfully:', customer);
-        this.completeOrderProcess(customer);
-      },
-      error: (error) => {
-        this.isLoading = false;
-        console.error('Error creating customer:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Order Failed',
-          detail: error.message || 'There was an error processing your order. Please try again.',
-          life: 5000
-        });
-      }
-    });
-  }
-
-  /**
-   * Update existing customer and complete order
-   */
-  private updateExistingCustomerAndCompleteOrder(): void {
+  private updateCustomerAddressAndCompleteOrder(): void {
     if (!this.existingCustomer) return;
 
     const updateData = {
@@ -510,12 +593,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     this.customerService.updateCustomer(this.existingCustomer.id, updateData).subscribe({
       next: (customer) => {
-        console.log('Customer updated successfully:', customer);
+        console.log('Customer address updated successfully:', customer);
+        this.existingCustomer = customer;
         this.completeOrderProcess(customer);
       },
       error: (error) => {
         this.isLoading = false;
-        console.error('Error updating customer:', error);
+        console.error('Error updating customer address:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Order Failed',

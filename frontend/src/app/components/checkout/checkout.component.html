@@ -198,12 +198,15 @@
               label="Back to Cart" 
               severity="secondary" 
               icon="pi pi-arrow-left"
+              [disabled]="isLoading"
               (onClick)="backToCart()">
             </p-button>
             <p-button 
               label="Continue to Shipping" 
               icon="pi pi-arrow-right" 
               iconPos="right"
+              [loading]="isLoading"
+              loadingIcon="pi pi-spin pi-spinner"
               (onClick)="nextStep()">
             </p-button>
           </div>
@@ -343,12 +346,14 @@
               label="Back to Personal Info" 
               severity="secondary" 
               icon="pi pi-arrow-left"
+              [disabled]="isLoading"
               (onClick)="previousStep()">
             </p-button>
             <p-button 
               label="Review Order" 
               icon="pi pi-arrow-right" 
               iconPos="right"
+              [disabled]="isLoading"
               (onClick)="nextStep()">
             </p-button>
           </div>
@@ -444,6 +449,7 @@
               label="Back to Shipping" 
               severity="secondary" 
               icon="pi pi-arrow-left"
+              [disabled]="isLoading"
               (onClick)="previousStep()">
             </p-button>
             <p-button 
