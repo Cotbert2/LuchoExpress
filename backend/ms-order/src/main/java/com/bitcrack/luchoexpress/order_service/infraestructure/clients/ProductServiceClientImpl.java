@@ -38,18 +38,4 @@ public class ProductServiceClientImpl implements ProductServiceClient {
             return new ProductValidationResponse(productId, null, null, false);
         }
     }
-    
-    @Override
-    public boolean productExists(UUID productId) {
-        try {
-            log.info("Checking existence of product with ID: {}", productId);
-            
-            ProductServiceFeignClient.ExistsResponse response = productServiceFeignClient.productExists(productId);
-            return response.exists();
-            
-        } catch (FeignException e) {
-            log.error("Error checking product existence {}: {}", productId, e.getMessage());
-            return false;
-        }
-    }
 }

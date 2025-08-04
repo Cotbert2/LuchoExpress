@@ -12,9 +12,6 @@ public interface ProductServiceFeignClient {
     @GetMapping("/api/products/{id}")
     ProductDto getProductById(@PathVariable("id") UUID productId);
     
-    @GetMapping("/api/products/{id}/exists")
-    ExistsResponse productExists(@PathVariable("id") UUID productId);
-    
     // DTOs for Feign communication
     record ProductDto(
         UUID id,
@@ -22,7 +19,18 @@ public interface ProductServiceFeignClient {
         java.math.BigDecimal price,
         UUID categoryId,
         String description,
-        String imageUrl
+        String imageUrl,
+        String createdAt,
+        String updatedAt,
+        CategoryDto category
+    ) {}
+    
+    record CategoryDto(
+        UUID id,
+        String name,
+        String description,
+        String createdAt,
+        String updatedAt
     ) {}
     
     record ExistsResponse(

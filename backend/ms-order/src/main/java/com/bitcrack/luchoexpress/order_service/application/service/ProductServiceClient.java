@@ -7,6 +7,4 @@ import java.util.UUID;
 public interface ProductServiceClient {
     
     ProductValidationResponse validateProduct(UUID productId);
-    
-    boolean productExists(UUID productId);
 }

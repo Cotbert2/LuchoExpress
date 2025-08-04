@@ -3,6 +3,7 @@ package com.bitcrack.luchoexpress.order_service.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -11,14 +12,16 @@ import java.util.UUID;
 @Table(name = "order_products")
 @Data
 @NoArgsConstructor
+@ToString(exclude = "order") // Evita problemas de recursión infinita
 public class OrderProduct {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     
-    @Column(nullable = false)
-    private UUID orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
     
     @Column(nullable = false)
     private UUID productId;

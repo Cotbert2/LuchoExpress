@@ -29,7 +29,7 @@ public class Order {
     @Column(nullable = false)
     private UUID customerId;
     
-    @OneToMany(mappedBy = "orderId", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<OrderProduct> products = new ArrayList<>();
     
     @Column(nullable = false)
@@ -68,7 +68,7 @@ public class Order {
     // Business methods
     public void addProduct(OrderProduct product) {
         products.add(product);
-        product.setOrderId(this.id);
+        product.setOrder(this);  // Establece la relación bidireccional
         calculateTotalAmount();
     }
     
