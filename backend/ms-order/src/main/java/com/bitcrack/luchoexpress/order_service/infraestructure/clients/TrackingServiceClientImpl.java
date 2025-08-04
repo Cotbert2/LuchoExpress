@@ -8,34 +8,36 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class TrackingServiceClientImpl implements TrackingServiceClient {
     
-    private final TrackingServiceFeignClient trackingServiceFeignClient;
+    private final TrackingOrdersServiceFeignClient trackingOrdersServiceFeignClient;
     
     @Override
     @Async
     public void notifyOrderCreated(Order order) {
         try {
-            log.info("Notifying tracking service of order creation: {}", order.getId());
+            log.info("Creating tracking for order: {}", order.getId());
             
-            TrackingServiceFeignClient.OrderNotificationDto notification = 
-                new TrackingServiceFeignClient.OrderNotificationDto(
+            TrackingOrdersServiceFeignClient.TrackingStatusDto trackingStatus = 
+                new TrackingOrdersServiceFeignClient.TrackingStatusDto(
                     order.getId(),
                     order.getOrderNumber(),
                     order.getCustomerId(),
                     order.getStatus().name(),
-                    "ORDER_CREATED"
+                    LocalDateTime.now()
                 );
             
-            trackingServiceFeignClient.notifyOrderCreated(notification);
+            trackingOrdersServiceFeignClient.createOrUpdateTracking(trackingStatus);
             
-            log.info("Successfully notified tracking service of order creation: {}", order.getId());
+            log.info("Successfully created tracking for order: {}", order.getId());
             
         } catch (FeignException e) {
-            log.error("Failed to notify tracking service of order creation {}: {}", order.getId(), e.getMessage());
+            log.error("Failed to create tracking for order {}: {}", order.getId(), e.getMessage());
             // Don't rethrow - this should not fail the order creation
         }
     }
@@ -44,23 +46,23 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
     @Async
     public void notifyOrderUpdated(Order order) {
         try {
-            log.info("Notifying tracking service of order update: {}", order.getId());
+            log.info("Updating tracking for order: {}", order.getId());
             
-            TrackingServiceFeignClient.OrderNotificationDto notification = 
-                new TrackingServiceFeignClient.OrderNotificationDto(
+            TrackingOrdersServiceFeignClient.TrackingStatusDto trackingStatus = 
+                new TrackingOrdersServiceFeignClient.TrackingStatusDto(
                     order.getId(),
                     order.getOrderNumber(),
                     order.getCustomerId(),
                     order.getStatus().name(),
-                    "ORDER_UPDATED"
+                    LocalDateTime.now()
                 );
             
-            trackingServiceFeignClient.notifyOrderUpdated(notification);
+            trackingOrdersServiceFeignClient.createOrUpdateTracking(trackingStatus);
             
-            log.info("Successfully notified tracking service of order update: {}", order.getId());
+            log.info("Successfully updated tracking for order: {}", order.getId());
             
         } catch (FeignException e) {
-            log.error("Failed to notify tracking service of order update {}: {}", order.getId(), e.getMessage());
+            log.error("Failed to update tracking for order {}: {}", order.getId(), e.getMessage());
             // Don't rethrow - this should not fail the order update
         }
     }
