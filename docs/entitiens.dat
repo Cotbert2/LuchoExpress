@@ -1,5 +1,6 @@
 Customer {
     id: UUID
+    userId: UUID
     documentId: string
     name: string
     birthDate: Date

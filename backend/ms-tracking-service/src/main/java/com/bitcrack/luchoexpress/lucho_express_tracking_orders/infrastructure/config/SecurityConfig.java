@@ -27,9 +27,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/tracking/**").permitAll()
                 
                 // Protected endpoints
-                .requestMatchers(HttpMethod.GET, "/api/tracking/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/tracking/update").hasAnyRole("ADMIN", "ROOT")
                 
                 .anyRequest().authenticated()
