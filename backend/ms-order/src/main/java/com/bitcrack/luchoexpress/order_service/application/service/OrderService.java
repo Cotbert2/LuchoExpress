@@ -29,6 +29,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final ProductServiceClient productServiceClient;
     private final TrackingServiceClient trackingServiceClient;
+    private final CustomerServiceClient customerServiceClient;
     
     public OrderResponse createOrder(CreateOrderRequest request, Authentication authentication) {
         log.info("Creating order for customer: {}", request.getCustomerId());
@@ -152,11 +153,18 @@ public class OrderService {
             return;
         }
 
-        //TODO: implement logic to ensure customerId matches the authenticated user
-        // UUID tokenCustomerId = extractCustomerIdFromToken(authentication);
-        // if (!customerId.equals(tokenCustomerId)) {
-        //     throw new UnauthorizedAccessException("You can only create orders for yourself" + customerId + " but token has " + tokenCustomerId);
-        // }
+        // For CLIENTE role, verify that the customerId in the request matches
+        // the customer associated with the authenticated user
+        UUID userId = extractUserIdFromToken(authentication);
+        CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerByUserId(userId);
+        
+        if (!customerInfo.customerId().equals(customerId)) {
+            throw new UnauthorizedAccessException(
+                String.format("You can only create orders for yourself. " +
+                    "Requested customer ID: %s, but your customer ID is: %s", 
+                    customerId, customerInfo.customerId())
+            );
+        }
     }
     
     private void validateAdminAccess(Authentication authentication) {
@@ -203,5 +211,27 @@ public class OrderService {
             }
         }
         throw new UnauthorizedAccessException("Invalid token: customer ID not found");
+    }
+    
+    private UUID extractUserIdFromToken(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            // Try to get userId first (matching ms-auth format)
+            String userIdString = jwt.getClaimAsString("userId");
+            if (userIdString != null) {
+                return UUID.fromString(userIdString);
+            }
+            
+            // Fallback: try to get from sub claim
+            userIdString = jwt.getClaimAsString("sub");
+            if (userIdString != null) {
+                // Check if sub is already a UUID
+                try {
+                    return UUID.fromString(userIdString);
+                } catch (IllegalArgumentException e) {
+                    // sub is username, look for userId in other claims
+                }
+            }
+        }
+        throw new UnauthorizedAccessException("Invalid token: user ID not found");
     }
 }
