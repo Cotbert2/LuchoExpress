@@ -78,8 +78,12 @@ public class OrderService {
     
     @Transactional(readOnly = true)
     public List<OrderResponse> getMyOrders(Authentication authentication) {
-        UUID customerId = extractCustomerIdFromToken(authentication);
-        log.info("Fetching orders for customer: {}", customerId);
+        // Extract userId from token, then get the associated customer
+        UUID userId = extractUserIdFromToken(authentication);
+        CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerByUserId(userId);
+        UUID customerId = customerInfo.customerId();
+        
+        log.info("Fetching orders for customer: {} (user: {})", customerId, userId);
         
         List<Order> orders = orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
         return orders.stream()
@@ -108,9 +112,19 @@ public class OrderService {
         
         // Check access permissions
         String role = extractRoleFromToken(authentication);
-        UUID userId = extractCustomerIdFromToken(authentication);
         
-        if (!order.canBeViewedBy(role, userId)) {
+        UUID customerId;
+        if ("ADMIN".equals(role) || "ROOT".equals(role)) {
+            // Admin/Root can view any order, use the order's customerId
+            customerId = order.getCustomerId();
+        } else {
+            // For regular users, get their customerId from the customer service
+            UUID userId = extractUserIdFromToken(authentication);
+            CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerByUserId(userId);
+            customerId = customerInfo.customerId();
+        }
+        
+        if (!order.canBeViewedBy(role, customerId)) {
             throw new UnauthorizedAccessException("You don't have permission to view this order");
         }
         
@@ -189,28 +203,6 @@ public class OrderService {
             }
         }
         return "USER"; // Default role
-    }
-    
-    private UUID extractCustomerIdFromToken(Authentication authentication) {
-        if (authentication.getPrincipal() instanceof Jwt jwt) {
-            // Try to get userId first (matching ms-auth format)
-            String userIdString = jwt.getClaimAsString("userId");
-            if (userIdString != null) {
-                return UUID.fromString(userIdString);
-            }
-            
-            // Fallback: try to get from sub claim
-            userIdString = jwt.getClaimAsString("sub");
-            if (userIdString != null) {
-                // Check if sub is already a UUID
-                try {
-                    return UUID.fromString(userIdString);
-                } catch (IllegalArgumentException e) {
-                    // sub is username, look for userId in other claims
-                }
-            }
-        }
-        throw new UnauthorizedAccessException("Invalid token: customer ID not found");
     }
     
     private UUID extractUserIdFromToken(Authentication authentication) {
