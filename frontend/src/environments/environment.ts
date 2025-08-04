@@ -4,5 +4,6 @@ export const environment = {
   authUrl: 'http://localhost:8080/auth',
   productsUrl: 'http://localhost:8085/api',
   customersUrl: 'http://localhost:8082',
-  ordersUrl: 'http://localhost:8084/api'
+  ordersUrl: 'http://localhost:8084/api',
+  trackingApiUrl: 'http://localhost:8086'
 };

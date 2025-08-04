@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService, OrderResponse } from '../../services/order.service';
+import { TrackingService } from '../../services/tracking.service';
 import { OrderStatus } from '../../interfaces/order.interface';
+import { TrackingStatus, TrackingResponse, OrderStatusEnum } from '../../interfaces/tracking.interface';
 
 // PrimeNG Imports
 import { TableModule } from 'primeng/table';
@@ -18,6 +20,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BadgeModule } from 'primeng/badge';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 
@@ -38,7 +42,9 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     ProgressSpinnerModule,
     BadgeModule,
     SkeletonModule,
-    TooltipModule
+    TooltipModule,
+    DialogModule,
+    DividerModule
   ],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.scss',
@@ -58,8 +64,17 @@ export class OrdersComponent implements OnInit {
   // Para el estado de las órdenes
   orderStatus = OrderStatus;
 
+  // Para el modal de tracking
+  trackingModalVisible = false;
+  trackingData: TrackingStatus | null = null;
+  trackingResponseTime: number = 0;
+  trackingLoading = false;
+  trackingError: string | null = null;
+  currentTrackingOrderNumber: string = '';
+
   constructor(
     private orderService: OrderService,
+    private trackingService: TrackingService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) {}
@@ -252,6 +267,85 @@ export class OrdersComponent implements OnInit {
         return 'Order has already been cancelled';
       default:
         return 'No actions available for this order status';
+    }
+  }
+
+  // Métodos para el modal de tracking
+  openTrackingModal(orderNumber: string) {
+    this.currentTrackingOrderNumber = orderNumber;
+    this.trackingModalVisible = true;
+    this.fetchTrackingData(orderNumber);
+  }
+
+  closeTrackingModal() {
+    this.trackingModalVisible = false;
+    this.trackingData = null;
+    this.trackingError = null;
+    this.currentTrackingOrderNumber = '';
+    this.trackingResponseTime = 0;
+  }
+
+  fetchTrackingData(orderNumber: string) {
+    this.trackingLoading = true;
+    this.trackingError = null;
+    this.trackingData = null;
+
+    this.trackingService.getTrackingStatus(orderNumber).subscribe({
+      next: (response: TrackingResponse) => {
+        this.trackingData = response.data;
+        this.trackingResponseTime = response.responseTime;
+        this.trackingLoading = false;
+      },
+      error: (error) => {
+        this.trackingLoading = false;
+        this.trackingResponseTime = error.responseTime || 0;
+        
+        if (error.status === 404) {
+          this.trackingError = error.error?.message || 'No tracking information found for this order';
+        } else if (error.status === 500) {
+          this.trackingError = error.error?.message || 'Internal server error occurred';
+        } else {
+          this.trackingError = 'Failed to fetch tracking information';
+        }
+
+        console.error('Error fetching tracking data:', error);
+      }
+    });
+  }
+
+  reloadTrackingData() {
+    if (this.currentTrackingOrderNumber) {
+      this.fetchTrackingData(this.currentTrackingOrderNumber);
+    }
+  }
+
+  getTrackingStatusSeverity(status: OrderStatusEnum): 'success' | 'secondary' | 'info' | 'warning' | 'danger' | 'contrast' {
+    switch (status) {
+      case OrderStatusEnum.PENDING:
+        return 'warning';
+      case OrderStatusEnum.SHIPPED:
+        return 'info';
+      case OrderStatusEnum.DELIVERED:
+        return 'success';
+      case OrderStatusEnum.CANCELLED:
+        return 'danger';
+      default:
+        return 'contrast';
+    }
+  }
+
+  getTrackingStatusLabel(status: OrderStatusEnum): string {
+    switch (status) {
+      case OrderStatusEnum.PENDING:
+        return 'Pending';
+      case OrderStatusEnum.SHIPPED:
+        return 'Shipped';
+      case OrderStatusEnum.DELIVERED:
+        return 'Delivered';
+      case OrderStatusEnum.CANCELLED:
+        return 'Cancelled';
+      default:
+        return status;
     }
   }
 }

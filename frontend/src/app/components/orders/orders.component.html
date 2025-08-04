@@ -172,6 +172,18 @@
           <!-- Actions -->
           <td>
             <div class="flex gap-2">
+              <!-- Fast tracking button -->
+              <p-button
+                icon="pi pi-bolt"
+                severity="info"
+                size="small"
+                (onClick)="openTrackingModal(order.orderNumber)"
+                pTooltip="Fast Tracking Fetch"
+                tooltipPosition="top"
+                [outlined]="true"
+                class="!text-yellow-500 !border-yellow-500 hover:!bg-yellow-50"
+              />
+
               <!-- Cancel button -->
               <p-button
                 *ngIf="canCancelOrder(order.status)"
@@ -222,3 +234,123 @@
 
 <!-- Confirmation Dialog -->
 <p-confirmDialog />
+
+<!-- Fast Tracking Modal -->
+<p-dialog 
+  [(visible)]="trackingModalVisible"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [closable]="true"
+  [resizable]="false"
+  [draggable]="false"
+  (onHide)="closeTrackingModal()"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3 w-full">
+      <i class="pi pi-bolt text-2xl text-yellow-500"></i>
+      <div class="flex-grow">
+        <h3 class="text-xl font-bold text-gray-800 m-0">Fast Tracking Fetch</h3>
+        <p class="text-sm text-gray-600 m-0" *ngIf="currentTrackingOrderNumber">
+          Order: {{ currentTrackingOrderNumber }}
+        </p>
+      </div>
+      <p-button
+        icon="pi pi-refresh"
+        severity="secondary"
+        size="small"
+        (onClick)="reloadTrackingData()"
+        [loading]="trackingLoading"
+        pTooltip="Reload tracking data"
+        [outlined]="true"
+      />
+    </div>
+  </ng-template>
+
+  <div class="min-h-48">
+    <!-- Loading State -->
+    <div *ngIf="trackingLoading" class="flex flex-col items-center justify-center py-8">
+      <i class="pi pi-spin pi-spinner text-3xl text-blue-500 mb-4"></i>
+      <p class="text-gray-600">Fetching tracking information...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!trackingLoading && trackingError" class="text-center py-8">
+      <i class="pi pi-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+      <h4 class="text-lg font-semibold text-gray-800 mb-2">Unable to fetch tracking data</h4>
+      <p class="text-gray-600 mb-4">{{ trackingError }}</p>
+      <p-button
+        label="Try Again"
+        icon="pi pi-refresh"
+        severity="secondary"
+        (onClick)="reloadTrackingData()"
+        [outlined]="true"
+      />
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="!trackingLoading && !trackingError && trackingData" class="space-y-4">
+      <!-- Tracking Status Card -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="text-lg font-semibold text-gray-800">Tracking Status</h4>
+          <p-tag 
+            [severity]="getTrackingStatusSeverity(trackingData.status)"
+            [value]="getTrackingStatusLabel(trackingData.status)"
+            class="text-sm"
+          />
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium text-gray-600">Order ID</label>
+            <p class="text-gray-800 font-mono text-sm">{{ trackingData.orderId }}</p>
+          </div>
+          
+          <div>
+            <label class="text-sm font-medium text-gray-600">Order Number</label>
+            <p class="text-gray-800 font-semibold">{{ trackingData.orderNumber }}</p>
+          </div>
+          
+          <div>
+            <label class="text-sm font-medium text-gray-600">User ID</label>
+            <p class="text-gray-800 font-mono text-sm">{{ trackingData.userId }}</p>
+          </div>
+          
+          <div>
+            <label class="text-sm font-medium text-gray-600">Last Updated</label>
+            <p class="text-gray-800">{{ formatDate(trackingData.updatedAt) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <p-divider />
+
+      <!-- Raw Data Section -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <i class="pi pi-code"></i>
+          Raw Service Response
+        </h4>
+        <pre class="bg-gray-800 text-green-400 p-3 rounded text-sm overflow-x-auto font-mono">{{ trackingData | json }}</pre>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-between w-full">
+      <div class="flex items-center gap-2 text-sm text-gray-600">
+        <i class="pi pi-clock"></i>
+        <span>Response time: <strong>{{ trackingResponseTime }}ms</strong></span>
+      </div>
+      
+      <div class="flex gap-2">
+        <p-button
+          label="Close"
+          severity="secondary"
+          (onClick)="closeTrackingModal()"
+          [outlined]="true"
+        />
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
