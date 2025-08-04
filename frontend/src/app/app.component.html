@@ -1,50 +1,130 @@
+<!--toolbar for users-->
+<p-toolbar 
+  *ngIf="isUser()" 
+  [style]="{ 'border-radius': '3rem', 'padding': '1rem 1rem 1rem 1.5rem' }">
+  <ng-template #start>
+    <div class="flex items-center gap-5">
+      <p-button icon="pi pi-home" text plain (onClick)="changeView('home')" />
+      <p-button icon="pi pi-bars" text plain (onClick)="changeView('products')" />
+    </div>
+  </ng-template>
 
-  <p-toolbar [style]="{ 'border-radius': '3rem', 'padding': '1rem 1rem 1rem 1.5rem' }">
-    <ng-template #start>
-      <div class="flex items-center gap-5">
+  <ng-template #end>
+    <div class="flex items-center">
+      <button class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"
+       (click)="changeView('order')"
+      >
+        <i class="pi pi-box text-xl"></i>
+    </button>
 
-        <p-button icon="pi pi-home" text plain (onClick)="changeView('home')" />
-        <p-button icon="pi pi-bars" text plain (onClick)="changeView('products')" />
-
-      </div>
-    </ng-template>
-
-    <ng-template #end>
-      <div class="flex items-center">
-
-
-         <button class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"
-         (click)="changeView('order')"
-        >
-          <i class="pi pi-box text-xl"></i>
+      <button 
+        class="toolbar-button text-2xl text-gray-600 cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors" 
+        (click)="handleCartClick()"
+        [title]="isUserLoggedIn() ? 'Ir al carrito' : 'Iniciar sesión para ver carrito'">
+        <i class="pi pi-shopping-cart text-xl"></i>
       </button>
 
-
-        <button 
-          class="toolbar-button text-2xl text-gray-600 cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors" 
-          (click)="handleCartClick()"
-          [title]="isUserLoggedIn() ? 'Ir al carrito' : 'Iniciar sesión para ver carrito'">
-          <i class="pi pi-shopping-cart text-xl"></i>
-        </button>
-
-        <div class="items-container" *ngIf="itemInCart.length > 0">
-          <p class="items-in-cart">{{itemInCart.length}}</p>
-        </div>
-
-       
-
-        <button 
-          class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"
-          [class.text-green-600]="isUserLoggedIn()"
-          [class.text-gray-600]="!isUserLoggedIn()"
-          (click)="changeView('login')"
-          [title]="isUserLoggedIn() ? 'Usuario conectado - Ir a perfil' : 'Iniciar sesión'">
-          <i class="pi pi-user text-xl"></i>
-          <span *ngIf="isUserLoggedIn()" class="user-status-indicator"></span>
-        </button>
+      <div class="items-container" *ngIf="itemInCart.length > 0">
+        <p class="items-in-cart">{{itemInCart.length}}</p>
       </div>
-    </ng-template>
-  </p-toolbar>
+
+      <button 
+        class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"
+        [class.text-green-600]="isUserLoggedIn()"
+        [class.text-gray-600]="!isUserLoggedIn()"
+        (click)="changeView('login')"
+        [title]="isUserLoggedIn() ? 'Usuario conectado - Ir a perfil' : 'Iniciar sesión'">
+        <i class="pi pi-user text-xl"></i>
+        <span *ngIf="isUserLoggedIn()" class="user-status-indicator"></span>
+      </button>
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<!--toolbar for admins and roots-->
+<p-toolbar 
+  *ngIf="isAdmin()" 
+  [style]="{ 'border-radius': '3rem', 'padding': '1rem 1rem 1rem 1.5rem' }">
+  <ng-template #start>
+    <div class="flex items-center gap-5">
+      <p-button icon="pi pi-home" text plain (onClick)="changeView('home')" />
+      
+      <!-- Admin navigation buttons -->
+      <button 
+        class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors"
+        (click)="changeView('admin/products')"
+        title="Manage Products">
+        <i class="pi pi-box text-xl"></i>
+      </button>
+
+      <button 
+        class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors"
+        (click)="changeView('admin/users')"
+        title="Manage Users">
+        <i class="pi pi-users text-xl"></i>
+      </button>
+
+      <button 
+        class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors"
+        (click)="changeView('admin/orders')"
+        title="Manage Orders">
+        <i class="pi pi-shopping-bag text-xl"></i>
+      </button>
+    </div>
+  </ng-template>
+
+  <ng-template #end>
+    <div class="flex items-center">
+      <div class="mr-4 text-sm">
+        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+          {{ getUserRole() }}
+        </span>
+      </div>
+
+      <button 
+        class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"
+        [class.text-green-600]="isUserLoggedIn()"
+        [class.text-gray-600]="!isUserLoggedIn()"
+        (click)="changeView('login')"
+        [title]="isUserLoggedIn() ? 'Usuario conectado - Ir a perfil' : 'Iniciar sesión'">
+        <i class="pi pi-user text-xl"></i>
+        <span *ngIf="isUserLoggedIn()" class="user-status-indicator"></span>
+      </button>
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<!--toolbar for non-authenticated users-->
+<p-toolbar 
+  *ngIf="!isUserLoggedIn()" 
+  [style]="{ 'border-radius': '3rem', 'padding': '1rem 1rem 1rem 1.5rem' }">
+  <ng-template #start>
+    <div class="flex items-center gap-5">
+      <p-button icon="pi pi-home" text plain (onClick)="changeView('home')" />
+      <p-button icon="pi pi-bars" text plain (onClick)="changeView('products')" />
+    </div>
+  </ng-template>
+
+  <ng-template #end>
+    <div class="flex items-center">
+      <button 
+        class="toolbar-button text-2xl text-gray-600 cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors" 
+        (click)="handleCartClick()"
+        title="Iniciar sesión para ver carrito">
+        <i class="pi pi-shopping-cart text-xl"></i>
+      </button>
+
+      <button 
+        class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"
+        [class.text-green-600]="isUserLoggedIn()"
+        [class.text-gray-600]="!isUserLoggedIn()"
+        (click)="changeView('login')"
+        title="Iniciar sesión">
+        <i class="pi pi-user text-xl"></i>
+      </button>
+    </div>
+  </ng-template>
+</p-toolbar>
 
 <p-toast position="top-right"></p-toast>
 

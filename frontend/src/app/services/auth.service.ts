@@ -99,6 +99,38 @@ export class AuthService {
     return !!token && !this.isTokenExpired(token);
   }
 
+  /**
+   * Get current user role
+   */
+  getUserRole(): string | null {
+    const user = this.currentUserSubject.value;
+    return user ? user.role : null;
+  }
+
+  /**
+   * Check if user is admin or root
+   */
+  isAdmin(): boolean {
+    const role = this.getUserRole();
+    return role === 'ADMIN' || role === 'ROOT';
+  }
+
+  /**
+   * Check if user is root
+   */
+  isRoot(): boolean {
+    const role = this.getUserRole();
+    return role === 'ROOT';
+  }
+
+  /**
+   * Check if user is regular user/client
+   */
+  isUser(): boolean {
+    const role = this.getUserRole();
+    return role === 'USER' || role === 'CLIENTE';
+  }
+
 
   getToken(): string | null {
     return localStorage.getItem('access_token');

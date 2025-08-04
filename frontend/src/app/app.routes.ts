@@ -35,6 +35,19 @@ export const routes: Routes = [
     path: 'order',
     loadComponent: () => import('./components/orders/orders.component').then(m => m.OrdersComponent)
   },
+  // Admin routes
+  {
+    path: 'admin/products',
+    loadComponent: () => import('./components/admin/admin-products/admin-products.component').then(m => m.AdminProductsComponent)
+  },
+  {
+    path: 'admin/users',
+    loadComponent: () => import('./components/admin/admin-users/admin-users.component').then(m => m.AdminUsersComponent)
+  },
+  {
+    path: 'admin/orders',
+    loadComponent: () => import('./components/admin/admin-orders/admin-orders.component').then(m => m.AdminOrdersComponent)
+  },
   {
     path: '**',
     redirectTo: '/home'
