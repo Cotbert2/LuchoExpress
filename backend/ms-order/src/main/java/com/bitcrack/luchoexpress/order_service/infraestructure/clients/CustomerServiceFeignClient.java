@@ -13,6 +13,9 @@ public interface CustomerServiceFeignClient {
     @GetMapping("/api/customers/by-user/{userId}")
     CustomerDto getCustomerByUserId(@PathVariable("userId") UUID userId);
     
+    @GetMapping("/api/customers/{customerId}")
+    CustomerDto getCustomerById(@PathVariable("customerId") UUID customerId);
+    
     // DTO for Feign communication
     record CustomerDto(
         UUID id,

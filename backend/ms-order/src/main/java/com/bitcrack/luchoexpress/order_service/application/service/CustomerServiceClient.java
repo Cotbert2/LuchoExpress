@@ -12,6 +12,13 @@ public interface CustomerServiceClient {
     CustomerInfo getCustomerByUserId(UUID userId);
     
     /**
+     * Get customer information by customer ID
+     * @param customerId The customer ID
+     * @return Customer information including the user ID
+     */
+    CustomerInfo getCustomerById(UUID customerId);
+    
+    /**
      * DTO for customer information
      */
     record CustomerInfo(

@@ -1,5 +1,6 @@
 package com.bitcrack.luchoexpress.order_service.infraestructure.clients;
 
+import com.bitcrack.luchoexpress.order_service.application.service.CustomerServiceClient;
 import com.bitcrack.luchoexpress.order_service.application.service.TrackingServiceClient;
 import com.bitcrack.luchoexpress.order_service.domain.Order;
 import feign.FeignException;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 public class TrackingServiceClientImpl implements TrackingServiceClient {
     
     private final TrackingOrdersServiceFeignClient trackingOrdersServiceFeignClient;
+    private final CustomerServiceClient customerServiceClient;
     
     @Override
     @Async
@@ -23,11 +25,14 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
         try {
             log.info("Creating tracking for order: {}", order.getId());
             
+            // Get customer information to obtain userId
+            CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerById(order.getCustomerId());
+            
             TrackingOrdersServiceFeignClient.TrackingStatusDto trackingStatus = 
                 new TrackingOrdersServiceFeignClient.TrackingStatusDto(
                     order.getId(),
                     order.getOrderNumber(),
-                    order.getCustomerId(),
+                    customerInfo.userId(),
                     order.getStatus().name(),
                     LocalDateTime.now()
                 );
@@ -39,6 +44,9 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
         } catch (FeignException e) {
             log.error("Failed to create tracking for order {}: {}", order.getId(), e.getMessage());
             // Don't rethrow - this should not fail the order creation
+        } catch (Exception e) {
+            log.error("Failed to create tracking for order {} due to customer service error: {}", order.getId(), e.getMessage());
+            // Don't rethrow - this should not fail the order creation
         }
     }
     
@@ -48,11 +56,14 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
         try {
             log.info("Updating tracking for order: {}", order.getId());
             
+            // Get customer information to obtain userId
+            CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerById(order.getCustomerId());
+            
             TrackingOrdersServiceFeignClient.TrackingStatusDto trackingStatus = 
                 new TrackingOrdersServiceFeignClient.TrackingStatusDto(
                     order.getId(),
                     order.getOrderNumber(),
-                    order.getCustomerId(),
+                    customerInfo.userId(),
                     order.getStatus().name(),
                     LocalDateTime.now()
                 );
@@ -63,6 +74,9 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
             
         } catch (FeignException e) {
             log.error("Failed to update tracking for order {}: {}", order.getId(), e.getMessage());
+            // Don't rethrow - this should not fail the order update
+        } catch (Exception e) {
+            log.error("Failed to update tracking for order {} due to customer service error: {}", order.getId(), e.getMessage());
             // Don't rethrow - this should not fail the order update
         }
     }
