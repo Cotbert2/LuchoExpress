@@ -168,6 +168,13 @@ public class OrderService {
     
     private String extractRoleFromToken(Authentication authentication) {
         if (authentication.getPrincipal() instanceof Jwt jwt) {
+            // Try to get role as string first (matching ms-auth format)
+            String role = jwt.getClaimAsString("role");
+            if (role != null) {
+                return role;
+            }
+            
+            // Fallback: try to get roles as list
             List<String> roles = jwt.getClaimAsStringList("roles");
             if (roles != null && !roles.isEmpty()) {
                 return roles.get(0); // Assuming single role per user
@@ -178,9 +185,21 @@ public class OrderService {
     
     private UUID extractCustomerIdFromToken(Authentication authentication) {
         if (authentication.getPrincipal() instanceof Jwt jwt) {
-            String userIdString = jwt.getClaimAsString("sub");
+            // Try to get userId first (matching ms-auth format)
+            String userIdString = jwt.getClaimAsString("userId");
             if (userIdString != null) {
                 return UUID.fromString(userIdString);
+            }
+            
+            // Fallback: try to get from sub claim
+            userIdString = jwt.getClaimAsString("sub");
+            if (userIdString != null) {
+                // Check if sub is already a UUID
+                try {
+                    return UUID.fromString(userIdString);
+                } catch (IllegalArgumentException e) {
+                    // sub is username, look for userId in other claims
+                }
             }
         }
         throw new UnauthorizedAccessException("Invalid token: customer ID not found");

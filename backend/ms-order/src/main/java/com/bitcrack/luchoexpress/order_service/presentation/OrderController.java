@@ -26,7 +26,7 @@ public class OrderController {
     private final OrderService orderService;
     
     @PostMapping
-    @PreAuthorize("hasRole('CLIENTE') or hasRole('ADMIN') or hasRole('ROOT')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('ROOT')")
     public ResponseEntity<OrderResponse> createOrder(
             @Valid @RequestBody CreateOrderRequest request, 
             Authentication authentication) {
@@ -36,7 +36,7 @@ public class OrderController {
     }
     
     @GetMapping("/me")
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<OrderResponse>> getMyOrders(Authentication authentication) {
         log.info("Fetching orders for authenticated user");
         List<OrderResponse> orders = orderService.getMyOrders(authentication);

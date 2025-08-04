@@ -33,3 +33,6 @@ docker run --name lucho-express-mysql \
 docker run --name redis-tracking \
   -p 6379:6379 \
   -d redis:7-alpine
+
+
+docker start customer-postgres auth-postgres lucho-express-mysql redis-tracking dd24c59ed658

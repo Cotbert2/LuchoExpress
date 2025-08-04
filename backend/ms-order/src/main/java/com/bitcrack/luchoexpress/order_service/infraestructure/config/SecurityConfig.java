@@ -1,5 +1,6 @@
 package com.bitcrack.luchoexpress.order_service.infraestructure.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,10 +19,13 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
     
     @Value("${jwt.secret:mySecretKey}")
     private String jwtSecret;
+    
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,8 +37,8 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 
                 // Protected endpoints - Orders
-                .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("CLIENTE", "ADMIN", "ROOT")
-                .requestMatchers(HttpMethod.GET, "/api/orders/me").hasRole("CLIENTE")
+                .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("USER", "ADMIN", "ROOT")
+                .requestMatchers(HttpMethod.GET, "/api/orders/me").hasRole("USER")
                 .requestMatchers(HttpMethod.GET, "/api/orders").hasAnyRole("ADMIN", "ROOT")
                 .requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("ADMIN", "ROOT")
@@ -42,7 +47,10 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.decoder(jwtDecoder()))
+                .jwt(jwt -> jwt
+                    .decoder(jwtDecoder())
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter)
+                )
             );
         
         return http.build();
@@ -50,9 +58,10 @@ public class SecurityConfig {
     
     @Bean
     public JwtDecoder jwtDecoder() {
-        // For development purposes - in production, use proper JWT configuration
-        SecretKeySpec secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
+        // Use HS512 to match ms-auth service with explicit algorithm
+        SecretKeySpec secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA512");
         return NimbusJwtDecoder.withSecretKey(secretKey)
+                .macAlgorithm(MacAlgorithm.HS512)
                 .build();
     }
 }
