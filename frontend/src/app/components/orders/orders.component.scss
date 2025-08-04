@@ -1,0 +1,123 @@
+// Estilos específicos para el componente de órdenes
+
+// Mejoras para la tabla en dispositivos móviles
+@media (max-width: 768px) {
+  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+// Estilos para los tags de estado
+:host ::ng-deep .p-tag {
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+// Mejoras para los botones
+:host ::ng-deep .p-button {
+  transition: all 0.2s ease-in-out;
+}
+
+:host ::ng-deep .p-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+// Estilos para las tarjetas
+:host ::ng-deep .p-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+:host ::ng-deep .p-card .p-card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+// Estilos para los inputs
+:host ::ng-deep .p-inputtext {
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  transition: border-color 0.2s ease-in-out;
+}
+
+:host ::ng-deep .p-inputtext:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+// Estilos para el datepicker
+:host ::ng-deep .p-datepicker {
+  border-radius: 6px;
+}
+
+// Animación para las filas de la tabla
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+  transition: background-color 0.2s ease-in-out;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f8fafc !important;
+}
+
+// Estilos para el skeleton loader
+:host ::ng-deep .p-skeleton {
+  border-radius: 4px;
+}
+
+// Estilos para productos
+.product-item {
+  @apply text-sm bg-gray-100 rounded-lg px-3 py-2 mb-1;
+}
+
+.product-name {
+  @apply font-medium text-gray-800;
+}
+
+.product-details {
+  @apply text-xs text-gray-600 mt-1;
+}
+
+// Estado de carga
+.loading-state {
+  @apply flex items-center justify-center py-8;
+}
+
+// Empty state
+.empty-state {
+  @apply text-center py-12;
+}
+
+.empty-state-icon {
+  @apply text-6xl text-gray-300 mb-4;
+}
+
+.empty-state-title {
+  @apply text-xl font-medium text-gray-500 mb-2;
+}
+
+.empty-state-subtitle {
+  @apply text-gray-400;
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .container {
+    @apply px-2;
+  }
+  
+  .grid {
+    @apply grid-cols-1;
+  }
+  
+  :host ::ng-deep .p-datatable .p-datatable-wrapper {
+    overflow-x: auto;
+  }
+}

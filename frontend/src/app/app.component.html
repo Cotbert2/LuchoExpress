@@ -11,6 +11,15 @@
 
     <ng-template #end>
       <div class="flex items-center">
+
+
+         <button class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"
+         (click)="changeView('order')"
+        >
+          <i class="pi pi-box text-xl"></i>
+      </button>
+
+
         <button 
           class="toolbar-button text-2xl text-gray-600 cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors" 
           (click)="handleCartClick()"
@@ -21,6 +30,8 @@
         <div class="items-container" *ngIf="itemInCart.length > 0">
           <p class="items-in-cart">{{itemInCart.length}}</p>
         </div>
+
+       
 
         <button 
           class="toolbar-button text-2xl cursor-pointer bg-transparent border-none w-16 hover:text-gray-800 transition-colors relative"

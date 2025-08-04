@@ -95,4 +95,14 @@ export class OrderService {
       headers: this.getHeaders()
     });
   }
+
+  /**
+   * Cancel an order
+   */
+  cancelOrder(orderId: string): Observable<OrderResponse> {
+    return this.http.put<OrderResponse>(`${this.baseUrl}/${orderId}`, 
+      { status: 'CANCELLED' }, 
+      { headers: this.getHeaders() }
+    );
+  }
 }
