@@ -17,6 +17,7 @@ import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BadgeModule } from 'primeng/badge';
 import { SkeletonModule } from 'primeng/skeleton';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 
@@ -36,7 +37,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     ToastModule,
     ProgressSpinnerModule,
     BadgeModule,
-    SkeletonModule
+    SkeletonModule,
+    TooltipModule
   ],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.scss',
@@ -46,6 +48,7 @@ export class OrdersComponent implements OnInit {
   orders: OrderResponse[] = [];
   filteredOrders: OrderResponse[] = [];
   loading = false;
+  cancellingOrderId: string | null = null;
   
   // Filtros
   dateFrom: Date | null = null;
@@ -113,12 +116,14 @@ export class OrdersComponent implements OnInit {
 
   cancelOrder(order: OrderResponse) {
     this.confirmationService.confirm({
-      message: `Are you sure you want to cancel order ${order.orderNumber}?`,
-      header: 'Confirm Cancellation',
+      message: `Are you sure you want to cancel order ${order.orderNumber}? This action cannot be undone.`,
+      header: 'Cancel Order',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Yes, cancel',
-      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-danger',
+      acceptLabel: 'Yes, Cancel Order',
+      rejectLabel: 'No, Keep Order',
       accept: () => {
+        this.cancellingOrderId = order.id;
         this.orderService.cancelOrder(order.id).subscribe({
           next: (updatedOrder) => {
             // Actualizar la orden en la lista
@@ -133,6 +138,7 @@ export class OrdersComponent implements OnInit {
               this.filteredOrders[filteredIndex] = updatedOrder;
             }
 
+            this.cancellingOrderId = null;
             this.messageService.add({
               severity: 'success',
               summary: 'Order Cancelled',
@@ -140,11 +146,24 @@ export class OrdersComponent implements OnInit {
             });
           },
           error: (error) => {
+            this.cancellingOrderId = null;
             console.error('Error canceling order:', error);
+            
+            let errorMessage = 'Could not cancel the order. Please try again.';
+            
+            // Handle specific error cases
+            if (error.status === 403) {
+              errorMessage = 'You don\'t have permission to cancel this order.';
+            } else if (error.status === 400) {
+              errorMessage = 'This order cannot be cancelled in its current status.';
+            } else if (error.status === 404) {
+              errorMessage = 'Order not found.';
+            }
+            
             this.messageService.add({
               severity: 'error',
-              summary: 'Error',
-              detail: 'Could not cancel the order. Please try again.'
+              summary: 'Cancellation Failed',
+              detail: errorMessage
             });
           }
         });
@@ -153,7 +172,12 @@ export class OrdersComponent implements OnInit {
   }
 
   canCancelOrder(status: string): boolean {
-    return status === OrderStatus.PENDING || status === OrderStatus.CONFIRMED;
+    // Only PENDING orders can be cancelled, matching backend logic
+    return status === OrderStatus.PENDING;
+  }
+
+  isCancellingOrder(orderId: string): boolean {
+    return this.cancellingOrderId === orderId;
   }
 
   getStatusSeverity(status: string): 'success' | 'secondary' | 'info' | 'warning' | 'danger' | 'contrast' {
@@ -203,5 +227,31 @@ export class OrdersComponent implements OnInit {
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString('es-CO');
+  }
+
+  getActionMessage(status: string): string {
+    switch (status) {
+      case OrderStatus.SHIPPED:
+        return 'Shipped';
+      case OrderStatus.DELIVERED:
+        return 'Delivered';
+      case OrderStatus.CANCELLED:
+        return 'Cancelled';
+      default:
+        return 'No actions';
+    }
+  }
+
+  getActionTooltip(status: string): string {
+    switch (status) {
+      case OrderStatus.SHIPPED:
+        return 'Order has been shipped and cannot be cancelled';
+      case OrderStatus.DELIVERED:
+        return 'Order has been delivered and cannot be cancelled';
+      case OrderStatus.CANCELLED:
+        return 'Order has already been cancelled';
+      default:
+        return 'No actions available for this order status';
+    }
   }
 }

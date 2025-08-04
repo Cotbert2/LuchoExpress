@@ -175,20 +175,26 @@
               <!-- Cancel button -->
               <p-button
                 *ngIf="canCancelOrder(order.status)"
-                icon="pi pi-times"
+                [icon]="cancellingOrderId === order.id ? 'pi pi-spin pi-spinner' : 'pi pi-times'"
                 severity="danger"
                 size="small"
                 (onClick)="cancelOrder(order)"
-                pTooltip="Cancel order"
+                pTooltip="Cancel this order (Only available for pending orders)"
+                tooltipPosition="top"
                 [outlined]="true"
+                [label]="cancellingOrderId === order.id ? 'Cancelling...' : 'Cancel'"
+                [disabled]="cancellingOrderId !== null"
               />
 
-              <!-- No action available indicator -->
+              <!-- Status info for non-cancellable orders -->
               <span 
                 *ngIf="!canCancelOrder(order.status)"
-                class="text-xs text-gray-500 px-2 py-1"
+                class="text-xs text-gray-500 px-2 py-1 flex items-center"
+                [pTooltip]="getActionTooltip(order.status)"
+                tooltipPosition="top"
               >
-                Not available
+                <i class="pi pi-info-circle mr-1"></i>
+                {{ getActionMessage(order.status) }}
               </span>
             </div>
           </td>

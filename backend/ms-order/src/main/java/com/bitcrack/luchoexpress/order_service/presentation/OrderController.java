@@ -70,4 +70,14 @@ public class OrderController {
         OrderResponse order = orderService.updateOrder(id, request, authentication);
         return ResponseEntity.ok(order);
     }
+    
+    @PutMapping("/{id}/cancel")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('ROOT')")
+    public ResponseEntity<OrderResponse> cancelOrder(
+            @PathVariable UUID id,
+            Authentication authentication) {
+        log.info("Cancelling order with ID: {}", id);
+        OrderResponse order = orderService.cancelOrder(id, authentication);
+        return ResponseEntity.ok(order);
+    }
 }

@@ -87,6 +87,27 @@ public class Order {
         this.status = newStatus;
     }
     
+    public void cancel() {
+        if (!canBeCancelled()) {
+            throw new IllegalStateException("Order cannot be cancelled in current status: " + this.status);
+        }
+        this.status = OrderStatusEnum.CANCELLED;
+    }
+    
+    public boolean canBeCancelled() {
+        // Orders can only be cancelled if they are in PENDING status
+        return this.status == OrderStatusEnum.PENDING;
+    }
+    
+    public boolean canBeCancelledBy(String role, UUID customerId) {
+        // ADMIN and ROOT can cancel any order (if status allows)
+        if ("ADMIN".equals(role) || "ROOT".equals(role)) {
+            return canBeCancelled();
+        }
+        // Customers can only cancel their own orders (if status allows)
+        return this.customerId.equals(customerId) && canBeCancelled();
+    }
+    
     public void updateDeliveryAddress(String newAddress) {
         this.deliveryAddress = newAddress;
     }

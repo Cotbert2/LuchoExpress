@@ -159,6 +159,51 @@ public class OrderService {
         return orderMapper.toResponse(updatedOrder);
     }
     
+    public OrderResponse cancelOrder(UUID id, Authentication authentication) {
+        log.info("Cancelling order with ID: {}", id);
+        
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order with ID " + id + " not found"));
+        
+        // Get the user's customerId for permission validation
+        String role = extractRoleFromToken(authentication);
+        UUID customerId;
+        
+        if ("ADMIN".equals(role) || "ROOT".equals(role)) {
+            // Admin/Root use the order's customerId for validation
+            customerId = order.getCustomerId();
+        } else {
+            // For regular users, get their customerId from the customer service
+            UUID userId = extractUserIdFromToken(authentication);
+            CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerByUserId(userId);
+            customerId = customerInfo.customerId();
+        }
+        
+        // Validate if the order can be cancelled by this user
+        if (!order.canBeCancelledBy(role, customerId)) {
+            if (!order.getCustomerId().equals(customerId)) {
+                throw new UnauthorizedAccessException("You can only cancel your own orders");
+            } else {
+                throw new UnauthorizedAccessException("Order cannot be cancelled in current status: " + order.getStatus());
+            }
+        }
+        
+        // Cancel the order
+        order.cancel();
+        Order cancelledOrder = orderRepository.save(order);
+        
+        // Notify tracking service asynchronously
+        try {
+            trackingServiceClient.notifyOrderUpdated(cancelledOrder);
+        } catch (Exception e) {
+            log.error("Failed to notify tracking service for order cancellation: {}", cancelledOrder.getId(), e);
+            // Continue processing - don't fail the order cancellation
+        }
+        
+        log.info("Order cancelled successfully: {}", cancelledOrder.getId());
+        return orderMapper.toResponse(cancelledOrder);
+    }
+    
     private void validateCustomerAccess(UUID customerId, Authentication authentication) {
         String role = extractRoleFromToken(authentication);
         
