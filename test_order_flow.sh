@@ -149,7 +149,7 @@ curl -v -X POST http://localhost:8084/api/orders \
     "customerId": "b9bde1d2-c5d3-4eb5-a690-e3a415299e48",
     "products": [
       {
-        "productId": "0fbe9789-eac3-42af-ad43-00fcb016a323",
+        "productId": "e99bf9da-1f38-4a91-a242-8c82f1a38236",
         "quantity": 2
       }
     ],

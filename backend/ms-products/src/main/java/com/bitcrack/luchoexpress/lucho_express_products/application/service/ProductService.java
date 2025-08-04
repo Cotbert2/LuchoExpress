@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -47,5 +49,20 @@ public class ProductService {
         productMapper.updateEntityFromRequest(product, request);
         Product updatedProduct = productRepository.save(product);
         return productMapper.toResponse(updatedProduct);
+    }
+    
+    @Transactional(readOnly = true)
+    public ProductResponse getProductById(UUID id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
+        return productMapper.toResponse(product);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

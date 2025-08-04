@@ -37,6 +37,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories-with-products").permitAll()
                 
+                // Public endpoints - Products (para que Order Service pueda acceder)
+                .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                
                 // Protected endpoints - Categories
                 .requestMatchers(HttpMethod.POST, "/api/categories").hasAnyRole("ADMIN", "ROOT")
                 .requestMatchers(HttpMethod.PATCH, "/api/categories/**").hasAnyRole("ADMIN", "ROOT")
