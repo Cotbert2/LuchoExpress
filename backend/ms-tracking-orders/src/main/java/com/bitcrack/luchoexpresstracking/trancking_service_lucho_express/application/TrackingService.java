@@ -9,6 +9,8 @@ import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_expre
 import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
 import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceClient;
 import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceFeignClient;
+import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceClient;
+import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceFeignClient;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +21,7 @@ public class TrackingService {
     
     private final RedisTemplate<String, TrackingStatus> redisTemplate;
     private final OrderServiceClient orderServiceClient;
+    private final CustomerServiceClient customerServiceClient;
     private static final String TRACKING_KEY_PREFIX = "tracking:order:";
     private static final long TTL_HOURS = 1;
     
@@ -98,7 +101,16 @@ public class TrackingService {
                 TrackingStatus trackingStatus = new TrackingStatus();
                 trackingStatus.setOrderId(orderDto.id());
                 trackingStatus.setOrderNumber(orderDto.orderNumber());
-                trackingStatus.setUserId(orderDto.customerId()); // Nota: esto sigue siendo customerId, necesitará corrección si es requerido
+                
+                // Obtener el userId del customer
+                UUID userId = getUserIdFromCustomer(orderDto.customerId());
+                if (userId != null) {
+                    trackingStatus.setUserId(userId);
+                } else {
+                    log.warn("Could not get userId for customerId: {}, using customerId as fallback", orderDto.customerId());
+                    trackingStatus.setUserId(orderDto.customerId()); // Fallback si no se encuentra el customer
+                }
+                
                 trackingStatus.setStatus(OrderStatusEnum.valueOf(orderDto.status()));
                 trackingStatus.setUpdatedAt(orderDto.updatedAt());
                 
@@ -109,6 +121,25 @@ public class TrackingService {
             
         } catch (Exception e) {
             log.error("Error loading order from order service for orderNumber: {}", orderNumber, e);
+            return null;
+        }
+    }
+    
+    private UUID getUserIdFromCustomer(UUID customerId) {
+        try {
+            log.info("Fetching userId for customerId: {}", customerId);
+            CustomerServiceFeignClient.CustomerDto customerDto = customerServiceClient.getCustomerById(customerId);
+            
+            if (customerDto != null) {
+                log.info("Found customer for customerId: {}, userId: {}", customerId, customerDto.userId());
+                return customerDto.userId();
+            } else {
+                log.warn("Customer not found for customerId: {}", customerId);
+                return null;
+            }
+            
+        } catch (Exception e) {
+            log.error("Error fetching customer for customerId: {}", customerId, e);
             return null;
         }
     }
