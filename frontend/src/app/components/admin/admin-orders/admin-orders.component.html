@@ -1,1 +1,352 @@
-<p>admin-orders works!</p>
+<!-- Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Order Management</h1>
+    <p class="text-gray-600 mt-1">Manage system orders</p>
+  </div>
+  <div class="flex gap-2">
+    <p-button 
+      icon="pi pi-refresh" 
+      severity="secondary"
+      pTooltip="Refresh data"
+      (onClick)="loadOrders()">
+    </p-button>
+  </div>
+</div>
+
+<!-- Filters -->
+<p-card class="mb-6">
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-filter text-lg"></i>
+      <span class="font-semibold">Filters</span>
+    </div>
+  </ng-template>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Status filter -->
+    <div class="flex flex-col">
+      <label class="text-sm font-medium text-gray-700 mb-2">Status</label>
+      <p-select 
+        [(ngModel)]="filters.status" 
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select status"
+        (onChange)="onStatusFilterChange()"
+        class="w-full">
+      </p-select>
+    </div>
+    
+    <!-- Customer filter -->
+    <div class="flex flex-col">
+      <label class="text-sm font-medium text-gray-700 mb-2">Customer</label>
+      <p-select 
+        [(ngModel)]="filters.customerId" 
+        [options]="customerOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select customer"
+        (onChange)="onCustomerFilterChange()"
+        [filter]="true"
+        filterBy="label"
+        class="w-full">
+      </p-select>
+    </div>
+    
+    <!-- Clear filters button -->
+    <div class="flex flex-col justify-end">
+      <p-button 
+        label="Clear Filters" 
+        icon="pi pi-times" 
+        severity="secondary"
+        (onClick)="clearFilters()"
+        class="w-full">
+      </p-button>
+    </div>
+  </div>
+</p-card>
+
+<!-- Quick statistics -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-blue-600 text-sm font-medium">Total Orders</p>
+        <p class="text-2xl font-bold text-blue-800">{{ filteredOrders.length }}</p>
+      </div>
+      <i class="pi pi-shopping-cart text-2xl text-blue-600"></i>
+    </div>
+  </div>
+  
+  <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-yellow-600 text-sm font-medium">Pending</p>
+        <p class="text-2xl font-bold text-yellow-800">
+          {{ getPendingOrdersCount() }}
+        </p>
+      </div>
+      <i class="pi pi-clock text-2xl text-yellow-600"></i>
+    </div>
+  </div>
+  
+  <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-green-600 text-sm font-medium">Delivered</p>
+        <p class="text-2xl font-bold text-green-800">
+          {{ getDeliveredOrdersCount() }}
+        </p>
+      </div>
+      <i class="pi pi-check-circle text-2xl text-green-600"></i>
+    </div>
+  </div>
+  
+  <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-red-600 text-sm font-medium">Cancelled</p>
+        <p class="text-2xl font-bold text-red-800">
+          {{ getCancelledOrdersCount() }}
+        </p>
+      </div>
+      <i class="pi pi-times-circle text-2xl text-red-600"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Orders table -->
+<p-card>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-list text-lg"></i>
+      <span class="font-semibold">Orders ({{ filteredOrders.length }})</span>
+    </div>
+  </ng-template>
+  
+  <p-table 
+    [value]="filteredOrders" 
+    [loading]="loading"
+    [paginator]="true" 
+    [rows]="10"
+    [rowsPerPageOptions]="[5,10,20,50]"
+    styleClass="p-datatable-gridlines"
+    [tableStyle]="{'min-width': '50rem'}"
+    responsiveLayout="scroll"
+    [sortField]="'createdAt'"
+    [sortOrder]="-1">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="orderNumber">
+          Order Number
+          <p-sortIcon field="orderNumber"></p-sortIcon>
+        </th>
+        <th>Customer</th>
+        <th>Products</th>
+        <th pSortableColumn="status">
+          Status
+          <p-sortIcon field="status"></p-sortIcon>
+        </th>
+        <th pSortableColumn="totalAmount">
+          Total
+          <p-sortIcon field="totalAmount"></p-sortIcon>
+        </th>
+        <th pSortableColumn="orderDate">
+          Order Date
+          <p-sortIcon field="orderDate"></p-sortIcon>
+        </th>
+        <th>Delivery Date</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-order>
+      <tr>
+        <td>
+          <div class="flex flex-col">
+            <span class="font-medium">{{ order.orderNumber }}</span>
+            <span class="text-xs text-gray-500">{{ order.id }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="flex flex-col">
+            <span class="font-medium">{{ getCustomerName(order.customerId) }}</span>
+            <span class="text-xs text-gray-500">{{ getCustomerEmail(order.customerId) }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="flex items-center gap-2">
+            <i class="pi pi-box"></i>
+            <span>{{ getProductsCount(order) }} items</span>
+          </div>
+        </td>
+        <td>
+          <p-tag 
+            [value]="getStatusText(order.status)" 
+            [severity]="getStatusSeverity(order.status)">
+          </p-tag>
+        </td>
+        <td>
+          <span class="font-semibold">{{ formatCurrency(order.totalAmount) }}</span>
+        </td>
+        <td>{{ order.orderDate | date:'short' }}</td>
+        <td>
+          <span *ngIf="order.estimatedDeliveryDate">
+            {{ order.estimatedDeliveryDate | date:'short' }}
+          </span>
+          <span *ngIf="!order.estimatedDeliveryDate" class="text-gray-400">
+            Not defined
+          </span>
+        </td>
+        <td>
+          <div class="flex gap-2">
+            <p-button 
+              *ngIf="canEditOrder(order)"
+              icon="pi pi-pencil" 
+              severity="info"
+              size="small"
+              pTooltip="Edit order"
+              (onClick)="openEditDialog(order)">
+            </p-button>
+            <p-button 
+              *ngIf="canCancelOrder(order)"
+              icon="pi pi-ban" 
+              severity="danger"
+              size="small"
+              pTooltip="Cancel order"
+              (onClick)="confirmCancelOrder(order)">
+            </p-button>
+            <p-button 
+              icon="pi pi-eye" 
+              severity="secondary"
+              size="small"
+              pTooltip="View details"
+              (onClick)="openEditDialog(order)">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center py-8">
+          <div class="flex flex-col items-center gap-2">
+            <i class="pi pi-shopping-cart text-4xl text-gray-400"></i>
+            <p class="text-gray-500">No orders found</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<!-- Edit Order Dialog -->
+<p-dialog 
+  header="Order Details" 
+  [(visible)]="displayEditDialog" 
+  [modal]="true" 
+  [style]="{width: '600px'}"
+  [closable]="true">
+  
+  <div *ngIf="selectedOrder" class="flex flex-col gap-6">
+    <!-- Order information -->
+    <div class="bg-gray-50 p-4 rounded-lg">
+      <h3 class="font-semibold text-lg mb-3">General Information</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm text-gray-600">Order Number</label>
+          <p class="font-medium">{{ selectedOrder.orderNumber }}</p>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600">Customer</label>
+          <p class="font-medium">{{ getCustomerName(selectedOrder.customerId) }}</p>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600">Total</label>
+          <p class="font-medium">{{ formatCurrency(selectedOrder.totalAmount) }}</p>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600">Order Date</label>
+          <p class="font-medium">{{ selectedOrder.orderDate | date:'short' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div>
+      <h3 class="font-semibold text-lg mb-3">Products</h3>
+      <div class="space-y-2">
+        <div *ngFor="let product of selectedOrder.products" 
+             class="flex justify-between items-center p-3 bg-gray-50 rounded">
+          <div>
+            <span class="font-medium">{{ product.productName }}</span>
+            <span class="text-gray-500 ml-2">x{{ product.quantity }}</span>
+          </div>
+          <span class="font-medium">{{ formatCurrency(product.unitPrice * product.quantity) }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Edit form -->
+    <div class="space-y-4">
+      <h3 class="font-semibold text-lg">Update Order</h3>
+      
+      <!-- Status -->
+      <div class="flex flex-col">
+        <label class="text-sm font-medium text-gray-700 mb-2">Status *</label>
+        <p-select 
+          [(ngModel)]="editOrderForm.status" 
+          [options]="availableStatuses"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select status"
+          class="w-full">
+        </p-select>
+      </div>
+      
+      <!-- Delivery address -->
+      <div class="flex flex-col">
+        <label class="text-sm font-medium text-gray-700 mb-2">Delivery Address *</label>
+        <textarea 
+          pInputText
+          [(ngModel)]="editOrderForm.deliveryAddress"
+          placeholder="Enter delivery address"
+          rows="3"
+          class="w-full resize-none">
+        </textarea>
+      </div>
+      
+      <!-- Estimated delivery date -->
+      <div class="flex flex-col">
+        <label class="text-sm font-medium text-gray-700 mb-2">Estimated Delivery Date</label>
+        <input 
+          type="date"
+          [(ngModel)]="editOrderForm.estimatedDeliveryDate"
+          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <p-button 
+        label="Cancel" 
+        severity="secondary"
+        (onClick)="displayEditDialog = false">
+      </p-button>
+      <p-button 
+        label="Update Order" 
+        (onClick)="updateOrder()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>
+
+<!-- Confirm Dialog -->
+<p-confirmDialog></p-confirmDialog>

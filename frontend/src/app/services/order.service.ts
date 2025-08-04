@@ -38,6 +38,17 @@ export interface OrderResponse {
   updatedAt: string;
 }
 
+export interface UpdateOrderRequest {
+  status?: string;
+  deliveryAddress?: string;
+  estimatedDeliveryDate?: string;
+}
+
+export interface OrderFilters {
+  status?: string;
+  customerId?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -103,5 +114,41 @@ export class OrderService {
     return this.http.put<OrderResponse>(`${this.baseUrl}/${orderId}/cancel`, {}, {
       headers: this.getHeaders()
     });
+  }
+
+  /**
+   * Update an order (admin only)
+   */
+  updateOrder(orderId: string, updateData: UpdateOrderRequest): Observable<OrderResponse> {
+    return this.http.put<OrderResponse>(`${this.baseUrl}/${orderId}`, updateData, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Filter orders by criteria
+   */
+  filterOrders(orders: OrderResponse[], filters: OrderFilters): OrderResponse[] {
+    return orders.filter(order => {
+      if (filters.status && order.status !== filters.status) {
+        return false;
+      }
+      if (filters.customerId && order.customerId !== filters.customerId) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  /**
+   * Get available order statuses
+   */
+  getOrderStatuses(): Array<{label: string, value: string}> {
+    return [
+      { label: 'Pendiente', value: 'PENDING' },
+      { label: 'Enviado', value: 'SHIPPED' },
+      { label: 'Entregado', value: 'DELIVERED' },
+      { label: 'Cancelado', value: 'CANCELLED' }
+    ];
   }
 }
