@@ -53,13 +53,14 @@ public class TrackingController {
             TrackingStatus trackingStatus = trackingService.getTrackingStatus(orderNumber);
             
             if (trackingStatus != null) {
-                log.info("Successfully retrieved tracking status for order: {}", orderNumber);
+                log.info("Successfully retrieved tracking status for order: {} with status: {}", 
+                        orderNumber, trackingStatus.getStatus());
                 return ResponseEntity.ok(trackingStatus);
             } else {
-                log.info("No tracking status found for order: {}", orderNumber);
+                log.info("No tracking status found for order: {} in Redis or Order Service", orderNumber);
                 Map<String, String> errorResponse = new HashMap<>();
                 errorResponse.put("error", "Order not found");
-                errorResponse.put("message", "No tracking information found for order " + orderNumber);
+                errorResponse.put("message", "No tracking information found for order " + orderNumber + ". The order may not exist or may not have been processed yet.");
                 
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
             }

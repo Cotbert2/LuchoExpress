@@ -10,12 +10,16 @@ import org.springframework.context.annotation.Primary;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 @Configuration
 public class JacksonConfig {
 
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+    // Formatter que acepta microsegundos opcionales
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+            .appendFraction(java.time.temporal.ChronoField.NANO_OF_SECOND, 0, 9, true)
+            .toFormatter();
 
     @Bean
     @Primary
@@ -28,6 +32,9 @@ public class JacksonConfig {
         
         mapper.registerModule(javaTimeModule);
         mapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        
+        // Configurar para ignorar propiedades desconocidas globalmente
+        mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         
         return mapper;
     }

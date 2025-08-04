@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.OrderStatusEnum;
 import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
+import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceClient;
+import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceFeignClient;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class TrackingService {
     
     private final RedisTemplate<String, TrackingStatus> redisTemplate;
+    private final OrderServiceClient orderServiceClient;
     private static final String TRACKING_KEY_PREFIX = "tracking:order:";
     private static final long TTL_HOURS = 1;
     
@@ -44,8 +48,18 @@ public class TrackingService {
             log.info("Key exists in Redis: {}", keyExists);
             
             if (!keyExists) {
-                log.info("Key does not exist in Redis: {}", key);
-                return null;
+                log.info("Key does not exist in Redis: {}. Trying to load from order service...", key);
+                
+                // Intentar cargar desde el servicio de órdenes
+                TrackingStatus trackingFromOrderService = loadTrackingFromOrderService(orderNumber);
+                if (trackingFromOrderService != null) {
+                    // Guardar en caché y retornar
+                    updateTrackingStatus(trackingFromOrderService);
+                    return trackingFromOrderService;
+                } else {
+                    log.info("Order not found in order service: {}", orderNumber);
+                    return null;
+                }
             }
             
             TrackingStatus trackingStatus = redisTemplate.opsForValue().get(key);
@@ -68,6 +82,34 @@ public class TrackingService {
         } catch (Exception e) {
             log.error("Error retrieving tracking status for order: {} with key: {}", orderNumber, key, e);
             throw e;
+        }
+    }
+    
+    private TrackingStatus loadTrackingFromOrderService(String orderNumber) {
+        try {
+            log.info("Loading order information from order service for orderNumber: {}", orderNumber);
+            
+            OrderServiceFeignClient.OrderDto orderDto = orderServiceClient.getOrderByOrderNumber(orderNumber);
+            
+            if (orderDto != null) {
+                log.info("Found order in order service: {}", orderDto);
+                
+                // Crear TrackingStatus desde la información de la orden
+                TrackingStatus trackingStatus = new TrackingStatus();
+                trackingStatus.setOrderId(orderDto.id());
+                trackingStatus.setOrderNumber(orderDto.orderNumber());
+                trackingStatus.setUserId(orderDto.customerId()); // Nota: esto sigue siendo customerId, necesitará corrección si es requerido
+                trackingStatus.setStatus(OrderStatusEnum.valueOf(orderDto.status()));
+                trackingStatus.setUpdatedAt(orderDto.updatedAt());
+                
+                return trackingStatus;
+            }
+            
+            return null;
+            
+        } catch (Exception e) {
+            log.error("Error loading order from order service for orderNumber: {}", orderNumber, e);
+            return null;
         }
     }
 }

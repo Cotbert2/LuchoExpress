@@ -37,13 +37,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
                 .requestMatchers("/actuator/**").permitAll()
-                
+                .requestMatchers(HttpMethod.GET, "/api/orders/by-order-number/{orderNumber}").permitAll()
                 // Protected endpoints - Orders
                 .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("USER", "ADMIN", "ROOT")
                 .requestMatchers(HttpMethod.GET, "/api/orders/me").hasRole("USER")
                 .requestMatchers(HttpMethod.GET, "/api/orders").hasAnyRole("ADMIN", "ROOT")
                 .requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("ADMIN", "ROOT", "USER")
+
 
                 // All other requests require authentication
                 .anyRequest().authenticated()

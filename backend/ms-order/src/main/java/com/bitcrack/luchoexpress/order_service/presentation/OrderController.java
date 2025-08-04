@@ -60,6 +60,14 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
     
+    @GetMapping("/by-order-number/{orderNumber}")
+    public ResponseEntity<OrderResponse> getOrderByOrderNumber(
+            @PathVariable String orderNumber) {
+        log.info("Fetching order with order number: {}", orderNumber);
+        OrderResponse order = orderService.getOrderByOrderNumberPublic(orderNumber);
+        return ResponseEntity.ok(order);
+    }
+    
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ROOT')")
     public ResponseEntity<OrderResponse> updateOrder(

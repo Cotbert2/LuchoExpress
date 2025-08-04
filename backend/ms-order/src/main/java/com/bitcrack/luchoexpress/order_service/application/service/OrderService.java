@@ -131,6 +131,45 @@ public class OrderService {
         return orderMapper.toResponse(order);
     }
     
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderByOrderNumber(String orderNumber, Authentication authentication) {
+        log.info("Fetching order with order number: {}", orderNumber);
+        
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new OrderNotFoundException("Order with order number " + orderNumber + " not found"));
+        
+        // Check access permissions
+        String role = extractRoleFromToken(authentication);
+        
+        UUID customerId;
+        if ("ADMIN".equals(role) || "ROOT".equals(role)) {
+            // Admin/Root can view any order, use the order's customerId
+            customerId = order.getCustomerId();
+        } else {
+            // For regular users, get their customerId from the customer service
+            UUID userId = extractUserIdFromToken(authentication);
+            CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerByUserId(userId);
+            customerId = customerInfo.customerId();
+        }
+        
+        if (!order.canBeViewedBy(role, customerId)) {
+            throw new UnauthorizedAccessException("You don't have permission to view this order");
+        }
+        
+        return orderMapper.toResponse(order);
+    }
+    
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderByOrderNumberPublic(String orderNumber) {
+        log.info("Fetching order with order number (public): {}", orderNumber);
+        
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new OrderNotFoundException("Order with order number " + orderNumber + " not found"));
+        
+        // Public access - no authentication required, return basic order information
+        return orderMapper.toResponse(order);
+    }
+    
     public OrderResponse updateOrder(UUID id, UpdateOrderRequest request, Authentication authentication) {
         log.info("Updating order with ID: {}", id);
         
