@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CartService, CartItem, CartSummary } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { CustomerService, CreateCustomerRequest, CustomerResponse } from '../../services/customer.service';
+import { OrderService, CreateOrderRequest, CreateOrderProductRequest, OrderResponse } from '../../services/order.service';
 import { UserResponse } from '../../interfaces/auth.interface';
 import { Subscription } from 'rxjs';
 
@@ -69,6 +70,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private authService: AuthService,
     private customerService: CustomerService,
+    private orderService: OrderService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
@@ -634,27 +636,105 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    * Complete the order process after customer is created/updated
    */
   private completeOrderProcess(customer: CustomerResponse): void {
-    // Simulate order processing
-    setTimeout(() => {
-      this.isLoading = false;
+    if (this.cartItems.length === 0) {
       this.messageService.add({
-        severity: 'success',
-        summary: 'Order Placed Successfully!',
-        detail: `Thank you ${customer.name}! Your order has been placed and will be shipped to your address.`,
-        life: 5000
+        severity: 'error',
+        summary: 'Empty Cart',
+        detail: 'Cannot create order with empty cart',
+        life: 3000
       });
-      
-      // Clear cart after successful order
-      this.cartService.clearCart();
-      
-      // Reset stepper state and forms
-      this.resetCheckoutState();
-      
-      // Redirect to home or order confirmation page
-      setTimeout(() => {
-        this.router.navigate(['/home']);
-      }, 2000);
-    }, 2000);
+      this.isLoading = false;
+      return;
+    }
+
+    // Prepare order data
+    const orderProducts: CreateOrderProductRequest[] = this.cartItems.map(item => ({
+      productId: item.id.toString(),
+      quantity: item.quantity
+    }));
+
+    const orderData: CreateOrderRequest = {
+      customerId: customer.id.toString(),
+      products: orderProducts,
+      deliveryAddress: this.buildFullAddress(),
+      estimatedDeliveryDate: this.calculateEstimatedDeliveryDate()
+    };
+
+    console.log('Creating order with data:', orderData);
+
+    // Create the order
+    this.orderService.createOrder(orderData).subscribe({
+      next: (order: OrderResponse) => {
+        this.isLoading = false;
+        console.log('Order created successfully:', order);
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Order Placed Successfully!',
+          detail: `Thank you ${customer.name}! Your order #${order.orderNumber} has been placed and will be shipped to your address.`,
+          life: 8000
+        });
+        
+        // Clear cart after successful order
+        this.cartService.clearCart();
+        
+        // Reset stepper state and forms
+        this.resetCheckoutState();
+        
+        // Show order confirmation details
+        this.showOrderConfirmation(order);
+        
+        // Redirect to home after showing confirmation
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 5000);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error creating order:', error);
+        
+        let errorMessage = 'There was an error creating your order. Please try again.';
+        
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.status === 401) {
+          errorMessage = 'Authentication failed. Please log in again.';
+        } else if (error.status === 404) {
+          errorMessage = 'One or more products in your cart are no longer available.';
+        } else if (error.status === 400) {
+          errorMessage = 'Invalid order data. Please check your information.';
+        }
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Order Creation Failed',
+          detail: errorMessage,
+          life: 6000
+        });
+      }
+    });
+  }
+
+  /**
+   * Calculate estimated delivery date (e.g., 5-7 business days from now)
+   */
+  private calculateEstimatedDeliveryDate(): string {
+    const today = new Date();
+    const deliveryDate = new Date(today);
+    deliveryDate.setDate(today.getDate() + 7); // 7 days from now
+    return deliveryDate.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+  }
+
+  /**
+   * Show order confirmation details
+   */
+  private showOrderConfirmation(order: OrderResponse): void {
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Order Details',
+      detail: `Order Number: ${order.orderNumber}\nTotal Amount: ${this.formatCurrency(order.totalAmount)}\nEstimated Delivery: ${order.estimatedDeliveryDate || 'TBD'}`,
+      life: 10000
+    });
   }
 
   /**

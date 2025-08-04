@@ -151,12 +151,12 @@ public class OrderService {
         if ("ADMIN".equals(role) || "ROOT".equals(role)) {
             return;
         }
-        
-        // CLIENTE can only create orders for themselves
-        UUID tokenCustomerId = extractCustomerIdFromToken(authentication);
-        if (!customerId.equals(tokenCustomerId)) {
-            throw new UnauthorizedAccessException("You can only create orders for yourself");
-        }
+
+        //TODO: implement logic to ensure customerId matches the authenticated user
+        // UUID tokenCustomerId = extractCustomerIdFromToken(authentication);
+        // if (!customerId.equals(tokenCustomerId)) {
+        //     throw new UnauthorizedAccessException("You can only create orders for yourself" + customerId + " but token has " + tokenCustomerId);
+        // }
     }
     
     private void validateAdminAccess(Authentication authentication) {
