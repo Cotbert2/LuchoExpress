@@ -1,4 +1,4 @@
-package main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients;
+package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.cloud.openfeign.FeignClient;

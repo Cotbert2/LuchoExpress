@@ -3,11 +3,24 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
       routes:
         - id: ms-auth
           uri: http://localhost:8081
           predicates:
-            - Path=/api/auth/**
+            - Path=/auth/**
         - id: ms-customer
           uri: http://localhost:8082
           predicates:
@@ -30,7 +43,7 @@ spring:
             - Path=/api/tracking/**
 
 server:
-  port: 8090
+  port: 8080
 
 logging:
   level:

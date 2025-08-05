@@ -1,4 +1,4 @@
-package main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.security;
+package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

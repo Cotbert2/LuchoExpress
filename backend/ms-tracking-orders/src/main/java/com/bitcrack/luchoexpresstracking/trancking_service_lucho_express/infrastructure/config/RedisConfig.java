@@ -1,4 +1,4 @@
-package main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.config;
+package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
 
 @Configuration
 public class RedisConfig {

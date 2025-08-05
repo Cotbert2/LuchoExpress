@@ -1,16 +1,16 @@
-package main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.application;
+package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.OrderStatusEnum;
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceClient;
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceFeignClient;
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceClient;
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceFeignClient;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.OrderStatusEnum;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceClient;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceFeignClient;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceClient;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceFeignClient;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;

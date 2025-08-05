@@ -1,10 +1,10 @@
-package main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.security;
+package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.application.TrackingService;
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.application.TrackingService;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

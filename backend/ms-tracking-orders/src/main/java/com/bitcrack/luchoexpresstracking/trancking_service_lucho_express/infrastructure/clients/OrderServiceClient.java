@@ -1,4 +1,4 @@
-package main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients;
+package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;

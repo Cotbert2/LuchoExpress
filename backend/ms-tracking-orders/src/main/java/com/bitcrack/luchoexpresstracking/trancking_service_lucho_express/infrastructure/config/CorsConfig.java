@@ -1,4 +1,4 @@
-package main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.config;
+package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

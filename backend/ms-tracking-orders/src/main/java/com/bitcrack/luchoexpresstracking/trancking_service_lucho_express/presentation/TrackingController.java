@@ -1,4 +1,4 @@
-package main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.presentation;
+package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.presentation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.application.TrackingService;
-import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.application.TrackingService;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
 
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -87,7 +87,7 @@ public class TrackingController {
             testStatus.setOrderNumber("TEST-001");
             testStatus.setOrderId(java.util.UUID.randomUUID());
             testStatus.setUserId(java.util.UUID.randomUUID());
-            testStatus.setStatus(main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.OrderStatusEnum.PENDING);
+            testStatus.setStatus(com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.OrderStatusEnum.PENDING);
             testStatus.setUpdatedAt(java.time.LocalDateTime.now());
             
             trackingService.updateTrackingStatus(testStatus);
