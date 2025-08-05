@@ -115,7 +115,7 @@ private void seedCategories() {
                  new BigDecimal("79.99"));
 
     createProduct(home.getId(), "Philips Hue Smart LED Bulb",
-                 "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.philips-hue.com%2Fen-us%2Fp%2Fhue-white-and-color-ambiance-br30-e26-smart-bulb-2-pack%2F046677578091&psig=AOvVaw2XWDMQVDoe2unmaKyZ5UoY&ust=1754495250163000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPjItaOC9I4DFQAAAAAdAAAAABAE",
+                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaHSYxQmD-KI5zhz1LjgAzTrpUBoAQ5UVYDw&s",
                  "Smart LED bulb with 16 million colors and mobile app control",
                  new BigDecimal("49.99"));
 

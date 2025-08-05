@@ -17,9 +17,9 @@ services:
     restart: always
 
   # Microservicio de productos
-  ms-product-lucho-express:
-    image: ms-product-lucho-express
-    container_name: ms-product-lucho-express
+  cotbert2/ms-product-lucho-express:
+    image: cotbert2/ms-product-lucho-express
+    container_name: cotbert2/ms-product-lucho-express
     environment:
       DB_HOST: mysql-products:3306
     ports:
@@ -45,9 +45,9 @@ services:
     restart: always
 
   # Microservicio de autenticación
-  ms-auth-lucho-express:
-    image: ms-auth-lucho-express
-    container_name: ms-auth-lucho-express
+  cotbert2/ms-auth-lucho-express:
+    image: cotbert2/ms-auth-lucho-express
+    container_name: cotbert2/ms-auth-lucho-express
     environment:
       DB_HOST: postgres-auth
       DB_PORT: 5432
@@ -74,9 +74,9 @@ services:
     restart: always
 
   # Microservicio de clientes
-  ms-customer-lucho-express:
-    image: ms-customer-lucho-express
-    container_name: ms-customer-lucho-express
+  cotbert2/ms-customer-lucho-express:
+    image: cotbert2/ms-customer-lucho-express
+    container_name: cotbert2/ms-customer-lucho-express
     environment:
       DB_HOST: postgres-customers
       DB_PORT: 5432
@@ -104,23 +104,23 @@ services:
     restart: always
 
   # Microservicio de pedidos
-  ms-orders-lucho-express:
-    image: ms-orders-lucho-express
-    container_name: ms-orders-lucho-express
+  cotbert2/ms-orders-lucho-express:
+    image: cotbert2/ms-orders-lucho-express
+    container_name: cotbert2/ms-orders-lucho-express
     environment:
       DB_HOST: order-mysql
       DB_PORT: 3306
-      PRODUCT_SERVICE_URL: http://ms-product-lucho-express:8085
-      CUSTOMER_SERVICE_URL: http://ms-customer-lucho-express:8082
-      Tracking_URL: http://ms-tracking-lucho-express:8086
+      PRODUCT_SERVICE_URL: http://cotbert2/ms-product-lucho-express:8085
+      CUSTOMER_SERVICE_URL: http://cotbert2/ms-customer-lucho-express:8082
+      Tracking_URL: http://cotbert2/ms-tracking-lucho-express:8086
     ports:
       - "8084:8084"
     networks:
       - lucho-express-network
     depends_on:
       - order-mysql
-      - ms-product-lucho-express
-      - ms-customer-lucho-express
+      - cotbert2/ms-product-lucho-express
+      - cotbert2/ms-customer-lucho-express
     restart: always
 
   # Redis para el microservicio de tracking
@@ -134,22 +134,22 @@ services:
     restart: always
 
   # Microservicio de tracking
-  ms-tracking-lucho-express:
-    image: ms-tracking-lucho-express
-    container_name: ms-tracking-lucho-express
+  cotbert2/ms-tracking-lucho-express:
+    image: cotbert2/ms-tracking-lucho-express
+    container_name: cotbert2/ms-tracking-lucho-express
     environment:
       REDIS_HOST: redis-tracking-service
       REDIS_PORT: 6379
-      ORDER_SERVICE_URL: http://ms-orders-lucho-express:8084
-      CUSTOMER_SERVICE_URL: http://ms-customer-lucho-express:8082
+      ORDER_SERVICE_URL: http://cotbert2/ms-orders-lucho-express:8084
+      CUSTOMER_SERVICE_URL: http://cotbert2/ms-customer-lucho-express:8082
     ports:
       - "8086:8086"
     networks:
       - lucho-express-network
     depends_on:
       - redis-tracking-service
-      - ms-orders-lucho-express
-      - ms-customer-lucho-express
+      - cotbert2/ms-orders-lucho-express
+      - cotbert2/ms-customer-lucho-express
     restart: always
 
   # API Gateway
@@ -161,11 +161,11 @@ services:
     networks:
       - lucho-express-network
     depends_on:
-      - ms-auth-lucho-express
-      - ms-product-lucho-express
-      - ms-customer-lucho-express
-      - ms-orders-lucho-express
-      - ms-tracking-lucho-express
+      - cotbert2/ms-auth-lucho-express
+      - cotbert2/ms-product-lucho-express
+      - cotbert2/ms-customer-lucho-express
+      - cotbert2/ms-orders-lucho-express
+      - cotbert2/ms-tracking-lucho-express
     restart: always
 
   # Frontend
