@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: ms-auth
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+        - id: ms-customer
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/customers/**
+        - id: ms-order
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/orders/**
+        - id: ms-products
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/products/**
+        - id: ms-categories
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/categories/**
+        - id: ms-tracking-orders
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/tracking/**
+
+server:
+  port: 8090
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.netty.http.client: DEBUG
