@@ -12,6 +12,7 @@ import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_expre
 import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceClient;
 import main.java.com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceFeignClient;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service

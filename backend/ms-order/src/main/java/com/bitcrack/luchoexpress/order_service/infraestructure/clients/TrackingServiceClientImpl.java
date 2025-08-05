@@ -6,6 +6,7 @@ import com.bitcrack.luchoexpress.order_service.domain.Order;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,9 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
     
     private final TrackingOrdersServiceFeignClient trackingOrdersServiceFeignClient;
     private final CustomerServiceClient customerServiceClient;
+    
+    @Value("${microservices.api-key}")
+    private String apiKey;
     
     @Override
     @Async
@@ -37,7 +41,7 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
                     LocalDateTime.now()
                 );
             
-            trackingOrdersServiceFeignClient.createOrUpdateTracking(trackingStatus);
+            trackingOrdersServiceFeignClient.createOrUpdateTracking(apiKey, trackingStatus);
             
             log.info("Successfully created tracking for order: {}", order.getId());
             
@@ -68,7 +72,7 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
                     LocalDateTime.now()
                 );
             
-            trackingOrdersServiceFeignClient.createOrUpdateTracking(trackingStatus);
+            trackingOrdersServiceFeignClient.createOrUpdateTracking(apiKey, trackingStatus);
             
             log.info("Successfully updated tracking for order: {}", order.getId());
             

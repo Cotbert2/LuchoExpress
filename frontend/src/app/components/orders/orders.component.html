@@ -275,16 +275,33 @@
 
     <!-- Error State -->
     <div *ngIf="!trackingLoading && trackingError" class="text-center py-8">
-      <i class="pi pi-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+      <i class="pi pi-exclamation-triangle text-4xl text-red-500 mb-4" 
+         *ngIf="!trackingError.includes('Authentication') && !trackingError.includes('Access denied')"></i>
+      <i class="pi pi-lock text-4xl text-orange-500 mb-4" 
+         *ngIf="trackingError.includes('Authentication')"></i>
+      <i class="pi pi-ban text-4xl text-red-600 mb-4" 
+         *ngIf="trackingError.includes('Access denied')"></i>
+      
       <h4 class="text-lg font-semibold text-gray-800 mb-2">Unable to fetch tracking data</h4>
       <p class="text-gray-600 mb-4">{{ trackingError }}</p>
-      <p-button
-        label="Try Again"
-        icon="pi pi-refresh"
-        severity="secondary"
-        (onClick)="reloadTrackingData()"
-        [outlined]="true"
-      />
+      
+      <div class="flex gap-2 justify-center">
+        <p-button
+          label="Try Again"
+          icon="pi pi-refresh"
+          severity="secondary"
+          (onClick)="reloadTrackingData()"
+          [outlined]="true"
+        />
+        <p-button
+          *ngIf="trackingError.includes('Authentication')"
+          label="Go to Login"
+          icon="pi pi-sign-in"
+          severity="info"
+          routerLink="/login"
+          [outlined]="true"
+        />
+      </div>
     </div>
 
     <!-- Success State -->

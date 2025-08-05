@@ -290,27 +290,54 @@ export class OrdersComponent implements OnInit {
     this.trackingError = null;
     this.trackingData = null;
 
-    this.trackingService.getTrackingStatus(orderNumber).subscribe({
-      next: (response: TrackingResponse) => {
-        this.trackingData = response.data;
-        this.trackingResponseTime = response.responseTime;
-        this.trackingLoading = false;
-      },
-      error: (error) => {
-        this.trackingLoading = false;
-        this.trackingResponseTime = error.responseTime || 0;
-        
-        if (error.status === 404) {
-          this.trackingError = error.error?.message || 'No tracking information found for this order';
-        } else if (error.status === 500) {
-          this.trackingError = error.error?.message || 'Internal server error occurred';
-        } else {
-          this.trackingError = 'Failed to fetch tracking information';
-        }
+    try {
+      this.trackingService.getTrackingStatus(orderNumber).subscribe({
+        next: (response: TrackingResponse) => {
+          this.trackingData = response.data;
+          this.trackingResponseTime = response.responseTime;
+          this.trackingLoading = false;
+        },
+        error: (error) => {
+          this.trackingLoading = false;
+          this.trackingResponseTime = error.responseTime || 0;
+          
+          // Manejo específico de errores de autenticación
+          if (error.status === 401) {
+            this.trackingError = 'Authentication required. Please log in to view tracking information.';
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Authentication Required',
+              detail: 'Please log in to view tracking information'
+            });
+          } else if (error.status === 403) {
+            this.trackingError = 'Access denied. You don\'t have permission to view this order\'s tracking information.';
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Access Denied',
+              detail: 'You don\'t have permission to view this order'
+            });
+          } else if (error.status === 404) {
+            this.trackingError = error.error?.message || 'No tracking information found for this order';
+          } else if (error.status === 500) {
+            this.trackingError = error.error?.message || 'Internal server error occurred';
+          } else {
+            this.trackingError = 'Failed to fetch tracking information';
+          }
 
-        console.error('Error fetching tracking data:', error);
-      }
-    });
+          console.error('Error fetching tracking data:', error);
+        }
+      });
+    } catch (authError: any) {
+      // Manejo de errores de token (cuando no hay token disponible)
+      this.trackingLoading = false;
+      this.trackingError = authError.message || 'Authentication token not available. Please log in.';
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Authentication Required',
+        detail: 'Please log in to view tracking information'
+      });
+      console.error('Authentication error:', authError);
+    }
   }
 
   reloadTrackingData() {

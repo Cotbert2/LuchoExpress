@@ -69,8 +69,7 @@
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 		
-		<!-- Dependencias JWT comentadas temporalmente (requieren Spring Security) -->
-		<!--
+		<!-- Dependencias JWT para validación de tokens -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -88,7 +87,6 @@
 			<version>0.11.5</version>
 			<scope>runtime</scope>
 		</dependency>
-		-->
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>

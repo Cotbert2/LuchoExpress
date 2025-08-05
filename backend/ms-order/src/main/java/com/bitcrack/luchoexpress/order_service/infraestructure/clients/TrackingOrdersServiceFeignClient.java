@@ -5,6 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -14,7 +15,9 @@ import java.util.UUID;
 public interface TrackingOrdersServiceFeignClient {
     
     @PostMapping("/api/tracking")
-    ResponseEntity<Map<String, String>> createOrUpdateTracking(@RequestBody TrackingStatusDto trackingStatus);
+    ResponseEntity<Map<String, String>> createOrUpdateTracking(
+        @RequestHeader("X-API-KEY") String apiKey,
+        @RequestBody TrackingStatusDto trackingStatus);
     
     record TrackingStatusDto(
         UUID orderId,
