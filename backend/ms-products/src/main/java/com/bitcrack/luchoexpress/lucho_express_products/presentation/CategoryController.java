@@ -14,7 +14,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
+// @CrossOrigin disabled when using API Gateway - CORS is handled at gateway level
+// @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class CategoryController {
     

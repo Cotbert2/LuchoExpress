@@ -1,5 +1,6 @@
 package com.bitcrack.luchoexpress.order_service.infrastructure.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -9,6 +10,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 @Configuration
+@ConditionalOnProperty(name = "app.cors.enabled", havingValue = "true", matchIfMissing = false)
 public class CorsConfig {
 
     @Bean

@@ -1,11 +1,13 @@
 package com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@ConditionalOnProperty(name = "app.cors.enabled", havingValue = "true", matchIfMissing = false)
 public class CorsConfig {
 
     @Bean

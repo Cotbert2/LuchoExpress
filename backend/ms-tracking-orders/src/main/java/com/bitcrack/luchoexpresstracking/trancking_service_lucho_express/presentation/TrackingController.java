@@ -15,7 +15,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tracking")
-@CrossOrigin(origins = {"http://localhost:4200", "http://127.0.0.1:4200"})
+// @CrossOrigin disabled when using API Gateway - CORS is handled at gateway level
+// @CrossOrigin(origins = {"http://localhost:4200", "http://127.0.0.1:4200"})
 @RequiredArgsConstructor
 @Slf4j
 public class TrackingController {

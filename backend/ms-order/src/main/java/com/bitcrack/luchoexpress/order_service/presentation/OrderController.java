@@ -18,7 +18,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "*")
+// @CrossOrigin disabled when using API Gateway - CORS is handled at gateway level
+// @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @Slf4j
 public class OrderController {
