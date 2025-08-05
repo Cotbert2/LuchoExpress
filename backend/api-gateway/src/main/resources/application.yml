@@ -33,6 +33,10 @@ spring:
           uri: http://localhost:8085
           predicates:
             - Path=/api/products/**
+        - id: ms-product-categories
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/categories-with-products/**
         - id: ms-categories
           uri: http://localhost:8085
           predicates:
