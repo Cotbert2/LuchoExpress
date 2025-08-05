@@ -1,0 +1,185 @@
+version: '3.8'
+
+services:
+  # Base de datos para productos
+  mysql-products:
+    image: mysql
+    container_name: mysql-products
+    environment:
+      MYSQL_DATABASE: product_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Microservicio de productos
+  ms-product-lucho-express:
+    image: ms-product-lucho-express
+    container_name: ms-product-lucho-express
+    environment:
+      DB_HOST: mysql-products:3306
+    ports:
+      - "8085:8085"
+    networks:
+      - lucho-express-network
+    depends_on:
+      - mysql-products
+    restart: always
+
+  # Base de datos para auth
+  postgres-auth:
+    image: postgres:latest
+    container_name: postgres-auth
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Microservicio de autenticación
+  ms-auth-lucho-express:
+    image: ms-auth-lucho-express
+    container_name: ms-auth-lucho-express
+    environment:
+      DB_HOST: postgres-auth
+      DB_PORT: 5432
+    ports:
+      - "8081:8081"
+    networks:
+      - lucho-express-network
+    depends_on:
+      - postgres-auth
+    restart: always
+
+  # Base de datos para clientes
+  postgres-customers:
+    image: postgres:latest
+    container_name: postgres-customers
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: customers_db
+    ports:
+      - "5432:5432"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Microservicio de clientes
+  ms-customer-lucho-express:
+    image: ms-customer-lucho-express
+    container_name: ms-customer-lucho-express
+    environment:
+      DB_HOST: postgres-customers
+      DB_PORT: 5432
+    ports:
+      - "8082:8082"
+    networks:
+      - lucho-express-network
+    depends_on:
+      - postgres-customers
+    restart: always
+
+  # Base de datos para pedidos
+  order-mysql:
+    image: mysql
+    container_name: order-mysql
+    environment:
+      MYSQL_DATABASE: orders_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "3307:3306"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Microservicio de pedidos
+  ms-orders-lucho-express:
+    image: ms-orders-lucho-express
+    container_name: ms-orders-lucho-express
+    environment:
+      DB_HOST: order-mysql
+      DB_PORT: 3306
+      PRODUCT_SERVICE_URL: http://ms-product-lucho-express:8085
+      CUSTOMER_SERVICE_URL: http://ms-customer-lucho-express:8082
+      Tracking_URL: http://ms-tracking-lucho-express:8086
+    ports:
+      - "8084:8084"
+    networks:
+      - lucho-express-network
+    depends_on:
+      - order-mysql
+      - ms-product-lucho-express
+      - ms-customer-lucho-express
+    restart: always
+
+  # Redis para el microservicio de tracking
+  redis-tracking-service:
+    image: redis:7-alpine
+    container_name: redis-tracking-service
+    ports:
+      - "6379:6379"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Microservicio de tracking
+  ms-tracking-lucho-express:
+    image: ms-tracking-lucho-express
+    container_name: ms-tracking-lucho-express
+    environment:
+      REDIS_HOST: redis-tracking-service
+      REDIS_PORT: 6379
+      ORDER_SERVICE_URL: http://ms-orders-lucho-express:8084
+      CUSTOMER_SERVICE_URL: http://ms-customer-lucho-express:8082
+    ports:
+      - "8086:8086"
+    networks:
+      - lucho-express-network
+    depends_on:
+      - redis-tracking-service
+      - ms-orders-lucho-express
+      - ms-customer-lucho-express
+    restart: always
+
+  # API Gateway
+  api-gateway-lucho-express:
+    image: api-gateway-lucho-express
+    container_name: api-gateway-lucho-express
+    ports:
+      - "8080:8080"
+    networks:
+      - lucho-express-network
+    depends_on:
+      - ms-auth-lucho-express
+      - ms-product-lucho-express
+      - ms-customer-lucho-express
+      - ms-orders-lucho-express
+      - ms-tracking-lucho-express
+    restart: always
+
+  # Frontend
+  frontend-lucho-express:
+    image: frontend-lucho-express
+    container_name: frontend-lucho-express
+    ports:
+      - "4200:80"
+    networks:
+      - lucho-express-network
+    depends_on:
+      - api-gateway-lucho-express
+    restart: always
+
+networks:
+  lucho-express-network:
+    driver: bridge
