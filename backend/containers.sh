@@ -1,35 +1,5 @@
 #!/bin/bash
 
-# This script is used to manage Docker containers for the application.
-
-docker run --name customer-postgres \
-  --network lucho-express-network \
-  -e POSTGRES_USER=admin \
-  -e POSTGRES_PASSWORD=admin \
-  -e POSTGRES_DB=customers_db \
-  -p 5432:5432 \
-  -d postgres:latest
-
-
-
-
-
-
-# Container for products microservice
-
-
-
-
-# Container for tracking microservice
-docker run --name redis-tracking \
-  -p 6379:6379 \
-  -d redis:7-alpine
-  --network lucho-express-network
-
-
-docker stop customer-postgres auth-postgres lucho-express-mysql redis-tracking orders-mysql
-
-
 # Container for products
 docker run --name mysql-products\
   --network lucho-express-network \
@@ -119,7 +89,33 @@ docker run --name redis-tracking-service \
   -p 6379:6379 \
   -d redis:7-alpine
 
+#Container for API Gateway
+docker run --name api-gateway-lucho-express \
+  -p 8080:8080 \
+  --network lucho-express-network \
+  -d api-gateway-lucho-express
 
 
 #network for all containers
 docker network create lucho-express-network
+
+#container for frontend
+docker run --name frontend-lucho-express \
+  -p 4200:80 \
+  -d frontend-lucho-express
+
+docker tag ms-auth-lucho-express cotbert2/ms-auth-lucho-express:v1
+docker tag ms-product-lucho-express cotbert2/ms-product-lucho-express:v1
+docker tag ms-customer-lucho-express cotbert2/ms-customer-lucho-express:v1
+docker tag ms-orders-lucho-express cotbert2/ms-orders-lucho-express:v1
+docker tag ms-tracking-lucho-express cotbert2/ms-tracking-lucho-express:v1
+docker tag api-gateway-lucho-express cotbert2/api-gateway-lucho-express:v1
+docker tag frontend-lucho-express cotbert2/frontend-lucho-express:v1
+
+docker push cotbert2/ms-auth-lucho-express:v1
+docker push cotbert2/ms-product-lucho-express:v1
+docker push cotbert2/ms-customer-lucho-express:v1
+docker push cotbert2/ms-orders-lucho-express:v1
+docker push cotbert2/ms-tracking-lucho-express:v1
+docker push cotbert2/api-gateway-lucho-express:v1
+docker push cotbert2/frontend-lucho-express:v1

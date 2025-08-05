@@ -88,7 +88,7 @@ private void seedCategories() {
                  new BigDecimal("45.99"));
 
     createProduct(books.getId(), "The Little Prince - Antoine de Saint-Exupéry",
-                 "https://m.media-amazon.com/images/I/41cVgTkpGwL._SX331_BO1,204,203,200_.jpg",
+                 "https://m.media-amazon.com/images/I/71OZY035QKL._UF1000,1000_QL80_.jpg",
                  "Classic literary tale about friendship, love, and the loss of innocence",
                  new BigDecimal("12.99"));
 
@@ -99,23 +99,23 @@ private void seedCategories() {
                  new BigDecimal("18.99"));
 
     createProduct(food.getId(), "70% Cacao Artisan Dark Chocolate",
-                 "https://cdn.shopify.com/s/files/1/0123/4567/8901/products/chocolate-70-cacao_1024x1024.jpg",
+                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS32ixpELtgSu9lEjQKQZlUB3TFCgx59DkxmA&s",
                  "Artisan dark chocolate with 70% cacao, organic and fair trade",
                  new BigDecimal("8.99"));
 
     // Additional products
     createProduct(electronics.getId(), "iPad Air Tablet",
-                 "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-air-select-wifi-blue-202203_FMT_WHH?wid=940&hei=1112&fmt=png-alpha&.v=1645065732688",
+                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShtM61evC32i3-d1sUSV-lF-mhTbCh5g0HtA&s",
                  "Tablet with M1 chip, 10.9-inch Liquid Retina display, and Apple Pencil support",
                  new BigDecimal("599.99"));
 
     createProduct(clothing.getId(), "Adidas Sports Jacket",
-                 "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/1234567890abcdef/essentials-3-stripes-track-jacket-black-HM4452_01_laydown.jpg",
+                 "https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/ba91a7ee28c345858d54e1ecf7caab7d_9366/z.n.e.-full-zip-hooded-track-jacket.jpg",
                  "Sports jacket with iconic three stripes, ideal for workouts and casual wear",
                  new BigDecimal("79.99"));
 
     createProduct(home.getId(), "Philips Hue Smart LED Bulb",
-                 "https://www.philips-hue.com/content/dam/hue-philips-com/global/products/bulbs/white-and-color-ambiance/single-bulb/8718699673147_PK1.png",
+                 "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.philips-hue.com%2Fen-us%2Fp%2Fhue-white-and-color-ambiance-br30-e26-smart-bulb-2-pack%2F046677578091&psig=AOvVaw2XWDMQVDoe2unmaKyZ5UoY&ust=1754495250163000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPjItaOC9I4DFQAAAAAdAAAAABAE",
                  "Smart LED bulb with 16 million colors and mobile app control",
                  new BigDecimal("49.99"));
 
