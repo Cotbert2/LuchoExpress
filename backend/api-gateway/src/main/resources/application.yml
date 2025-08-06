@@ -6,14 +6,19 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOriginPatterns: "*"
+            allowedOriginPatterns: 
+              - "http://localhost:4200"
+              - "http://127.0.0.1:4200"
             allowedMethods:
               - GET
               - POST
               - PUT
+              - PATCH
               - DELETE
               - OPTIONS
+              - HEAD
             allowedHeaders: "*"
+            exposedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
       routes:
