@@ -154,7 +154,7 @@ services:
 
   # API Gateway
   api-gateway-lucho-express:
-    image: cotbert2/api-gateway-lucho-express:v1
+    image: cotbert2/api-gateway-lucho-express:v2
     container_name: api-gateway-lucho-express
     ports:
       - "8080:8080"

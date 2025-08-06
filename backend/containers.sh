@@ -109,7 +109,7 @@ docker tag ms-product-lucho-express cotbert2/ms-product-lucho-express:v1
 docker tag ms-customer-lucho-express cotbert2/ms-customer-lucho-express:v1
 docker tag ms-orders-lucho-express cotbert2/ms-orders-lucho-express:v1
 docker tag ms-tracking-lucho-express cotbert2/ms-tracking-lucho-express:v1
-docker tag api-gateway-lucho-express cotbert2/api-gateway-lucho-express:v1
+docker tag api-gateway-lucho-express cotbert2/api-gateway-lucho-express:v2
 docker tag frontend-lucho-express cotbert2/frontend-lucho-express:v1
 
 docker push cotbert2/ms-auth-lucho-express:v1
