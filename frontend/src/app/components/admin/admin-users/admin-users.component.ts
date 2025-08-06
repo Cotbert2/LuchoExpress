@@ -232,10 +232,10 @@ export class AdminUsersComponent implements OnInit {
     }
 
     this.confirmationService.confirm({
-      message: `¿Está seguro de que desea desactivar al usuario ${user.username}?`,
-      header: 'Confirmar desactivación',
+      message: `Are you sure you want to deactivate the user ${user.username}?`,
+      header: 'Confirm deactivation',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí',
+      acceptLabel: 'Yes',
       rejectLabel: 'No',
       accept: () => {
         this.disableUser(user);
@@ -248,8 +248,8 @@ export class AdminUsersComponent implements OnInit {
       next: () => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Éxito',
-          detail: 'Usuario desactivado correctamente'
+          summary: 'Success',
+          detail: 'User deactivated successfully'
         });
         this.loadUsers();
       },
@@ -258,7 +258,7 @@ export class AdminUsersComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Error al desactivar usuario'
+          detail: 'Error deactivating user'
         });
       }
     });
@@ -269,7 +269,7 @@ export class AdminUsersComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'El nombre de usuario es requerido'
+        detail: 'Username is required'
       });
       return false;
     }
@@ -278,7 +278,7 @@ export class AdminUsersComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'El email es requerido'
+        detail: 'Email is required'
       });
       return false;
     }
@@ -287,7 +287,7 @@ export class AdminUsersComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'La contraseña es requerida'
+        detail: 'Password is required'
       });
       return false;
     }
@@ -300,7 +300,7 @@ export class AdminUsersComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'El nombre de usuario es requerido'
+        detail: 'Username is required'
       });
       return false;
     }
@@ -309,7 +309,7 @@ export class AdminUsersComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'El email es requerido'
+        detail: 'Email is required'
       });
       return false;
     }
@@ -335,7 +335,7 @@ export class AdminUsersComponent implements OnInit {
   }
 
   getStatusText(enabled: boolean): string {
-    return enabled ? 'Activo' : 'Inactivo';
+    return enabled ? 'Active' : 'Inactive';
   }
 
   canCreateRole(role: string): boolean {

@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
         ErrorResponse error = new ErrorResponse(
             HttpStatus.UNAUTHORIZED.value(),
-            "Invalid credentials",
+            "Invalid credentials or banned user",
             ex.getMessage(),
             LocalDateTime.now()
         );

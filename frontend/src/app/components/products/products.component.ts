@@ -9,6 +9,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
+import { InputIconModule } from 'primeng/inputicon';
+import { IconFieldModule } from 'primeng/iconfield';
 
 @Component({
   selector: 'app-products',
@@ -19,7 +21,9 @@ import { FormsModule } from '@angular/forms';
     InputTextModule,
     CardModule,
     TagModule,
-    FormsModule
+    FormsModule,
+    InputIconModule,
+    IconFieldModule
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss'

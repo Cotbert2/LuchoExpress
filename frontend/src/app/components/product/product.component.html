@@ -49,22 +49,22 @@
 
       <!-- Selector de cantidad -->
       <div class="flex items-center gap-4 mb-6">
-  <label for="quantity" class="text-gray-700 min-w-[80px]">Quantity:</label>
-  <div class="flex items-center gap-2">
-    <p-inputnumber 
-      [(ngModel)]="cuantity" 
-      inputId="quantity"
-      [min]="1" 
-      [max]="9"
-      mode="decimal"
-      showButtons
-      buttonLayout="horizontal"
-      incrementButtonIcon="pi pi-plus" 
-      decrementButtonIcon="pi pi-minus"
-      class="w-28 [&_input]:w-12"
-    ></p-inputnumber>
-  </div>
-</div>
+      <label for="quantity" class="text-gray-700 min-w-[80px]">Quantity:</label>
+      <div class="flex items-center gap-2">
+        <p-inputnumber 
+          [(ngModel)]="cuantity" 
+          inputId="quantity"
+          [min]="1" 
+          [max]="9"
+          mode="decimal"
+          showButtons
+          buttonLayout="horizontal"
+          incrementButtonIcon="pi pi-plus" 
+          decrementButtonIcon="pi pi-minus"
+          class="w-28 [&_input]:w-12"
+        ></p-inputnumber>
+      </div>
+    </div>
 
       <!-- Botón -->
       <p-button 

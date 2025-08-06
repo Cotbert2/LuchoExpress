@@ -1,23 +1,23 @@
-<div class="container mx-auto p-4">
+<div class="container p-4 mx-auto">
   <!-- Header -->
   <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">My Orders</h1>
+    <h1 class="mb-2 text-3xl font-bold text-gray-800">My Orders</h1>
     <p class="text-gray-600">Manage and review the status of your orders</p>
   </div>
 
   <!-- Filters -->
-  <p-card class="mb-6">
+  <p-card class="mb-6 ">
     <ng-template pTemplate="header">
-      <div class="flex items-center gap-2">
-        <i class="pi pi-filter text-lg"></i>
+      <div class="flex items-center gap-2 py-2 pl-5 text-white rounded-t-lg bg-zinc-800">
+        <i class="text-lg pi pi-filter"></i>
         <span class="font-semibold">Filters</span>
       </div>
     </ng-template>
     
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
       <!-- Text search -->
       <div class="flex flex-col">
-        <label for="search" class="text-sm font-medium text-gray-700 mb-1">Search</label>
+        <label for="search" class="mb-1 text-sm font-medium text-gray-700">Search</label>
         <input
           id="search"
           pInputText
@@ -30,7 +30,7 @@
 
       <!-- Date from -->
       <div class="flex flex-col">
-        <label for="dateFrom" class="text-sm font-medium text-gray-700 mb-1">From</label>
+        <label for="dateFrom" class="mb-1 text-sm font-medium text-gray-700">From</label>
         <p-datepicker
           [(ngModel)]="dateFrom"
           placeholder="From date"
@@ -43,7 +43,7 @@
 
       <!-- Date to -->
       <div class="flex flex-col">
-        <label for="dateTo" class="text-sm font-medium text-gray-700 mb-1">To</label>
+        <label for="dateTo" class="mb-1 text-sm font-medium text-gray-700">To</label>
         <p-datepicker
           [(ngModel)]="dateTo"
           placeholder="To date"
@@ -70,9 +70,9 @@
   <!-- Orders table -->
   <p-card>
     <ng-template pTemplate="header">
-      <div class="flex justify-between items-center">
+      <div class="flex items-center justify-between pl-5 text-white rounded-t-lg bg-zinc-800">
         <div class="flex items-center gap-2">
-          <i class="pi pi-shopping-cart text-lg"></i>
+          <i class="text-lg pi pi-shopping-cart"></i>
           <span class="font-semibold">Orders ({{ filteredOrders.length }})</span>
         </div>
         <p-button
@@ -158,7 +158,7 @@
             <div class="space-y-1">
               <div 
                 *ngFor="let product of order.products" 
-                class="text-sm bg-gray-100 rounded px-2 py-1"
+                class="px-2 py-1 text-sm bg-gray-100 rounded"
               >
                 <div class="font-medium">{{ product.productName }}</div>
                 <div class="text-xs text-gray-600">
@@ -201,11 +201,11 @@
               <!-- Status info for non-cancellable orders -->
               <span 
                 *ngIf="!canCancelOrder(order.status)"
-                class="text-xs text-gray-500 px-2 py-1 flex items-center"
+                class="flex items-center px-2 py-1 text-xs text-gray-500"
                 [pTooltip]="getActionTooltip(order.status)"
                 tooltipPosition="top"
               >
-                <i class="pi pi-info-circle mr-1"></i>
+                <i class="mr-1 pi pi-info-circle"></i>
                 {{ getActionMessage(order.status) }}
               </span>
             </div>
@@ -216,11 +216,11 @@
       <!-- Empty state -->
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="text-center py-8">
+          <td colspan="7" class="py-8 text-center">
             <div class="flex flex-col items-center">
-              <i class="pi pi-shopping-cart text-4xl text-gray-400 mb-4"></i>
-              <p class="text-gray-500 text-lg">You don't have any orders yet</p>
-              <p class="text-gray-400 text-sm">When you place an order, it will appear here</p>
+              <i class="mb-4 text-4xl text-gray-400 pi pi-shopping-cart"></i>
+              <p class="text-lg text-gray-500">You don't have any orders yet</p>
+              <p class="text-sm text-gray-400">When you place an order, it will appear here</p>
             </div>
           </td>
         </tr>
@@ -246,11 +246,11 @@
   (onHide)="closeTrackingModal()"
 >
   <ng-template pTemplate="header">
-    <div class="flex items-center gap-3 w-full">
-      <i class="pi pi-bolt text-2xl text-yellow-500"></i>
+    <div class="flex items-center w-full gap-3">
+      <i class="text-2xl text-yellow-500 pi pi-bolt"></i>
       <div class="flex-grow">
-        <h3 class="text-xl font-bold text-gray-800 m-0">Fast Tracking Fetch</h3>
-        <p class="text-sm text-gray-600 m-0" *ngIf="currentTrackingOrderNumber">
+        <h3 class="m-0 text-xl font-bold text-gray-800">Fast Tracking Fetch</h3>
+        <p class="m-0 text-sm text-gray-600" *ngIf="currentTrackingOrderNumber">
           Order: {{ currentTrackingOrderNumber }}
         </p>
       </div>
@@ -269,23 +269,23 @@
   <div class="min-h-48">
     <!-- Loading State -->
     <div *ngIf="trackingLoading" class="flex flex-col items-center justify-center py-8">
-      <i class="pi pi-spin pi-spinner text-3xl text-blue-500 mb-4"></i>
+      <i class="mb-4 text-3xl text-blue-500 pi pi-spin pi-spinner"></i>
       <p class="text-gray-600">Fetching tracking information...</p>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="!trackingLoading && trackingError" class="text-center py-8">
-      <i class="pi pi-exclamation-triangle text-4xl text-red-500 mb-4" 
+    <div *ngIf="!trackingLoading && trackingError" class="py-8 text-center">
+      <i class="mb-4 text-4xl text-red-500 pi pi-exclamation-triangle" 
          *ngIf="!trackingError.includes('Authentication') && !trackingError.includes('Access denied')"></i>
-      <i class="pi pi-lock text-4xl text-orange-500 mb-4" 
+      <i class="mb-4 text-4xl text-orange-500 pi pi-lock" 
          *ngIf="trackingError.includes('Authentication')"></i>
-      <i class="pi pi-ban text-4xl text-red-600 mb-4" 
+      <i class="mb-4 text-4xl text-red-600 pi pi-ban" 
          *ngIf="trackingError.includes('Access denied')"></i>
       
-      <h4 class="text-lg font-semibold text-gray-800 mb-2">Unable to fetch tracking data</h4>
-      <p class="text-gray-600 mb-4">{{ trackingError }}</p>
+      <h4 class="mb-2 text-lg font-semibold text-gray-800">Unable to fetch tracking data</h4>
+      <p class="mb-4 text-gray-600">{{ trackingError }}</p>
       
-      <div class="flex gap-2 justify-center">
+      <div class="flex justify-center gap-2">
         <p-button
           label="Try Again"
           icon="pi pi-refresh"
@@ -307,7 +307,7 @@
     <!-- Success State -->
     <div *ngIf="!trackingLoading && !trackingError && trackingData" class="space-y-4">
       <!-- Tracking Status Card -->
-      <div class="bg-gray-50 rounded-lg p-4">
+      <div class="p-4 rounded-lg bg-gray-50">
         <div class="flex items-center justify-between mb-3">
           <h4 class="text-lg font-semibold text-gray-800">Tracking Status</h4>
           <p-tag 
@@ -317,20 +317,20 @@
           />
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label class="text-sm font-medium text-gray-600">Order ID</label>
-            <p class="text-gray-800 font-mono text-sm">{{ trackingData.orderId }}</p>
+            <p class="font-mono text-sm text-gray-800">{{ trackingData.orderId }}</p>
           </div>
           
           <div>
             <label class="text-sm font-medium text-gray-600">Order Number</label>
-            <p class="text-gray-800 font-semibold">{{ trackingData.orderNumber }}</p>
+            <p class="font-semibold text-gray-800">{{ trackingData.orderNumber }}</p>
           </div>
           
           <div>
             <label class="text-sm font-medium text-gray-600">User ID</label>
-            <p class="text-gray-800 font-mono text-sm">{{ trackingData.userId }}</p>
+            <p class="font-mono text-sm text-gray-800">{{ trackingData.userId }}</p>
           </div>
           
           <div>
@@ -343,12 +343,12 @@
       <p-divider />
 
       <!-- Raw Data Section -->
-      <div class="bg-gray-50 rounded-lg p-4">
-        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+      <div class="p-4 rounded-lg bg-gray-50">
+        <h4 class="flex items-center gap-2 mb-3 text-lg font-semibold text-gray-800">
           <i class="pi pi-code"></i>
           Raw Service Response
         </h4>
-        <pre class="bg-gray-800 text-green-400 p-3 rounded text-sm overflow-x-auto font-mono">{{ trackingData | json }}</pre>
+        <pre class="p-3 overflow-x-auto font-mono text-sm text-green-400 bg-gray-800 rounded">{{ trackingData | json }}</pre>
       </div>
     </div>
   </div>

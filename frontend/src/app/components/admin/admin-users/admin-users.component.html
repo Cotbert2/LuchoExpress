@@ -1,8 +1,8 @@
 <!-- Header -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+<div class="flex flex-col items-start justify-between gap-4 mb-6 md:flex-row md:items-center">
   <div>
     <h1 class="text-3xl font-bold text-gray-900">Users Management</h1>
-    <p class="text-gray-600 mt-1">Manage users in the system</p>
+    <p class="mt-1 text-gray-600">Manage users in the system</p>
   </div>
   <p-button 
     label="Create User" 
@@ -16,15 +16,15 @@
 <p-card class="mb-6">
   <ng-template pTemplate="header">
     <div class="flex items-center gap-2">
-      <i class="pi pi-filter text-lg"></i>
+      <i class="text-lg pi pi-filter"></i>
       <span class="font-semibold">Filters</span>
     </div>
   </ng-template>
   
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
     <!-- Filtro por rol -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Role</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Role</label>
       <p-select 
         [(ngModel)]="filters.role" 
         [options]="roleOptions"
@@ -38,7 +38,7 @@
     
     <!-- Filtro por email -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Email</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Email</label>
       <input 
         pInputText 
         type="text" 
@@ -65,7 +65,7 @@
 <p-card>
   <ng-template pTemplate="header">
     <div class="flex items-center gap-2">
-      <i class="pi pi-users text-lg"></i>
+      <i class="text-lg pi pi-users"></i>
       <span class="font-semibold">Users ({{ filteredUsers.length }})</span>
     </div>
   </ng-template>
@@ -95,8 +95,8 @@
       <tr>
         <td>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <i class="pi pi-user text-blue-600"></i>
+            <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+              <i class="text-blue-600 pi pi-user"></i>
             </div>
             <span class="font-medium">{{ user.username }}</span>
           </div>
@@ -139,10 +139,10 @@
     
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="6" class="text-center py-8">
+        <td colspan="6" class="py-8 text-center">
           <div class="flex flex-col items-center gap-2">
-            <i class="pi pi-users text-4xl text-gray-400"></i>
-            <p class="text-gray-500">No se encontraron usuarios</p>
+            <i class="text-4xl text-gray-400 pi pi-users"></i>
+            <p class="text-gray-500">No users found</p>
           </div>
         </td>
       </tr>
@@ -152,41 +152,41 @@
 
 <!-- Dialog Crear Usuario -->
 <p-dialog 
-  header="Crear Usuario" 
+  header="Create User" 
   [(visible)]="displayCreateDialog" 
   [modal]="true" 
   [style]="{width: '450px'}"
   [closable]="true">
   
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4 mb-32">
     <!-- Username -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Nombre de Usuario *</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Username *</label>
       <input 
         pInputText 
         type="text" 
         [(ngModel)]="createUserForm.username"
-        placeholder="Ingrese el nombre de usuario"
+        placeholder="Enter your username"
         class="w-full">
     </div>
     
     <!-- Email -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Email *</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Email *</label>
       <input 
         pInputText 
         type="email" 
         [(ngModel)]="createUserForm.email"
-        placeholder="Ingrese el email"
+        placeholder="Enter your email"
         class="w-full">
     </div>
     
     <!-- Password -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Contraseña *</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Password *</label>
       <p-password 
         [(ngModel)]="createUserForm.password"
-        placeholder="Ingrese la contraseña"
+        placeholder="Enter password"
         [toggleMask]="true"
         class="w-full">
       </p-password>
@@ -194,13 +194,13 @@
     
     <!-- Role -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Rol *</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Role *</label>
       <p-select 
         [(ngModel)]="createUserForm.role" 
         [options]="availableRoleOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Seleccionar rol"
+        placeholder="Choose role"
         class="w-full">
       </p-select>
     </div>
@@ -209,12 +209,12 @@
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-2">
       <p-button 
-        label="Cancelar" 
+        label="Cancel" 
         severity="secondary"
         (onClick)="displayCreateDialog = false">
       </p-button>
       <p-button 
-        label="Crear Usuario" 
+        label="Create User" 
         (onClick)="createUser()">
       </p-button>
     </div>
@@ -223,7 +223,7 @@
 
 <!-- Dialog Editar Usuario -->
 <p-dialog 
-  header="Editar Usuario" 
+  header="Edit User" 
   [(visible)]="displayEditDialog" 
   [modal]="true" 
   [style]="{width: '450px'}"
@@ -232,35 +232,35 @@
   <div class="flex flex-col gap-4" *ngIf="selectedUser">
     <!-- Username -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Nombre de Usuario *</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Username *</label>
       <input 
         pInputText 
         type="text" 
         [(ngModel)]="editUserForm.username"
-        placeholder="Ingrese el nombre de usuario"
+        placeholder="Enter your username"
         class="w-full">
     </div>
     
     <!-- Email -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Email *</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Email *</label>
       <input 
         pInputText 
         type="email" 
         [(ngModel)]="editUserForm.email"
-        placeholder="Ingrese el email"
+        placeholder="Enter your email"
         class="w-full">
     </div>
     
     <!-- Role -->
     <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700 mb-2">Rol *</label>
+      <label class="mb-2 text-sm font-medium text-gray-700">Rol *</label>
       <p-select 
         [(ngModel)]="editUserForm.role" 
         [options]="availableRoleOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Seleccionar rol"
+        placeholder="Choose your role"
         class="w-full">
       </p-select>
     </div>
@@ -272,19 +272,19 @@
         [binary]="true"
         inputId="enabled">
       </p-checkbox>
-      <label for="enabled" class="text-sm font-medium text-gray-700">Usuario activo</label>
+      <label for="enabled" class="text-sm font-medium text-gray-700">Active user</label>
     </div>
   </div>
   
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-2">
       <p-button 
-        label="Cancelar" 
+        label="Cancel" 
         severity="secondary"
         (onClick)="displayEditDialog = false">
       </p-button>
       <p-button 
-        label="Actualizar Usuario" 
+        label="Update user" 
         (onClick)="updateUser()">
       </p-button>
     </div>

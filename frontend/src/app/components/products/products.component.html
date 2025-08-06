@@ -25,42 +25,49 @@
     </div>
 
     <!-- Filtros y búsqueda -->
-    <div class="p-4 mb-6 bg-white rounded-lg shadow-md filters-section dark:bg-gray-800">
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <!-- Búsqueda -->
-        <div class="search-container">
-          <label for="search" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Search products
-          </label>
-          <span class="w-full p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input 
-              type="text" 
-              pInputText 
-              id="search"
-              [(ngModel)]="searchTerm" 
-              (input)="onSearchChange()"
-              placeholder="Search by name or description..."
-              class="w-full" />
-          </span>
-        </div>
+  <div class="p-4 mb-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      
+      <!-- Búsqueda -->
+      <div class="flex flex-col">
+  <label for="search" class="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+    Search products
+  </label>
 
-        <!-- Filtro por categoría -->
-        <div class="category-filter">
-          <label for="category" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Filter by category
-          </label>
-          <select 
-            id="category"
-            [(ngModel)]="selectedCategory"
-            (change)="onCategoryChange()"
-            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            <option *ngFor="let category of categories" [value]="category.value">
-              {{ category.label }}
-            </option>
-          </select>
-        </div>
+  <p-iconfield class="w-full">
+    <p-inputicon slot="start" class="pi pi-search"></p-inputicon>
+    <input
+      type="text"
+      pInputText
+      id="search"
+      [(ngModel)]="searchTerm"
+      (input)="onSearchChange()"
+      placeholder="Search by name or description..."
+      class="w-full"
+    />
+  </p-iconfield>
+</div>
+
+
+
+      <!-- Filtro por categoría -->
+      <div class="flex flex-col">
+        <label for="category" class="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+          Filter by category
+        </label>
+        <select 
+          id="category"
+          [(ngModel)]="selectedCategory"
+          (change)="onCategoryChange()"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          <option *ngFor="let category of categories" [value]="category.value">
+            {{ category.label }}
+          </option>
+        </select>
       </div>
+      
+    </div>
+
 
       <!-- Resultados counter -->
       <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
@@ -74,10 +81,10 @@
       <div *ngIf="filteredProducts.length === 0" class="py-8 text-center no-products-message">
         <i class="mb-4 text-4xl text-gray-400 pi pi-search"></i>
         <h3 class="mb-2 text-xl font-semibold text-gray-600 dark:text-gray-300">
-          No se encontraron productos
+          No products found
         </h3>
         <p class="text-gray-500 dark:text-gray-400">
-          Intenta ajustar tus filtros de búsqueda
+          Try adjusting your search filters
         </p>
       </div>
 
