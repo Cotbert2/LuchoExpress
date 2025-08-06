@@ -1,58 +1,78 @@
 <p-toast position="top-right"></p-toast>
 
-<div class="full-container df ai-center jc-center">
-    <div class="df item">
-        <p-panel>
-            <p-image [src]="product.imageUrl" [preview]="true">
-                <ng-template #indicator>
-                    <i class="pi pi-search"></i>
-                </ng-template>
-                <ng-template #image>
-                    <img [src]="product.imageUrl" alt="image" width="720" />
-                </ng-template>
-                <ng-template #preview let-style="style" let-previewCallback="previewCallback">
-                    <img [src]="product.imageUrl" alt="image" [style]="style" (click)="previewCallback()" />
-                </ng-template>
-            </p-image>
+<div class="df ai-center jc-center">
+  <div class="gap-6 df item">
+    <!-- Imagen -->
+    <p-panel>
+      <p-image [src]="product.imageUrl" [preview]="true">
+        <ng-template #indicator>
+          <i class="pi pi-search"></i>
+        </ng-template>
+        <ng-template #image>
+          <img [src]="product.imageUrl" alt="image" width="720" />
+        </ng-template>
+        <ng-template #preview let-style="style" let-previewCallback="previewCallback">
+          <img [src]="product.imageUrl" alt="image" [style]="style" (click)="previewCallback()" />
+        </ng-template>
+      </p-image>
+    </p-panel>
 
-        </p-panel>
-        <p-panel>
-            <h1>{{product.name}}</h1>
+    <!-- Info del producto -->
+    <p-panel class="w-full max-w-md px-6 py-8 shadow-lg bg-white/95 backdrop-blur-sm rounded-xl">
+      <h1 class="mb-6 text-3xl font-bold text-center text-gray-800">
+        {{ product.name }}
+      </h1>
 
-            <div class="space-betwwen-items">
+      <div class="space-between-items">
+        <h3 class="mb-1 text-lg font-semibold text-gray-700">Description:</h3>
+        <p class="text-gray-600">{{ product.description }}</p>
+      </div>
 
-                <h3>Descripcion:</h3>
-                <p>{{product.description}}</p>
-            </div>
+      <div class="space-between-items">
+        <p class="text-gray-500">{{ stock + ' items available!' }}</p>
+      </div>
 
-            <div class="space-betwwen-items">
-                <p>{{stock + ' items available!'}}</p>
+      <div class="space-between-items">
+        <p class="mb-1 text-gray-700">Our Rating:</p>
+        <p-rating [(ngModel)]="rating" [readonly]="true"></p-rating>
+      </div>
 
-            </div>
+      <div class="space-between-items">
+        <p class="mb-1 text-gray-700">Price:</p>
+        <div class="items-center gap-2 df">
+          <p class="text-sm font-semibold red" *ngIf="product.discount">
+            {{ product.discount + '% OFF' }}
+          </p>
+          <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ '$' + product.price }}</h2>
+        </div>
+      </div>
 
-            <div class="space-betwwen-items">
-                <p>Our Rating:</p>
-                <p-rating [(ngModel)]="rating" [readonly]="true"></p-rating>
-            </div>
+      <!-- Selector de cantidad -->
+      <div class="flex items-center gap-4 mb-6">
+  <label for="quantity" class="text-gray-700 min-w-[80px]">Quantity:</label>
+  <div class="flex items-center gap-2">
+    <p-inputnumber 
+      [(ngModel)]="cuantity" 
+      inputId="quantity"
+      [min]="1" 
+      [max]="9"
+      mode="decimal"
+      showButtons
+      buttonLayout="horizontal"
+      incrementButtonIcon="pi pi-plus" 
+      decrementButtonIcon="pi pi-minus"
+      class="w-28 [&_input]:w-12"
+    ></p-inputnumber>
+  </div>
+</div>
 
-
-            <div class="space-betwwen-items">
-                <p>Price:</p>
-                <div class="df">
-
-                    <p class="red">
-                        <span *ngIf="product.discount">{{product.discount + '% OFF'}}</span>
-                    </p>
-                </div>
-                <h2>{{'$' + product.price}}</h2>
-            </div>
-
-
-            <p-inputnumber [(ngModel)]="cuantity" prefix="↑ " inputId="Cuantity" suffix="units" [min]="1" [max]="33" /> <br>
-
-            <p-button icon="pi pi-shopping-cart"  label="Buy Now!" (onClick)="addToCart()"></p-button>
-
-
-        </p-panel>
-    </div>
+      <!-- Botón -->
+      <p-button 
+        icon="pi pi-shopping-cart" 
+        label="Buy Now!" 
+        (onClick)="addToCart()" 
+        class="w-full mt-4">
+      </p-button>
+    </p-panel>
+  </div>
 </div>

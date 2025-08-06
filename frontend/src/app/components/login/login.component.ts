@@ -22,7 +22,7 @@ import { LoginRequest, RegisterRequest, UserResponse } from '../../interfaces/au
     InputTextModule,
     ButtonModule,
     ReactiveFormsModule,
-    ToastModule
+    ToastModule,
   ],
   providers: [MessageService],
   templateUrl: './login.component.html',

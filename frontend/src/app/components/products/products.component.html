@@ -1,10 +1,10 @@
-<div class="products-container p-4">
+<div class="p-4 products-container">
   <!-- Vista de detalle de producto individual -->
   <div *ngIf="showProductDetail && selectedProduct" class="product-detail-view">
     <div class="mb-4">
       <p-button 
         icon="pi pi-arrow-left" 
-        label="Volver a productos" 
+        label="Return to products" 
         (click)="backToProductsList()"
         styleClass="p-button-outlined">
       </p-button>
@@ -20,19 +20,19 @@
   <div *ngIf="!showProductDetail" class="products-list-view">
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Our Products</h1>
+      <h1 class="mb-2 text-3xl font-bold text-gray-800 dark:text-white">Our Products</h1>
       <p class="text-gray-600 dark:text-gray-300">Explore our wide selection of products</p>
     </div>
 
     <!-- Filtros y búsqueda -->
-    <div class="filters-section mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="p-4 mb-6 bg-white rounded-lg shadow-md filters-section dark:bg-gray-800">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <!-- Búsqueda -->
         <div class="search-container">
-          <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Buscar productos
+          <label for="search" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            Search products
           </label>
-          <span class="p-input-icon-left w-full">
+          <span class="w-full p-input-icon-left">
             <i class="pi pi-search"></i>
             <input 
               type="text" 
@@ -40,14 +40,14 @@
               id="search"
               [(ngModel)]="searchTerm" 
               (input)="onSearchChange()"
-              placeholder="Buscar por nombre o descripción..."
+              placeholder="Search by name or description..."
               class="w-full" />
           </span>
         </div>
 
         <!-- Filtro por categoría -->
         <div class="category-filter">
-          <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label for="category" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             Filter by category
           </label>
           <select 
@@ -71,9 +71,9 @@
     <!-- Grid de productos -->
     <div class="products-grid">
       <!-- Mensaje si no hay productos -->
-      <div *ngIf="filteredProducts.length === 0" class="no-products-message text-center py-8">
-        <i class="pi pi-search text-4xl text-gray-400 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
+      <div *ngIf="filteredProducts.length === 0" class="py-8 text-center no-products-message">
+        <i class="mb-4 text-4xl text-gray-400 pi pi-search"></i>
+        <h3 class="mb-2 text-xl font-semibold text-gray-600 dark:text-gray-300">
           No se encontraron productos
         </h3>
         <p class="text-gray-500 dark:text-gray-400">
@@ -82,7 +82,7 @@
       </div>
 
       <!-- Lista de productos -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" *ngIf="filteredProducts.length > 0">
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" *ngIf="filteredProducts.length > 0">
         <div 
           *ngFor="let product of filteredProducts" 
           class="product-card"
@@ -90,12 +90,12 @@
           
           <p-card styleClass="h-full cursor-pointer hover:shadow-lg transition-shadow duration-300">
             <!-- Imagen del producto -->
-            <div class="product-image-container mb-4">
-              <div class="w-full h-48 overflow-hidden rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+            <div class="mb-4 product-image-container">
+              <div class="flex items-center justify-center w-full h-48 overflow-hidden bg-gray-100 rounded-lg dark:bg-gray-700">
                 <img
                   [src]="product.imageUrl"
                   [alt]="product.name"
-                  class="w-full h-full object-cover"
+                  class="object-cover w-full h-full"
                   style="max-width: 80%; max-height: 100%;"
                   />
               </div>
@@ -103,16 +103,16 @@
 
             <!-- Información del producto -->
             <div class="product-info">
-              <h3 class="font-semibold text-lg text-gray-800 dark:text-white mb-2 line-clamp-2">
+              <h3 class="mb-2 text-lg font-semibold text-gray-800 dark:text-white line-clamp-2">
                 {{ product.name }}
               </h3>
               
-              <p class="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2" *ngIf="product.description">
+              <p class="mb-3 text-sm text-gray-600 dark:text-gray-300 line-clamp-2" *ngIf="product.description">
                 {{ product.description }}
               </p>
 
               <!-- Precio y acciones -->
-              <div class="flex justify-between items-center mt-4">
+              <div class="flex items-center justify-between mt-4">
                 <div class="price">
                   <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     ${{ product.price }}
@@ -121,7 +121,7 @@
                 
                 <p-button
                   icon="pi pi-eye"
-                  label="Ver"
+                  label="See more"
                   styleClass="p-button-sm p-button-outlined"
                   (click)="showProductDetails(product); $event.stopPropagation()">
                 </p-button>
@@ -141,8 +141,8 @@
     </div>
 
     <!-- Loading state -->
-    <div *ngIf="products.length === 0" class="loading-state text-center py-8">
-      <i class="pi pi-spin pi-spinner text-3xl text-blue-500 mb-4"></i>
+    <div *ngIf="products.length === 0" class="py-8 text-center loading-state">
+      <i class="mb-4 text-3xl text-blue-500 pi pi-spin pi-spinner"></i>
       <p class="text-gray-600 dark:text-gray-300">Cargando productos...</p>
     </div>
   </div>

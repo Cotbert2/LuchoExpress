@@ -60,7 +60,7 @@ export class ProductsComponent implements OnInit {
     this.productsService.getCategoriesWithProducts().subscribe({
       next: (data: CategoryWithProductsResponse[]) => {
         this.products = [];
-        this.categories = [{ label: 'Todas las categorías', value: null }];
+        this.categories = [{ label: 'All categories', value: null }];
         
         data.forEach(categoryWithProducts => {
           // Agregar productos

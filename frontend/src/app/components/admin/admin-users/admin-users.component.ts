@@ -54,7 +54,7 @@ export class AdminUsersComponent implements OnInit {
   // Filtros
   filters: UserFilters = {};
   roleOptions: RoleOption[] = [
-    { label: 'Todos los roles', value: '' },
+    { label: 'All roles', value: '' },
     { label: 'ROOT', value: 'ROOT' },
     { label: 'ADMIN', value: 'ADMIN' },
     { label: 'USER', value: 'USER' }

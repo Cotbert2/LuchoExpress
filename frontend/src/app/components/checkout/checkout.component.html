@@ -1,7 +1,7 @@
 <p-toast position="top-right"></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="checkout-container mx-auto p-4 max-w-6xl">
+<div class="max-w-6xl p-4 mx-auto checkout-container">
   <!-- Header -->
   <div class="mb-6">
     <p-toolbar styleClass="border-none bg-transparent p-0">
@@ -15,7 +15,7 @@
             pTooltip="Back to Home" 
             tooltipPosition="bottom">
           </p-button>
-          <h1 class="text-3xl font-bold text-gray-800 dark:text-white m-0">Shopping Cart</h1>
+          <h1 class="m-0 text-3xl font-bold text-gray-800 dark:text-white">Shopping Cart</h1>
         </div>
       </ng-template>
       
@@ -41,16 +41,16 @@
   </div>
 
   <!-- Checkout Stepper -->
-  <div *ngIf="showCheckoutStepper" class="checkout-stepper mb-6">
+  <div *ngIf="showCheckoutStepper" class="mb-6 checkout-stepper">
     
     <!-- Stepper Header -->
-    <div class="stepper-header mb-6">
+    <div class="mb-6 stepper-header">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-4">
           
           <!-- Step 1 -->
           <div class="flex items-center">
-            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300"
+            <div class="flex items-center justify-center w-10 h-10 transition-all duration-300 border-2 rounded-full"
                  [class]="activeStepIndex >= 0 ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 text-gray-400'">
               <i class="pi pi-user"></i>
             </div>
@@ -67,7 +67,7 @@
 
           <!-- Step 2 -->
           <div class="flex items-center">
-            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300"
+            <div class="flex items-center justify-center w-10 h-10 transition-all duration-300 border-2 rounded-full"
                  [class]="activeStepIndex >= 1 ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 text-gray-400'">
               <i class="pi pi-map-marker"></i>
             </div>
@@ -84,7 +84,7 @@
 
           <!-- Step 3 -->
           <div class="flex items-center">
-            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300"
+            <div class="flex items-center justify-center w-10 h-10 transition-all duration-300 border-2 rounded-full"
                  [class]="activeStepIndex >= 2 ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 text-gray-400'">
               <i class="pi pi-check"></i>
             </div>
@@ -102,297 +102,295 @@
       
       <!-- Step 1: Personal Information -->
       <div *ngIf="activeStepIndex === 0" class="step-content">
-        <div class="p-6">
-          <h3 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">Personal Information</h3>
-          <p class="text-gray-600 dark:text-gray-300 mb-6">Please provide your personal details for the order.</p>
-          
-          <!-- Personal Information Form -->
-          <form [formGroup]="personalInfoForm" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              <!-- Document ID -->
-              <div class="form-field">
-                <p-floatLabel>
-                  <input 
-                    pInputText 
-                    id="documentId" 
-                    formControlName="documentId"
-                    [class.ng-invalid]="hasFieldError(personalInfoForm, 'documentId')"
-                    class="w-full" />
-                  <label for="documentId">Document ID *</label>
-                </p-floatLabel>
-                <small 
-                  class="text-red-500" 
-                  *ngIf="hasFieldError(personalInfoForm, 'documentId')">
-                  {{ getFieldError(personalInfoForm, 'documentId') }}
-                </small>
-              </div>
+  <div class="p-6">
+    <h3 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white">Personal Information</h3>
+    <p class="mb-6 text-gray-600 dark:text-gray-300">Please provide your personal details for the order.</p>
+    
+    <!-- Personal Information Form -->
+    <form [formGroup]="personalInfoForm" class="space-y-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        
+        <!-- Document ID -->
+        <div class="form-field-float">
+          <input 
+            pInputText 
+            id="documentId" 
+            formControlName="documentId"
+            placeholder=" "
+            class="w-full" />
+          <label for="documentId" class="required">Document ID</label>
+          <small 
+            class="error-message" 
+            *ngIf="hasFieldError(personalInfoForm, 'documentId')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError(personalInfoForm, 'documentId') }}
+          </small>
+        </div>
 
-              <!-- Full Name -->
-              <div class="form-field">
-                <p-floatLabel>
-                  <input 
-                    pInputText 
-                    id="name" 
-                    formControlName="name"
-                    [class.ng-invalid]="hasFieldError(personalInfoForm, 'name')"
-                    class="w-full" />
-                  <label for="name">Full Name *</label>
-                </p-floatLabel>
-                <small 
-                  class="text-red-500" 
-                  *ngIf="hasFieldError(personalInfoForm, 'name')">
-                  {{ getFieldError(personalInfoForm, 'name') }}
-                </small>
-              </div>
+        <!-- Full Name -->
+        <div class="form-field-float">
+          <input 
+            pInputText 
+            id="name" 
+            formControlName="name"
+            placeholder=" "
+            class="w-full" />
+          <label for="name" class="required">Full Name</label>
+          <small 
+            class="error-message" 
+            *ngIf="hasFieldError(personalInfoForm, 'name')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError(personalInfoForm, 'name') }}
+          </small>
+        </div>
 
-              <!-- Email -->
-              <div class="form-field">
-                <p-floatLabel>
-                  <input 
-                    pInputText 
-                    id="email" 
-                    type="email"
-                    formControlName="email"
-                    [class.ng-invalid]="hasFieldError(personalInfoForm, 'email')"
-                    class="w-full" />
-                  <label for="email">Email Address *</label>
-                </p-floatLabel>
-                <small 
-                  class="text-red-500" 
-                  *ngIf="hasFieldError(personalInfoForm, 'email')">
-                  {{ getFieldError(personalInfoForm, 'email') }}
-                </small>
-              </div>
+        <!-- Email -->
+        <div class="form-field-float">
+          <input 
+            pInputText 
+            id="email" 
+            type="email"
+            formControlName="email"
+            placeholder=" "
+            class="w-full" />
+          <label for="email" class="required">Email Address</label>
+          <small 
+            class="error-message" 
+            *ngIf="hasFieldError(personalInfoForm, 'email')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError(personalInfoForm, 'email') }}
+          </small>
+        </div>
 
-              <!-- Phone -->
-              <div class="form-field">
-                <p-floatLabel>
-                  <input 
-                    pInputText 
-                    id="phone" 
-                    type="tel"
-                    formControlName="phone"
-                    [class.ng-invalid]="hasFieldError(personalInfoForm, 'phone')"
-                    class="w-full" />
-                  <label for="phone">Phone Number</label>
-                </p-floatLabel>
-                <small 
-                  class="text-red-500" 
-                  *ngIf="hasFieldError(personalInfoForm, 'phone')">
-                  {{ getFieldError(personalInfoForm, 'phone') }}
-                </small>
-              </div>
-            </div>
-
-            <div class="form-info mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-              <div class="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-300">
-                <i class="pi pi-info-circle"></i>
-                <span>This information will be used for order confirmation and delivery updates.</span>
-              </div>
-            </div>
-          </form>
-
-          <div class="flex pt-6 justify-between">
-            <p-button 
-              label="Back to Cart" 
-              severity="secondary" 
-              icon="pi pi-arrow-left"
-              [disabled]="isLoading"
-              (onClick)="backToCart()">
-            </p-button>
-            <p-button 
-              label="Continue to Shipping" 
-              icon="pi pi-arrow-right" 
-              iconPos="right"
-              [loading]="isLoading"
-              loadingIcon="pi pi-spin pi-spinner"
-              (onClick)="nextStep()">
-            </p-button>
+        <!-- Phone -->
+        <div class="form-field-float">
+          <input 
+            pInputText 
+            id="phone" 
+            type="tel"
+            formControlName="phone"
+            placeholder=" "
+            class="w-full" />
+          <label for="phone">Phone Number</label>
+          <div class="field-hint" *ngIf="!hasFieldError(personalInfoForm, 'phone')">
+            <i class="pi pi-info-circle"></i>
+            Optional - For delivery updates
           </div>
+          <small 
+            class="error-message" 
+            *ngIf="hasFieldError(personalInfoForm, 'phone')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError(personalInfoForm, 'phone') }}
+          </small>
         </div>
       </div>
+
+      <div class="p-3 mt-4 rounded-md form-info bg-blue-50 dark:bg-blue-900/20">
+        <div class="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-300">
+          <i class="pi pi-info-circle"></i>
+          <span>This information will be used for order confirmation and delivery updates.</span>
+        </div>
+      </div>
+    </form>
+
+    <div class="flex justify-between pt-6">
+      <p-button 
+        label="Back to Cart" 
+        severity="secondary" 
+        icon="pi pi-arrow-left"
+        [disabled]="isLoading"
+        (onClick)="backToCart()">
+      </p-button>
+      <p-button 
+        label="Continue to Shipping" 
+        icon="pi pi-arrow-right" 
+        iconPos="right"
+        [loading]="isLoading"
+        loadingIcon="pi pi-spin pi-spinner"
+        (onClick)="nextStep()">
+      </p-button>
+    </div>
+  </div>
+</div>
 
       <!-- Step 2: Shipping Information -->
       <div *ngIf="activeStepIndex === 1" class="step-content">
-        <div class="p-6">
-          <h3 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">Shipping Information</h3>
-          <p class="text-gray-600 dark:text-gray-300 mb-6">Please provide your shipping address details.</p>
-          
-          <!-- Shipping Information Form -->
-          <form [formGroup]="shippingInfoForm" class="space-y-4">
-            
-            <!-- Address -->
-            <div class="form-field">
-              <p-floatLabel>
-                <input 
-                  pInputText 
-                  id="address" 
-                  formControlName="address"
-                  [class.ng-invalid]="hasFieldError(shippingInfoForm, 'address')"
-                  class="w-full" />
-                <label for="address">Street Address *</label>
-              </p-floatLabel>
-              <small 
-                class="text-red-500" 
-                *ngIf="hasFieldError(shippingInfoForm, 'address')">
-                {{ getFieldError(shippingInfoForm, 'address') }}
-              </small>
-            </div>
+  <div class="p-6">
+    <h3 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white">Shipping Information</h3>
+    <p class="mb-6 text-gray-600 dark:text-gray-300">Please provide your shipping address details.</p>
+    
+    <!-- Shipping Information Form -->
+    <form [formGroup]="shippingInfoForm" class="space-y-4">
+      
+      <!-- Address -->
+      <div class="form-field-float">
+        <input 
+          pInputText 
+          id="address" 
+          formControlName="address"
+          placeholder=" "
+          class="w-full" />
+        <label for="address" class="required">Street Address</label>
+        <small 
+          class="error-message" 
+          *ngIf="hasFieldError(shippingInfoForm, 'address')">
+          <i class="pi pi-exclamation-triangle"></i>
+          {{ getFieldError(shippingInfoForm, 'address') }}
+        </small>
+      </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              <!-- City -->
-              <div class="form-field">
-                <p-floatLabel>
-                  <input 
-                    pInputText 
-                    id="city" 
-                    formControlName="city"
-                    [class.ng-invalid]="hasFieldError(shippingInfoForm, 'city')"
-                    class="w-full" />
-                  <label for="city">City *</label>
-                </p-floatLabel>
-                <small 
-                  class="text-red-500" 
-                  *ngIf="hasFieldError(shippingInfoForm, 'city')">
-                  {{ getFieldError(shippingInfoForm, 'city') }}
-                </small>
-              </div>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        
+        <!-- City -->
+        <div class="form-field-float">
+          <input 
+            pInputText 
+            id="city" 
+            formControlName="city"
+            placeholder=" "
+            class="w-full" />
+          <label for="city" class="required">City</label>
+          <small 
+            class="error-message" 
+            *ngIf="hasFieldError(shippingInfoForm, 'city')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError(shippingInfoForm, 'city') }}
+          </small>
+        </div>
 
-              <!-- State -->
-              <div class="form-field">
-                <p-floatLabel>
-                  <input 
-                    pInputText 
-                    id="state" 
-                    formControlName="state"
-                    [class.ng-invalid]="hasFieldError(shippingInfoForm, 'state')"
-                    class="w-full" />
-                  <label for="state">State/Province *</label>
-                </p-floatLabel>
-                <small 
-                  class="text-red-500" 
-                  *ngIf="hasFieldError(shippingInfoForm, 'state')">
-                  {{ getFieldError(shippingInfoForm, 'state') }}
-                </small>
-              </div>
+        <!-- State -->
+        <div class="form-field-float">
+          <input 
+            pInputText 
+            id="state" 
+            formControlName="state"
+            placeholder=" "
+            class="w-full" />
+          <label for="state" class="required">State/Province</label>
+          <small 
+            class="error-message" 
+            *ngIf="hasFieldError(shippingInfoForm, 'state')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError(shippingInfoForm, 'state') }}
+          </small>
+        </div>
 
-              <!-- ZIP Code -->
-              <div class="form-field">
-                <p-floatLabel>
-                  <input 
-                    pInputText 
-                    id="zipCode" 
-                    formControlName="zipCode"
-                    [class.ng-invalid]="hasFieldError(shippingInfoForm, 'zipCode')"
-                    class="w-full" />
-                  <label for="zipCode">ZIP Code *</label>
-                </p-floatLabel>
-                <small 
-                  class="text-red-500" 
-                  *ngIf="hasFieldError(shippingInfoForm, 'zipCode')">
-                  {{ getFieldError(shippingInfoForm, 'zipCode') }}
-                </small>
-              </div>
+        <!-- ZIP Code -->
+        <div class="form-field-float">
+          <input 
+            pInputText 
+            id="zipCode" 
+            formControlName="zipCode"
+            placeholder=" "
+            class="w-full" />
+          <label for="zipCode" class="required">ZIP Code</label>
+          <small 
+            class="error-message" 
+            *ngIf="hasFieldError(shippingInfoForm, 'zipCode')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError(shippingInfoForm, 'zipCode') }}
+          </small>
+        </div>
 
-              <!-- Country -->
-              <div class="form-field">
-                <p-floatLabel>
-                  <input 
-                    pInputText 
-                    id="country" 
-                    formControlName="country"
-                    [class.ng-invalid]="hasFieldError(shippingInfoForm, 'country')"
-                    class="w-full" />
-                  <label for="country">Country *</label>
-                </p-floatLabel>
-                <small 
-                  class="text-red-500" 
-                  *ngIf="hasFieldError(shippingInfoForm, 'country')">
-                  {{ getFieldError(shippingInfoForm, 'country') }}
-                </small>
-              </div>
-            </div>
-
-            <!-- Delivery Instructions -->
-            <div class="form-field">
-              <p-floatLabel>
-                <input 
-                  pInputText 
-                  id="deliveryInstructions" 
-                  formControlName="deliveryInstructions"
-                  [class.ng-invalid]="hasFieldError(shippingInfoForm, 'deliveryInstructions')"
-                  class="w-full" />
-                <label for="deliveryInstructions">Delivery Instructions (Optional)</label>
-              </p-floatLabel>
-              <small 
-                class="text-red-500" 
-                *ngIf="hasFieldError(shippingInfoForm, 'deliveryInstructions')">
-                {{ getFieldError(shippingInfoForm, 'deliveryInstructions') }}
-              </small>
-            </div>
-
-            <div class="form-info mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
-              <div class="flex items-center gap-2 text-sm text-green-600 dark:text-green-300">
-                <i class="pi pi-truck"></i>
-                <span>Free shipping on all orders! Your items will be delivered within 3-5 business days.</span>
-              </div>
-            </div>
-          </form>
-
-          <div class="flex pt-6 justify-between">
-            <p-button 
-              label="Back to Personal Info" 
-              severity="secondary" 
-              icon="pi pi-arrow-left"
-              [disabled]="isLoading"
-              (onClick)="previousStep()">
-            </p-button>
-            <p-button 
-              label="Review Order" 
-              icon="pi pi-arrow-right" 
-              iconPos="right"
-              [loading]="isLoading"
-              loadingIcon="pi pi-spin pi-spinner"
-              (onClick)="nextStep()">
-            </p-button>
-          </div>
+        <!-- Country -->
+        <div class="form-field-float">
+          <input 
+            pInputText 
+            id="country" 
+            formControlName="country"
+            placeholder=" "
+            class="w-full" />
+          <label for="country" class="required">Country</label>
+          <small 
+            class="error-message" 
+            *ngIf="hasFieldError(shippingInfoForm, 'country')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError(shippingInfoForm, 'country') }}
+          </small>
         </div>
       </div>
+
+      <!-- Delivery Instructions -->
+      <div class="form-field-float">
+        <input 
+          pInputText 
+          id="deliveryInstructions" 
+          formControlName="deliveryInstructions"
+          placeholder=" "
+          class="w-full" />
+        <label for="deliveryInstructions">Delivery Instructions</label>
+        <div class="field-hint" *ngIf="!hasFieldError(shippingInfoForm, 'deliveryInstructions')">
+          <i class="pi pi-info-circle"></i>
+          Optional - Special delivery notes
+        </div>
+        <small 
+          class="error-message" 
+          *ngIf="hasFieldError(shippingInfoForm, 'deliveryInstructions')">
+          <i class="pi pi-exclamation-triangle"></i>
+          {{ getFieldError(shippingInfoForm, 'deliveryInstructions') }}
+        </small>
+      </div>
+
+      <div class="p-3 mt-4 rounded-md form-info bg-green-50 dark:bg-green-900/20">
+        <div class="flex items-center gap-2 text-sm text-green-600 dark:text-green-300">
+          <i class="pi pi-truck"></i>
+          <span>Free shipping on all orders! Your items will be delivered within 3-5 business days.</span>
+        </div>
+      </div>
+    </form>
+
+    <div class="flex justify-between pt-6">
+      <p-button 
+        label="Back to Personal Info" 
+        severity="secondary" 
+        icon="pi pi-arrow-left"
+        [disabled]="isLoading"
+        (onClick)="previousStep()">
+      </p-button>
+      <p-button 
+        label="Review Order" 
+        icon="pi pi-arrow-right" 
+        iconPos="right"
+        [loading]="isLoading"
+        loadingIcon="pi pi-spin pi-spinner"
+        (onClick)="nextStep()">
+      </p-button>
+    </div>
+  </div>
+</div>
 
       <!-- Step 3: Confirmation -->
       <div *ngIf="activeStepIndex === 2" class="step-content">
         <div class="p-6">
-          <h3 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">Order Confirmation</h3>
-          <p class="text-gray-600 dark:text-gray-300 mb-6">Please review your order details before completing the purchase.</p>
+          <h3 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white">Order Confirmation</h3>
+          <p class="mb-6 text-gray-600 dark:text-gray-300">Please review your order details before completing the purchase.</p>
           
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             
             <!-- Order Summary -->
             <div class="order-summary">
               <p-card header="Order Summary" styleClass="h-fit">
                 <div class="space-y-4">
-                  <div class="flex justify-between items-center">
+                  <div class="flex items-center justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Items ({{ cartSummary.totalItems }})</span>
                     <span class="font-semibold">{{ formatCurrency(cartSummary.totalAmount) }}</span>
                   </div>
                   
-                  <div class="flex justify-between items-center">
+                  <div class="flex items-center justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Shipping</span>
                     <span class="font-semibold text-green-600">FREE</span>
                   </div>
                   
-                  <div class="flex justify-between items-center">
+                  <div class="flex items-center justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Tax</span>
                     <span class="font-semibold">{{ formatCurrency(cartSummary.totalAmount * 0.1) }}</span>
                   </div>
                   
                   <p-divider></p-divider>
                   
-                  <div class="flex justify-between items-center text-lg">
+                  <div class="flex items-center justify-between text-lg">
                     <span class="font-bold">Total</span>
-                    <span class="font-bold text-2xl text-blue-600">
+                    <span class="text-2xl font-bold text-blue-600">
                       {{ formatCurrency(cartSummary.totalAmount + (cartSummary.totalAmount * 0.1)) }}
                     </span>
                   </div>
@@ -401,7 +399,7 @@
             </div>
 
             <!-- Customer Information -->
-            <div class="customer-info space-y-4">
+            <div class="space-y-4 customer-info">
               
               <!-- Personal Information -->
               <p-card header="Personal Information" styleClass="h-fit">
@@ -435,7 +433,7 @@
           </div>
 
           <!-- Order Terms -->
-          <div class="order-terms mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+          <div class="p-4 mt-6 rounded-md order-terms bg-yellow-50 dark:bg-yellow-900/20">
             <div class="flex items-start gap-2 text-sm text-yellow-700 dark:text-yellow-300">
               <i class="pi pi-exclamation-triangle mt-0.5"></i>
               <div>
@@ -445,7 +443,7 @@
             </div>
           </div>
 
-          <div class="flex pt-6 justify-between">
+          <div class="flex justify-between pt-6">
             <p-button 
               label="Back to Shipping" 
               severity="secondary" 
@@ -471,16 +469,16 @@
   <div *ngIf="!showCheckoutStepper">
 
   <!-- Empty Cart State -->
-  <div *ngIf="cartItems.length === 0" class="empty-cart-state text-center py-16">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 max-w-md mx-auto">
-      <i class="pi pi-shopping-cart text-6xl text-gray-400 mb-4"></i>
-      <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-4">
+  <div *ngIf="cartItems.length === 0" class="py-16 text-center empty-cart-state">
+    <div class="max-w-md p-8 mx-auto bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <i class="mb-4 text-6xl text-gray-400 pi pi-shopping-cart"></i>
+      <h2 class="mb-4 text-2xl font-semibold text-gray-700 dark:text-gray-300">
         Your cart is empty
       </h2>
-      <p class="text-gray-500 dark:text-gray-400 mb-6">
+      <p class="mb-6 text-gray-500 dark:text-gray-400">
         Looks like you haven't added any items to your cart yet.
       </p>
-      <div class="flex gap-3 justify-center">
+      <div class="flex justify-center gap-3">
         <p-button 
           label="Continue Shopping" 
           icon="pi pi-shopping-bag"
@@ -498,32 +496,32 @@
   </div>
 
   <!-- Cart Items -->
-  <div *ngIf="cartItems.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div *ngIf="cartItems.length > 0" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
     
     <!-- Items List -->
     <div class="lg:col-span-2">
       <div class="space-y-4">
         <div *ngFor="let item of cartItems; trackBy: trackByItemId" class="cart-item">
           <p-card styleClass="shadow-md hover:shadow-lg transition-shadow duration-300">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+            <div class="grid items-center grid-cols-1 gap-4 md:grid-cols-4">
               
               <!-- Product Image -->
               <div class="product-image">
-                <div class="w-full h-32 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
+                <div class="flex items-center justify-center w-full h-32 overflow-hidden bg-gray-100 rounded-lg dark:bg-gray-700">
                   <img 
                     [src]="item.imageUrl " 
                     [alt]="item.name"
-                    class="w-full h-full object-cover"
+                    class="object-cover w-full h-full"
                     />
                 </div>
               </div>
 
               <!-- Product Info -->
               <div class="md:col-span-2 product-info">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                <h3 class="mb-2 text-lg font-semibold text-gray-800 dark:text-white">
                   {{ item.name }}
                 </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2" *ngIf="item.description">
+                <p class="mb-2 text-sm text-gray-600 dark:text-gray-300" *ngIf="item.description">
                   {{ item.description }}
                 </p>
                 <div class="flex items-center gap-2">
@@ -534,10 +532,10 @@
                 </div>
               </div>
 
-              <div class="quantity-actions text-center">
+              <div class="text-center quantity-actions">
                 <div class="flex flex-col items-center gap-3">
                   <div class="quantity-input">
-                    <label class="text-sm text-gray-600 dark:text-gray-300 block mb-1">Quantity</label>
+                    <label class="block mb-1 text-sm text-gray-600 dark:text-gray-300">Quantity</label>
                     <p-inputNumber
                       [(ngModel)]="item.quantity"
                       [min]="1"
@@ -590,18 +588,18 @@
           <div class="space-y-4">
             
             <!-- Summary Details -->
-            <div class="summary-details space-y-3">
-              <div class="flex justify-between items-center">
+            <div class="space-y-3 summary-details">
+              <div class="flex items-center justify-between">
                 <span class="text-gray-600 dark:text-gray-300">Items ({{ cartSummary.totalItems }})</span>
                 <span class="font-semibold">{{ formatCurrency(cartSummary.totalAmount) }}</span>
               </div>
               
-              <div class="flex justify-between items-center">
+              <div class="flex items-center justify-between">
                 <span class="text-gray-600 dark:text-gray-300">Shipping</span>
                 <span class="font-semibold text-green-600">FREE</span>
               </div>
               
-              <div class="flex justify-between items-center">
+              <div class="flex items-center justify-between">
                 <span class="text-gray-600 dark:text-gray-300">Tax</span>
                 <span class="font-semibold">{{ formatCurrency(cartSummary.totalAmount * 0.1) }}</span>
               </div>
@@ -611,9 +609,9 @@
 
             <!-- Total -->
             <div class="total-section">
-              <div class="flex justify-between items-center text-lg">
+              <div class="flex items-center justify-between text-lg">
                 <span class="font-bold text-gray-800 dark:text-white">Total</span>
-                <span class="font-bold text-2xl text-blue-600 dark:text-blue-400">
+                <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {{ formatCurrency(cartSummary.totalAmount + (cartSummary.totalAmount * 0.1)) }}
                 </span>
               </div>
@@ -622,7 +620,7 @@
             <p-divider></p-divider>
 
             <!-- Action Buttons -->
-            <div class="action-buttons space-y-3">
+            <div class="space-y-3 action-buttons">
               <p-button 
                 label="Proceed to Checkout" 
                 icon="pi pi-credit-card"
@@ -643,9 +641,9 @@
             </div>
 
             <!-- Security Info -->
-            <div class="security-info mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+            <div class="p-3 mt-4 rounded-md security-info bg-gray-50 dark:bg-gray-700">
               <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <i class="pi pi-shield text-green-500"></i>
+                <i class="text-green-500 pi pi-shield"></i>
                 <span>Secure checkout</span>
               </div>
             </div>

@@ -1,19 +1,17 @@
 .red {
-    margin-left: 1rem;
-    color: red;
+  color: red;
 }
 
-.space-betwwen-items{
-    margin-bottom: 1rem;
+.space-between-items {
+  margin-bottom: 1.5rem;
 }
 
-.item{
-    padding: 4rem;
+.item {
+  padding: 4rem;
+  gap: 2rem;
 }
 
-
-p-inputnumber{
-    width: 2rem;
-    margin-bottom: 2rem;
+p-inputnumber.small-input {
+  width: 4rem;
 }
 
