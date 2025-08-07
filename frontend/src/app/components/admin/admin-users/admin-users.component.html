@@ -40,11 +40,11 @@
     <div class="flex flex-col">
       <label class="mb-2 text-sm font-medium text-gray-700">Email</label>
       <input 
-        pInputText 
-        type="text" 
+        pInputText
+        type="text"
         [(ngModel)]="emailFilter"
         placeholder="Search by email..."
-        (input)="onEmailFilterChange()"
+        (ngModelChange)="onEmailFilterChange()"
         class="w-full">
     </div>
     

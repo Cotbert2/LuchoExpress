@@ -30,6 +30,7 @@ export interface UserResponse {
 export interface UserFilters {
   role?: string;
   email?: string;
+  enabled?: boolean | null;
 }
 
 @Injectable({
@@ -79,6 +80,9 @@ export class UserService {
         return false;
       }
       if (filters.email && !user.email.toLowerCase().includes(filters.email.toLowerCase())) {
+        return false;
+      }
+      if (filters.enabled !== null && filters.enabled !== undefined && user.enabled !== filters.enabled) {
         return false;
       }
       return true;
