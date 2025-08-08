@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { LoginRequest, RegisterRequest, UserResponse } from '../../interfaces/auth.interface';
+import { UserService } from '../../services/user.service';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-login',
@@ -23,24 +25,28 @@ import { LoginRequest, RegisterRequest, UserResponse } from '../../interfaces/au
     ButtonModule,
     ReactiveFormsModule,
     ToastModule,
+    DialogModule
   ],
   providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnInit, OnDestroy {
-
   private destroy$ = new Subject<void>();
   currentUser: UserResponse | null = null;
   loginForm!: FormGroup;
   registerForm!: FormGroup;
+  changePasswordForm!: FormGroup;
 
   @Input() isLogin: boolean = true;
+
+  displayChangePasswordDialog = false;
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {
     this.initializeForms();
@@ -72,6 +78,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
+
+    this.changePasswordForm = this.fb.group({
+      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
   }
 
   private passwordMatchValidator(form: FormGroup) {
@@ -98,9 +109,19 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.resetForms();
   }
 
+  openChangePasswordDialog(): void {
+    this.changePasswordForm.reset();
+    this.displayChangePasswordDialog = true;
+  }
+
+  closeChangePasswordDialog(): void {
+    this.displayChangePasswordDialog = false;
+  }
+
   private resetForms(): void {
     this.loginForm.reset();
     this.registerForm.reset();
+    this.changePasswordForm.reset();
   }
 
   handleSignUp(): void {
@@ -189,6 +210,28 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
+  handleChangePassword(): void {
+    if (!this.currentUser?.id) return;
+    if (this.changePasswordForm.invalid) {
+      this.markFormGroupTouched(this.changePasswordForm);
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please fill the form correctly' });
+      return;
+    }
+
+    const newPassword = this.changePasswordForm.value.password;
+    this.userService.updateUser(this.currentUser.id, { password: newPassword }).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Password updated successfully' });
+        this.changePasswordForm.reset();
+        this.displayChangePasswordDialog = false;
+      },
+      error: (error) => {
+        console.error('Change password error:', error);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update password' });
+      }
+    });
+  }
+
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach(field => {
       const control = formGroup.get(field);
@@ -204,5 +247,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   get registerEmail() { return this.registerForm.get('email'); }
   get registerPassword() { return this.registerForm.get('password'); }
   get registerConfirmPassword() { return this.registerForm.get('confirmPassword'); }
-
+  get newPassword() { return this.changePasswordForm.get('password'); }
+  get confirmNewPassword() { return this.changePasswordForm.get('confirmPassword'); }
 }

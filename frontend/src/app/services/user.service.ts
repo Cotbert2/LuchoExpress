@@ -12,10 +12,8 @@ export interface CreateUserRequest {
 }
 
 export interface UpdateUserRequest {
-  username?: string;
-  email?: string;
-  role?: string;
-  enabled?: boolean;
+  // Only password is updatable in backend
+  password?: string;
 }
 
 export interface UserResponse {

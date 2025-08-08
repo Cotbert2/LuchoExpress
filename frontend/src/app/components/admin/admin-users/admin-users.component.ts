@@ -15,7 +15,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
-import { UserService, UserResponse, CreateUserRequest, UpdateUserRequest, UserFilters } from '../../../services/user.service';
+import { UserService, UserResponse, CreateUserRequest, UserFilters } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
 
 interface RoleOption {
@@ -63,7 +63,6 @@ export class AdminUsersComponent implements OnInit {
   
   // Dialogs
   displayCreateDialog = false;
-  displayEditDialog = false;
   
   // Forms
   createUserForm: CreateUserRequest = {
@@ -73,7 +72,6 @@ export class AdminUsersComponent implements OnInit {
     role: 'USER'
   };
   
-  editUserForm: UpdateUserRequest = {};
   selectedUser: UserResponse | null = null;
   
   // Usuario actual
@@ -158,17 +156,6 @@ export class AdminUsersComponent implements OnInit {
     this.displayCreateDialog = true;
   }
 
-  openEditDialog(user: UserResponse) {
-    this.selectedUser = user;
-    this.editUserForm = {
-      username: user.username,
-      email: user.email,
-      role: user.role
-      // enabled is managed via activate/deactivate actions, not here
-    };
-    this.displayEditDialog = true;
-  }
-
   createUser() {
     if (!this.validateCreateForm()) {
       return;
@@ -190,32 +177,6 @@ export class AdminUsersComponent implements OnInit {
           severity: 'error',
           summary: 'Error',
           detail: 'Error al crear usuario'
-        });
-      }
-    });
-  }
-
-  updateUser() {
-    if (!this.selectedUser || !this.validateEditForm()) {
-      return;
-    }
-
-    this.userService.updateUser(this.selectedUser.id, this.editUserForm).subscribe({
-      next: (user) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Usuario actualizado correctamente'
-        });
-        this.displayEditDialog = false;
-        this.loadUsers();
-      },
-      error: (error) => {
-        console.error('Error updating user:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al actualizar usuario'
         });
       }
     });
@@ -319,28 +280,6 @@ export class AdminUsersComponent implements OnInit {
         severity: 'error',
         summary: 'Error',
         detail: 'Password is required'
-      });
-      return false;
-    }
-
-    return true;
-  }
-
-  validateEditForm(): boolean {
-    if (!this.editUserForm.username?.trim()) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Username is required'
-      });
-      return false;
-    }
-
-    if (!this.editUserForm.email?.trim()) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Email is required'
       });
       return false;
     }

@@ -118,13 +118,6 @@
         <td>
           <div class="flex gap-2">
             <p-button 
-              icon="pi pi-pencil" 
-              severity="info"
-              size="small"
-              pTooltip="Edit user"
-              (onClick)="openEditDialog(user)">
-            </p-button>
-            <p-button 
               *ngIf="canDisableUser(user) && user.enabled"
               icon="pi pi-ban" 
               severity="danger"
@@ -224,66 +217,6 @@
       <p-button 
         label="Create User" 
         (onClick)="createUser()">
-      </p-button>
-    </div>
-  </ng-template>
-</p-dialog>
-
-<!-- Dialog Editar Usuario -->
-<p-dialog 
-  header="Edit User" 
-  [(visible)]="displayEditDialog" 
-  [modal]="true" 
-  [style]="{width: '450px'}"
-  [closable]="true">
-  
-  <div class="flex flex-col gap-4 mb-28" *ngIf="selectedUser">
-    <!-- Username -->
-    <div class="flex flex-col">
-      <label class="mb-2 text-sm font-medium text-gray-700">Username *</label>
-      <input 
-        pInputText 
-        type="text" 
-        [(ngModel)]="editUserForm.username"
-        placeholder="Enter your username"
-        class="w-full">
-    </div>
-    
-    <!-- Email -->
-    <div class="flex flex-col">
-      <label class="mb-2 text-sm font-medium text-gray-700">Email *</label>
-      <input 
-        pInputText 
-        type="email" 
-        [(ngModel)]="editUserForm.email"
-        placeholder="Enter your email"
-        class="w-full">
-    </div>
-    
-    <!-- Role -->
-    <div class="flex flex-col">
-      <label class="mb-2 text-sm font-medium text-gray-700">Rol *</label>
-      <p-select 
-        [(ngModel)]="editUserForm.role" 
-        [options]="availableRoleOptions"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Choose your role"
-        class="w-full">
-      </p-select>
-    </div>
-  </div>
-  
-  <ng-template pTemplate="footer">
-    <div class="flex justify-end gap-2">
-      <p-button 
-        label="Cancel" 
-        severity="secondary"
-        (onClick)="displayEditDialog = false">
-      </p-button>
-      <p-button 
-        label="Update user" 
-        (onClick)="updateUser()">
       </p-button>
     </div>
   </ng-template>

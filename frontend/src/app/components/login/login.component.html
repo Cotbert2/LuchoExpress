@@ -1,33 +1,51 @@
 <p-toast></p-toast>
 
-    <div class="flex items-center justify-center min-h-screen p-4 full-container">
-    <p-panel class="w-full max-w-md px-8 py-10 shadow-2xl bg-white/95 backdrop-blur-sm rounded-xl">
-        <!-- Usuario autenticado -->
-        <div *ngIf="currentUser?.id" class="text-center">
-    <h3 class="mb-4 text-2xl font-bold text-green-600">
-        Welcome back, {{ currentUser?.username }}!
-    </h3>
-    <div class="mb-6">
-        <p class="mb-2 text-gray-600">{{ currentUser?.email }}</p>
-        <p class="text-sm text-gray-500">You are: {{ currentUser?.role }}</p>
-    </div>
-    <p class="mb-6 text-gray-700">
-        We're glad to see you again. Let's get started!
-    </p>
-    <div class="flex justify-center">
+<div class="flex items-center justify-center min-h-screen p-4 full-container">
+  <p-panel class="w-full max-w-md px-8 py-10 shadow-2xl bg-white/95 backdrop-blur-sm rounded-xl">
+    <!-- Usuario autenticado -->
+    <div *ngIf="currentUser?.id" 
+        class="max-w-md p-6 mx-auto ">
+      
+      <h3 class="mb-2 text-2xl font-bold text-green-600">
+        Welcome back, <span class="text-gray-800">{{ currentUser?.username }}</span>!
+      </h3>
+
+      <div class="pb-4 mb-4 border-b border-gray-200">
+        <p class="flex items-center gap-2 mb-2 text-gray-600">
+          <i class="text-green-500 pi pi-envelope"></i>
+          {{ currentUser?.email }}
+        </p>
+        <p class="flex items-center gap-2 text-sm text-gray-500">
+          <i class="text-green-500 pi pi-user"></i>
+          You are: <span class="capitalize">{{ currentUser?.role }}</span>
+        </p>
+      </div>
+
+      <p class="mb-6 text-gray-700">
+        Manage your account settings below.
+      </p>
+
+      <div class="flex flex-col gap-3">
         <p-button 
-        severity="danger" 
-        label="Log Out" 
-        (onClick)="handleLogOut()"
-        class="w-full max-w-xs">
+          label="Change Password" 
+          icon="pi pi-key" 
+          styleClass="p-button-outlined p-button-success w-full"
+          (onClick)="openChangePasswordDialog()">
         </p-button>
-    </div>
+
+        <p-button 
+          label="Log Out" 
+          icon="pi pi-sign-out" 
+          styleClass="p-button-danger w-full"
+          (onClick)="handleLogOut()">
+        </p-button>
+      </div>
     </div>
 
 
     <!-- Formulario Login / Registro -->
     <div *ngIf="!currentUser?.id" class="text-center">
-      <h3 class="mb-8 text-2xl font-semibold text-gray-800">
+      <h3 class="mb-8 text-2xl font-semibold text-green-600">
         {{ isLogin ? 'Welcome back' : 'Create your account' }}
       </h3>
 
@@ -183,3 +201,71 @@
     </div>
   </p-panel>
 </div>
+
+<!-- Change Password Dialog -->
+<p-dialog 
+  header="Change Password" 
+  [(visible)]="displayChangePasswordDialog" 
+  [modal]="true" 
+  [style]="{width: '450px'}"
+  [closable]="true"
+  (onHide)="closeChangePasswordDialog()">
+
+  <form [formGroup]="changePasswordForm" (ngSubmit)="handleChangePassword()" class="space-y-4">
+    <div class="relative text-left">
+      <p-floatlabel variant="in" class="w-full">
+        <input 
+          pInputText 
+          type="password" 
+          id="newPassword" 
+          formControlName="password"
+          class="w-full"
+          [class.ng-invalid]="newPassword?.invalid && newPassword?.touched"
+        />
+        <label for="newPassword">
+          <i class="pi pi-lock"></i> New Password
+        </label>
+      </p-floatlabel>
+      <small class="text-xs text-red-500" *ngIf="newPassword?.invalid && newPassword?.touched">
+        <span *ngIf="newPassword?.errors?.['required']">Password is required</span>
+        <span *ngIf="newPassword?.errors?.['minlength']">At least 6 characters</span>
+        <span *ngIf="newPassword?.errors?.['maxlength']">Max 100 characters</span>
+      </small>
+    </div>
+
+    <div class="relative text-left">
+      <p-floatlabel variant="in" class="w-full">
+        <input 
+          pInputText 
+          type="password" 
+          id="confirmNewPassword" 
+          formControlName="confirmPassword"
+          class="w-full"
+          [class.ng-invalid]="confirmNewPassword?.invalid && confirmNewPassword?.touched"
+        />
+        <label for="confirmNewPassword">
+          <i class="pi pi-lock"></i> Confirm New Password
+        </label>
+      </p-floatlabel>
+      <small class="text-xs text-red-500" *ngIf="confirmNewPassword?.invalid && confirmNewPassword?.touched">
+        <span *ngIf="confirmNewPassword?.errors?.['required']">Please confirm your password</span>
+        <span *ngIf="confirmNewPassword?.errors?.['passwordMismatch']">Passwords do not match</span>
+      </small>
+    </div>
+  </form>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <p-button 
+        label="Cancel" 
+        severity="secondary"
+        (onClick)="closeChangePasswordDialog()">
+      </p-button>
+      <p-button 
+        label="Update Password" 
+        [disabled]="changePasswordForm.invalid"
+        (onClick)="handleChangePassword()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
