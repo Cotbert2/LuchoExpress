@@ -68,9 +68,17 @@ export class UserService {
     });
   }
 
-  disableUser(id: string): Observable<void> {
-    return this.http.patch<void>(`${this.API_URL}/users/${id}/disable`, {}, {
-      headers: this.authService.getAuthHeaders()
+  disableUser(id: string): Observable<any> {
+    return this.http.patch(`${this.API_URL}/users/${id}/disable`, {}, {
+      headers: this.authService.getAuthHeaders(),
+      responseType: 'text' as 'json'
+    });
+  }
+
+  enableUser(id: string): Observable<any> {
+    return this.http.patch(`${this.API_URL}/users/${id}/enable`, {}, {
+      headers: this.authService.getAuthHeaders(),
+      responseType: 'text' as 'json'
     });
   }
 

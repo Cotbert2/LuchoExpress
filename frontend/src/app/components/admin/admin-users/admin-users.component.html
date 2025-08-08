@@ -125,12 +125,20 @@
               (onClick)="openEditDialog(user)">
             </p-button>
             <p-button 
-              *ngIf="canDisableUser(user)"
+              *ngIf="canDisableUser(user) && user.enabled"
               icon="pi pi-ban" 
               severity="danger"
               size="small"
               pTooltip="Deactivate user"
               (onClick)="confirmDisableUser(user)">
+            </p-button>
+            <p-button
+              *ngIf="!user.enabled"
+              icon="pi pi-check"
+              severity="success"
+              size="small"
+              pTooltip="Activate user"
+              (onClick)="activateUser(user)">
             </p-button>
           </div>
         </td>
@@ -263,16 +271,6 @@
         placeholder="Choose your role"
         class="w-full">
       </p-select>
-    </div>
-    
-    <!-- Enabled -->
-    <div class="flex items-center gap-2">
-      <p-checkbox 
-        [(ngModel)]="editUserForm.enabled" 
-        [binary]="true"
-        inputId="enabled">
-      </p-checkbox>
-      <label for="enabled" class="text-sm font-medium text-gray-700">Active user</label>
     </div>
   </div>
   

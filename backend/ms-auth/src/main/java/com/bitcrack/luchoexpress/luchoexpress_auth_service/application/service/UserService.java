@@ -50,10 +50,10 @@ public class UserService {
     
     public TokenResponse login(LoginRequest request) {
         User user = userRepository.findByUsernameAndEnabled(request.getUsername(), true)
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials or banned user"));
         
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new InvalidCredentialsException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials or banned user");
         }
         
         String token = jwtService.generateToken(user);
@@ -152,6 +152,20 @@ public class UserService {
         }
         
         targetUser.disable();
+        userRepository.save(targetUser);
+    }
+
+    public void enableUser(UUID id, Authentication authentication) {
+        User currentUser = getCurrentUserEntity(authentication);
+        User targetUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
+
+        // Reuse same permission rules as disabling
+        if (!currentUser.canDisableUser(targetUser)) {
+            throw new UnauthorizedOperationException("You don't have permission to enable this user");
+        }
+
+        targetUser.enable();
         userRepository.save(targetUser);
     }
     

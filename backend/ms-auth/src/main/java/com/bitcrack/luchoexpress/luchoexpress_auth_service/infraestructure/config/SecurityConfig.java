@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/auth/users").hasAnyRole("ADMIN", "ROOT")
                 .requestMatchers(HttpMethod.PATCH, "/auth/users/{id}").authenticated()
                 .requestMatchers(HttpMethod.PATCH, "/auth/users/{id}/disable").authenticated()
+                .requestMatchers(HttpMethod.PATCH, "/auth/users/{id}/enable").authenticated()
                 
                 .anyRequest().authenticated()
             )

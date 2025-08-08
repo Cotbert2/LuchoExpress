@@ -81,4 +81,10 @@ public class AuthController {
         userService.disableUser(id, authentication);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/users/{id}/enable")
+    public ResponseEntity<Void> enableUser(@PathVariable UUID id, Authentication authentication) {
+        userService.enableUser(id, authentication);
+        return ResponseEntity.noContent().build();
+    }
 }

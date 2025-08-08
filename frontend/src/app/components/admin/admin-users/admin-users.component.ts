@@ -163,8 +163,8 @@ export class AdminUsersComponent implements OnInit {
     this.editUserForm = {
       username: user.username,
       email: user.email,
-      role: user.role,
-      enabled: user.enabled
+      role: user.role
+      // enabled is managed via activate/deactivate actions, not here
     };
     this.displayEditDialog = true;
   }
@@ -251,7 +251,12 @@ export class AdminUsersComponent implements OnInit {
           summary: 'Success',
           detail: 'User deactivated successfully'
         });
-        this.loadUsers();
+        // Optimistic update
+        const idx = this.users.findIndex(u => u.id === user.id);
+        if (idx > -1) {
+          this.users[idx] = { ...this.users[idx], enabled: false };
+        }
+        this.applyFilters();
       },
       error: (error) => {
         console.error('Error disabling user:', error);
@@ -259,6 +264,32 @@ export class AdminUsersComponent implements OnInit {
           severity: 'error',
           summary: 'Error',
           detail: 'Error deactivating user'
+        });
+      }
+    });
+  }
+
+  activateUser(user: UserResponse) {
+    this.userService.enableUser(user.id).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Usuario activado correctamente'
+        });
+        // Optimistic update
+        const idx = this.users.findIndex(u => u.id === user.id);
+        if (idx > -1) {
+          this.users[idx] = { ...this.users[idx], enabled: true };
+        }
+        this.applyFilters();
+      },
+      error: (error) => {
+        console.error('Error activating user:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al activar usuario'
         });
       }
     });
