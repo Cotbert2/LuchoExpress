@@ -121,7 +121,7 @@
               icon="pi pi-pencil" 
               severity="info"
               size="small"
-              pTooltip="Editar usuario"
+              pTooltip="Edit user"
               (onClick)="openEditDialog(user)">
             </p-button>
             <p-button 
@@ -129,7 +129,7 @@
               icon="pi pi-ban" 
               severity="danger"
               size="small"
-              pTooltip="Desactivar usuario"
+              pTooltip="Deactivate user"
               (onClick)="confirmDisableUser(user)">
             </p-button>
           </div>
@@ -229,7 +229,7 @@
   [style]="{width: '450px'}"
   [closable]="true">
   
-  <div class="flex flex-col gap-4" *ngIf="selectedUser">
+  <div class="flex flex-col gap-4 mb-28" *ngIf="selectedUser">
     <!-- Username -->
     <div class="flex flex-col">
       <label class="mb-2 text-sm font-medium text-gray-700">Username *</label>
