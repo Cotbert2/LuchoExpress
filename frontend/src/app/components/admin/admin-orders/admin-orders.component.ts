@@ -70,8 +70,9 @@ export class AdminOrdersComponent implements OnInit {
     { label: 'All customers', value: '' }
   ];
   
-  // Dialog
+  // Dialogs
   displayEditDialog = false;
+  displayViewDialog = false;
   
   // Forms
   editOrderForm: UpdateOrderRequest = {};
@@ -162,14 +163,19 @@ export class AdminOrdersComponent implements OnInit {
     this.selectedOrder = order;
     this.editOrderForm = {
       status: order.status,
-      deliveryAddress: order.deliveryAddress,
+      deliveryAddress: order.deliveryAddress, // keep address unchanged but include it in payload
       estimatedDeliveryDate: order.estimatedDeliveryDate
     };
     this.displayEditDialog = true;
   }
 
+  openViewDialog(order: OrderResponse) {
+    this.selectedOrder = order;
+    this.displayViewDialog = true;
+  }
+
   updateOrder() {
-    if (!this.selectedOrder || !this.validateEditForm()) {
+    if (!this.selectedOrder) {
       return;
     }
 
@@ -237,19 +243,6 @@ export class AdminOrdersComponent implements OnInit {
     });
   }
 
-  validateEditForm(): boolean {
-    if (!this.editOrderForm.deliveryAddress?.trim()) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Delivery address is required'
-      });
-      return false;
-    }
-
-    return true;
-  }
-
   getStatusSeverity(status: string): string {
     switch (status) {
       case 'PENDING':
@@ -311,6 +304,10 @@ export class AdminOrdersComponent implements OnInit {
 
   getPendingOrdersCount(): number {
     return this.filteredOrders.filter(order => order.status === 'PENDING').length;
+  }
+
+  getShippedOrdersCount(): number {
+    return this.filteredOrders.filter(order => order.status === 'SHIPPED').length;
   }
 
   getDeliveredOrdersCount(): number {

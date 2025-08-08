@@ -68,7 +68,7 @@
 </p-card>
 
 <!-- Quick statistics -->
-<div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-4">
+<div class="grid grid-cols-1 gap-4 mt-10 mb-10 md:grid-cols-5">
   <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
     <div class="flex items-center justify-between">
       <div>
@@ -88,6 +88,18 @@
         </p>
       </div>
       <i class="text-2xl text-yellow-600 pi pi-clock"></i>
+    </div>
+  </div>
+
+  <div class="p-4 border border-indigo-200 rounded-lg bg-indigo-50">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-indigo-600">Shipped</p>
+        <p class="text-2xl font-bold text-indigo-800">
+          {{ getShippedOrdersCount() }}
+        </p>
+      </div>
+      <i class="text-2xl text-indigo-600 pi pi-car"></i>
     </div>
   </div>
   
@@ -210,20 +222,13 @@
               pTooltip="Edit order"
               (onClick)="openEditDialog(order)">
             </p-button>
-            <p-button 
-              *ngIf="canCancelOrder(order)"
-              icon="pi pi-ban" 
-              severity="danger"
-              size="small"
-              pTooltip="Cancel order"
-              (onClick)="confirmCancelOrder(order)">
-            </p-button>
+            <!-- Remove Cancel button from row actions -->
             <p-button 
               icon="pi pi-eye" 
               severity="secondary"
               size="small"
               pTooltip="View details"
-              (onClick)="openEditDialog(order)">
+              (onClick)="openViewDialog(order)">
             </p-button>
           </div>
         </td>
@@ -243,10 +248,10 @@
   </p-table>
 </p-card>
 
-<!-- Edit Order Dialog -->
+<!-- View Order Dialog (read-only) -->
 <p-dialog 
   header="Order Details" 
-  [(visible)]="displayEditDialog" 
+  [(visible)]="displayViewDialog" 
   [modal]="true" 
   [style]="{width: '600px'}"
   [closable]="true">
@@ -289,12 +294,54 @@
         </div>
       </div>
     </div>
-    
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <p-button 
+        label="Close" 
+        severity="secondary"
+        (onClick)="displayViewDialog = false">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Edit Order Dialog (only Status and Estimated Delivery Date) -->
+<p-dialog 
+  header="Update Order" 
+  [(visible)]="displayEditDialog" 
+  [modal]="true" 
+  [style]="{width: '600px'}"
+  [closable]="true">
+  
+  <div *ngIf="selectedOrder" class="flex flex-col gap-6">
+    <!-- Order info summary -->
+    <div class="p-4 rounded-lg bg-gray-50">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm text-gray-600">Order</label>
+          <p class="font-medium">{{ selectedOrder.orderNumber }}</p>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600">Current Status</label>
+          <p-tag 
+            [value]="getStatusText(selectedOrder.status)" 
+            [severity]="getStatusSeverity(selectedOrder.status)">
+          </p-tag>
+        </div>
+      </div>
+    </div>
+
     <!-- Edit form -->
-    <div class="space-y-4">
-      <h3 class="text-lg font-semibold">Update Order</h3>
-      
-      <!-- Status -->
+    <div class="space-y-4 mb-44">
+      <div class="flex flex-col">
+        <label class="mb-2 text-sm font-medium text-gray-700">Estimated Delivery Date</label>
+        <input 
+          type="date"
+          [(ngModel)]="editOrderForm.estimatedDeliveryDate"
+          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
       <div class="flex flex-col">
         <label class="mb-2 text-sm font-medium text-gray-700">Status *</label>
         <p-select 
@@ -306,27 +353,7 @@
           class="w-full">
         </p-select>
       </div>
-      
-      <!-- Delivery address -->
-      <div class="flex flex-col">
-        <label class="mb-2 text-sm font-medium text-gray-700">Delivery Address *</label>
-        <textarea 
-          pInputText
-          [(ngModel)]="editOrderForm.deliveryAddress"
-          placeholder="Enter delivery address"
-          rows="3"
-          class="w-full resize-none">
-        </textarea>
-      </div>
-      
-      <!-- Estimated delivery date -->
-      <div class="flex flex-col">
-        <label class="mb-2 text-sm font-medium text-gray-700">Estimated Delivery Date</label>
-        <input 
-          type="date"
-          [(ngModel)]="editOrderForm.estimatedDeliveryDate"
-          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-      </div>
+            
     </div>
   </div>
   
