@@ -71,12 +71,12 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       this.messageService.add({
         severity: 'info',
-        summary: 'Iniciar sesión requerido',
-        detail: 'Debes iniciar sesión para acceder al carrito de compras',
+        summary: 'Login Required',
+        detail: 'Please log in to proceed with checkout.',
         life: 4000
       });
-      
-      console.log('Usuario no autenticado, redirigiendo al login');
+
+      console.log('User not authenticated, redirecting to login');
       setTimeout(() => {
         this.router.navigate(['/login']);
       }, 1000);

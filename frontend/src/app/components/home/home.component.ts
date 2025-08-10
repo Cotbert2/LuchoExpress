@@ -26,7 +26,7 @@ export class HomeComponent implements OnInit {
   ) {}
 
 
-  productsInfo : any = {};
+  productsInfo : any[] = []; 
 
     responsiveOptions = [
     {
@@ -58,11 +58,15 @@ export class HomeComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.productsService.getAllProducts().subscribe((data: any) => {
-      console.log('products: ', data);
-      this.productsInfo = data;
-    }, (error) => {
-      console.log('error: ', error);
+    this.productsService.getAllProducts().subscribe({
+      next: (data: any) => {
+        console.log('products: ', data);
+        this.productsInfo = Array.isArray(data) ? data : [];
+      },
+      error: (error) => {
+        console.log('error: ', error);
+        this.productsInfo = []; // Asegurar que siempre sea un array
+      }
     });
 
     // this.inventoryService.getProducts().subscribe((data : any) => {

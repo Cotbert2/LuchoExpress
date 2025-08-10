@@ -161,22 +161,49 @@ export class AdminUsersComponent implements OnInit {
       return;
     }
 
+    console.log('Creating user with data:', this.createUserForm);
+
     this.userService.createUser(this.createUserForm).subscribe({
       next: (user) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Éxito',
-          detail: 'Usuario creado correctamente'
+          summary: 'Success',
+          detail: 'User created successfully'
         });
         this.displayCreateDialog = false;
         this.loadUsers();
       },
       error: (error) => {
         console.error('Error creating user:', error);
+        
+        let errorMessage = 'Error creating user';
+        
+        // Handle specific validation errors
+        if (error.error && error.error.fieldErrors) {
+          const fieldErrors = error.error.fieldErrors;
+          const errorMessages = [];
+          
+          for (const field in fieldErrors) {
+            if (fieldErrors[field] && fieldErrors[field].length > 0) {
+              errorMessages.push(fieldErrors[field][0]);
+            }
+          }
+          
+          if (errorMessages.length > 0) {
+            errorMessage = errorMessages.join(', ');
+          }
+        } else if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.status === 400) {
+          errorMessage = 'Invalid user data';
+        } else if (error.status === 409) {
+          errorMessage = 'User or email already exists';
+        }
+        
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Error al crear usuario'
+          detail: errorMessage
         });
       }
     });
@@ -186,8 +213,8 @@ export class AdminUsersComponent implements OnInit {
     if (user.role === 'ROOT') {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Advertencia',
-        detail: 'Los usuarios ROOT no se pueden desactivar'
+        summary: 'Warning',
+        detail: 'ROOT users cannot be deactivated'
       });
       return;
     }
@@ -235,8 +262,8 @@ export class AdminUsersComponent implements OnInit {
       next: () => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Éxito',
-          detail: 'Usuario activado correctamente'
+          summary: 'Success',
+          detail: 'User activated successfully'
         });
         // Optimistic update
         const idx = this.users.findIndex(u => u.id === user.id);
@@ -250,13 +277,14 @@ export class AdminUsersComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Error al activar usuario'
+          detail: 'Error activating user'
         });
       }
     });
   }
 
   validateCreateForm(): boolean {
+    // Username validation
     if (!this.createUserForm.username.trim()) {
       this.messageService.add({
         severity: 'error',
@@ -265,7 +293,17 @@ export class AdminUsersComponent implements OnInit {
       });
       return false;
     }
+    
+    if (this.createUserForm.username.trim().length < 3 || this.createUserForm.username.trim().length > 50) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Username must be between 3 and 50 characters'
+      });
+      return false;
+    }
 
+    // Email validation
     if (!this.createUserForm.email.trim()) {
       this.messageService.add({
         severity: 'error',
@@ -274,12 +312,51 @@ export class AdminUsersComponent implements OnInit {
       });
       return false;
     }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.createUserForm.email.trim())) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Please enter a valid email address'
+      });
+      return false;
+    }
+    
+    if (this.createUserForm.email.trim().length > 100) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Email cannot exceed 100 characters'
+      });
+      return false;
+    }
 
+    // Password validation
     if (!this.createUserForm.password.trim()) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
         detail: 'Password is required'
+      });
+      return false;
+    }
+    
+    if (this.createUserForm.password.trim().length < 6 || this.createUserForm.password.trim().length > 100) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Password must be between 6 and 100 characters'
+      });
+      return false;
+    }
+
+    // Role validation
+    if (!this.createUserForm.role) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Role is required'
       });
       return false;
     }
