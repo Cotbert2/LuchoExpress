@@ -109,19 +109,64 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private initializeForms(): void {
     this.personalInfoForm = this.formBuilder.group({
-      documentId: ['', [Validators.required, Validators.maxLength(50)]],
-      name: ['', [Validators.required, Validators.maxLength(100)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
-      phone: ['', [Validators.maxLength(20)]]
+      documentId: ['', [
+        Validators.required, 
+        Validators.minLength(8),
+        Validators.maxLength(50),
+        Validators.pattern(/^[a-zA-Z0-9\-]+$/) // Alphanumeric and hyphens only
+      ]],
+      name: ['', [
+        Validators.required, 
+        Validators.minLength(2),
+        Validators.maxLength(100),
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$/) // Letters, spaces, and accented characters only
+      ]],
+      email: ['', [
+        Validators.required, 
+        Validators.email, 
+        Validators.maxLength(100),
+        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+      ]],
+      phone: ['', [
+        Validators.minLength(10),
+        Validators.maxLength(20),
+        Validators.pattern(/^[\+]?[0-9\s\-\(\)]+$/) // Numbers, spaces, hyphens, parentheses, and optional +
+      ]]
     });
 
     this.shippingInfoForm = this.formBuilder.group({
-      address: ['', [Validators.required, Validators.maxLength(255)]],
-      city: ['', [Validators.required, Validators.maxLength(100)]],
-      state: ['', [Validators.required, Validators.maxLength(100)]],
-      zipCode: ['', [Validators.required, Validators.maxLength(20)]],
-      country: ['', [Validators.required, Validators.maxLength(100)]],
-      deliveryInstructions: ['', [Validators.maxLength(500)]]
+      address: ['', [
+        Validators.required, 
+        Validators.minLength(10),
+        Validators.maxLength(255)
+      ]],
+      city: ['', [
+        Validators.required, 
+        Validators.minLength(2),
+        Validators.maxLength(100),
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$/) // Letters, spaces, and accented characters only
+      ]],
+      state: ['', [
+        Validators.required, 
+        Validators.minLength(2),
+        Validators.maxLength(100),
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$/) // Letters, spaces, and accented characters only
+      ]],
+      zipCode: ['', [
+        Validators.required, 
+        Validators.minLength(3),
+        Validators.maxLength(20),
+        Validators.pattern(/^[a-zA-Z0-9\-\s]+$/) // Alphanumeric, hyphens, and spaces
+      ]],
+      country: ['', [
+        Validators.required, 
+        Validators.minLength(2),
+        Validators.maxLength(100),
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$/) // Letters, spaces, and accented characters only
+      ]],
+      deliveryInstructions: ['', [
+        Validators.maxLength(500)
+      ]]
     });
   }
 
@@ -218,21 +263,61 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Update item quantity
+   * Update item quantity with validation
    */
   updateQuantity(item: CartItem, newQuantity: number): void {
+    // Validate new quantity
     if (newQuantity <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid Quantity',
+        detail: 'Quantity must be at least 1. Item will be removed if you want quantity 0.',
+        life: 4000
+      });
       this.confirmRemoveItem(item);
       return;
     }
 
-    this.cartService.updateItemQuantity(item.id, newQuantity);
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Quantity Updated',
-      detail: `${item.name} quantity updated to ${newQuantity}`,
-      life: 2000
-    });
+    // Check for reasonable maximum quantity (optional business rule)
+    const maxQuantity = 99;
+    if (newQuantity > maxQuantity) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Quantity Too High',
+        detail: `Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`,
+        life: 4000
+      });
+      return;
+    }
+
+    // Validate that quantity is a whole number
+    if (newQuantity !== Math.floor(newQuantity)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid Quantity',
+        detail: 'Quantity must be a whole number.',
+        life: 3000
+      });
+      return;
+    }
+
+    try {
+      this.cartService.updateItemQuantity(item.id, newQuantity);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Quantity Updated',
+        detail: `${item.name} quantity updated to ${newQuantity}`,
+        life: 2000
+      });
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Update Failed',
+        detail: 'Failed to update item quantity. Please try again.',
+        life: 3000
+      });
+    }
   }
 
   /**
@@ -296,12 +381,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    * Proceed to checkout process
    */
   proceedToCheckout(): void {
-    if (this.cartItems.length === 0) {
+    const cartValidation = this.validateCartItems();
+    
+    if (!cartValidation.isValid) {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Empty Cart',
-        detail: 'Please add some items to your cart before proceeding',
-        life: 3000
+        summary: 'Cart Issues Found',
+        detail: cartValidation.message,
+        life: 4000
       });
       return;
     }
@@ -319,6 +406,70 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         life: 5000
       });
     }
+  }
+
+  /**
+   * Validate cart items before checkout
+   */
+  private validateCartItems(): { isValid: boolean; message: string } {
+    if (this.cartItems.length === 0) {
+      return {
+        isValid: false,
+        message: 'Your cart is empty. Please add some items before proceeding.'
+      };
+    }
+
+    const invalidItems: string[] = [];
+    const zeroQuantityItems: string[] = [];
+    let totalValue = 0;
+
+    for (const item of this.cartItems) {
+      // Check for zero or negative quantities
+      if (item.quantity <= 0) {
+        zeroQuantityItems.push(item.name);
+      }
+
+      // Check for invalid prices
+      if (item.price <= 0) {
+        invalidItems.push(`${item.name} (invalid price)`);
+      }
+
+      // Check for missing product information
+      if (!item.name || item.name.trim() === '') {
+        invalidItems.push('Product with missing name');
+      }
+
+      totalValue += item.price * item.quantity;
+    }
+
+    // Check for zero quantity items
+    if (zeroQuantityItems.length > 0) {
+      return {
+        isValid: false,
+        message: `The following items have invalid quantities: ${zeroQuantityItems.join(', ')}. Please update the quantities.`
+      };
+    }
+
+    // Check for invalid items
+    if (invalidItems.length > 0) {
+      return {
+        isValid: false,
+        message: `The following items have issues: ${invalidItems.join(', ')}. Please remove them from your cart.`
+      };
+    }
+
+    const minimumOrderValue = 10; 
+    if (totalValue < minimumOrderValue) {
+      return {
+        isValid: false,
+        message: `Minimum order value is ${this.formatCurrency(minimumOrderValue)}. Current total: ${this.formatCurrency(totalValue)}.`
+      };
+    }
+
+    return {
+      isValid: true,
+      message: 'Cart is valid'
+    };
   }
 
   /**
@@ -340,12 +491,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.createOrUpdateCustomer();
       } else {
         this.markFormGroupTouched(this.personalInfoForm);
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Form Invalid',
-          detail: 'Please fill in all required fields correctly',
-          life: 3000
-        });
+        this.showValidationErrorsForStep('personal information');
       }
     } else if (this.activeStepIndex === 1) {
       // Validate shipping info form before proceeding
@@ -354,15 +500,42 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.updateCustomerAddress();
       } else {
         this.markFormGroupTouched(this.shippingInfoForm);
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Form Invalid',
-          detail: 'Please fill in all required shipping information',
-          life: 3000
-        });
+        this.showValidationErrorsForStep('shipping information');
       }
     } else if (this.activeStepIndex < 2) {
       this.activeStepIndex++;
+    }
+  }
+
+  /**
+   * Show specific validation errors for the current step
+   */
+  private showValidationErrorsForStep(stepName: string): void {
+    const form = this.activeStepIndex === 0 ? this.personalInfoForm : this.shippingInfoForm;
+    const invalidFields: string[] = [];
+    
+    Object.keys(form.controls).forEach(fieldName => {
+      const control = form.get(fieldName);
+      if (control?.errors && control.touched) {
+        invalidFields.push(this.getFieldDisplayName(fieldName));
+      }
+    });
+
+    if (invalidFields.length > 0) {
+      const fieldsList = invalidFields.join(', ');
+      this.messageService.add({
+        severity: 'warn',
+        summary: `Incomplete ${stepName}`,
+        detail: `Please fix the following fields: ${fieldsList}`,
+        life: 5000
+      });
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Form Invalid',
+        detail: `Please complete all required ${stepName} fields`,
+        life: 3000
+      });
     }
   }
 
@@ -552,17 +725,51 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   getFieldError(formGroup: FormGroup, fieldName: string): string {
     const field = formGroup.get(fieldName);
     if (field?.errors && field.touched) {
+      const displayName = this.getFieldDisplayName(fieldName);
+      
       if (field.errors['required']) {
-        return `${this.getFieldDisplayName(fieldName)} is required`;
+        return `${displayName} is required`;
       }
+      
       if (field.errors['email']) {
-        return 'Please enter a valid email address';
+        return 'Please enter a valid email address (example: user@example.com)';
       }
+      
+      if (field.errors['pattern']) {
+        return this.getPatternErrorMessage(fieldName);
+      }
+      
+      if (field.errors['minlength']) {
+        const requiredLength = field.errors['minlength'].requiredLength;
+        const actualLength = field.errors['minlength'].actualLength;
+        return `${displayName} must be at least ${requiredLength} characters long (currently ${actualLength} characters)`;
+      }
+      
       if (field.errors['maxlength']) {
-        return `${this.getFieldDisplayName(fieldName)} is too long`;
+        const requiredLength = field.errors['maxlength'].requiredLength;
+        const actualLength = field.errors['maxlength'].actualLength;
+        return `${displayName} cannot exceed ${requiredLength} characters (currently ${actualLength} characters)`;
       }
     }
     return '';
+  }
+
+  /**
+   * Get specific pattern error messages for each field
+   */
+  private getPatternErrorMessage(fieldName: string): string {
+    const patternMessages: { [key: string]: string } = {
+      documentId: 'Document ID can only contain letters, numbers, and hyphens',
+      name: 'Full name can only contain letters and spaces',
+      email: 'Please enter a valid email format (example: user@example.com)',
+      phone: 'Phone number can only contain numbers, spaces, hyphens, parentheses, and optional country code (+)',
+      city: 'City name can only contain letters and spaces',
+      state: 'State name can only contain letters and spaces',
+      country: 'Country name can only contain letters and spaces',
+      zipCode: 'ZIP code can only contain letters, numbers, hyphens, and spaces'
+    };
+    
+    return patternMessages[fieldName] || 'Invalid format';
   }
 
   /**
@@ -596,32 +803,40 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    * Complete checkout process
    */
   completeCheckout(): void {
-    if (!this.personalInfoForm.valid || !this.shippingInfoForm.valid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Forms Invalid',
-        detail: 'Please complete all required information',
-        life: 3000
-      });
+    // Validate all forms
+    const allFormsValid = this.validateAllForms();
+    
+    if (!allFormsValid) {
       return;
     }
 
     if (!this.currentUser) {
       this.messageService.add({
         severity: 'error',
-        summary: 'User Error',
-        detail: 'User information is not available',
-        life: 3000
+        summary: 'Authentication Error',
+        detail: 'Your session has expired. Please log in again.',
+        life: 4000
       });
+      this.router.navigate(['/login']);
       return;
     }
 
     if (!this.existingCustomer) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Customer Error',
-        detail: 'Customer information is not available',
-        life: 3000
+        summary: 'Customer Profile Error',
+        detail: 'Customer profile could not be created. Please try again.',
+        life: 4000
+      });
+      return;
+    }
+
+    if (this.cartItems.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Empty Cart',
+        detail: 'Your cart is empty. Please add items before proceeding to checkout.',
+        life: 4000
       });
       return;
     }
@@ -630,6 +845,56 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     
     // Complete the order process directly since customer and address are already updated
     this.completeOrderProcess(this.existingCustomer);
+  }
+
+  /**
+   * Validate all forms and show detailed errors
+   */
+  private validateAllForms(): boolean {
+    const personalValid = this.personalInfoForm.valid;
+    const shippingValid = this.shippingInfoForm.valid;
+    
+    if (!personalValid || !shippingValid) {
+      this.markFormGroupTouched(this.personalInfoForm);
+      this.markFormGroupTouched(this.shippingInfoForm);
+      
+      const invalidSections: string[] = [];
+      const invalidFields: string[] = [];
+      
+      if (!personalValid) {
+        invalidSections.push('Personal Information');
+        Object.keys(this.personalInfoForm.controls).forEach(fieldName => {
+          const control = this.personalInfoForm.get(fieldName);
+          if (control?.errors) {
+            invalidFields.push(this.getFieldDisplayName(fieldName));
+          }
+        });
+      }
+      
+      if (!shippingValid) {
+        invalidSections.push('Shipping Information');
+        Object.keys(this.shippingInfoForm.controls).forEach(fieldName => {
+          const control = this.shippingInfoForm.get(fieldName);
+          if (control?.errors) {
+            invalidFields.push(this.getFieldDisplayName(fieldName));
+          }
+        });
+      }
+      
+      const sectionsList = invalidSections.join(' and ');
+      const fieldsList = invalidFields.join(', ');
+      
+      this.messageService.add({
+        severity: 'warn',
+        summary: `${sectionsList} Incomplete`,
+        detail: `Please fix the following fields: ${fieldsList}`,
+        life: 6000
+      });
+      
+      return false;
+    }
+    
+    return true;
   }
 
   /**

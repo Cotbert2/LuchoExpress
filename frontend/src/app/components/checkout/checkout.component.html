@@ -117,13 +117,25 @@
             id="documentId" 
             formControlName="documentId"
             placeholder=" "
-            class="w-full" />
+            class="w-full"
+            [class.border-red-500]="hasFieldError(personalInfoForm, 'documentId')"
+            [class.border-green-500]="personalInfoForm.get('documentId')?.valid && personalInfoForm.get('documentId')?.touched" />
           <label for="documentId" class="required">Document ID</label>
+          <div class="field-hint" *ngIf="!hasFieldError(personalInfoForm, 'documentId') && !personalInfoForm.get('documentId')?.touched">
+            <i class="pi pi-info-circle"></i>
+            Enter your national ID, passport, or similar document
+          </div>
           <small 
             class="error-message" 
             *ngIf="hasFieldError(personalInfoForm, 'documentId')">
             <i class="pi pi-exclamation-triangle"></i>
             {{ getFieldError(personalInfoForm, 'documentId') }}
+          </small>
+          <small 
+            class="success-message" 
+            *ngIf="personalInfoForm.get('documentId')?.valid && personalInfoForm.get('documentId')?.touched && !hasFieldError(personalInfoForm, 'documentId')">
+            <i class="pi pi-check"></i>
+            Document ID format is valid
           </small>
         </div>
 
@@ -134,13 +146,25 @@
             id="name" 
             formControlName="name"
             placeholder=" "
-            class="w-full" />
+            class="w-full"
+            [class.border-red-500]="hasFieldError(personalInfoForm, 'name')"
+            [class.border-green-500]="personalInfoForm.get('name')?.valid && personalInfoForm.get('name')?.touched" />
           <label for="name" class="required">Full Name</label>
+          <div class="field-hint" *ngIf="!hasFieldError(personalInfoForm, 'name') && !personalInfoForm.get('name')?.touched">
+            <i class="pi pi-info-circle"></i>
+            Enter your complete legal name (letters and spaces only)
+          </div>
           <small 
             class="error-message" 
             *ngIf="hasFieldError(personalInfoForm, 'name')">
             <i class="pi pi-exclamation-triangle"></i>
             {{ getFieldError(personalInfoForm, 'name') }}
+          </small>
+          <small 
+            class="success-message" 
+            *ngIf="personalInfoForm.get('name')?.valid && personalInfoForm.get('name')?.touched && !hasFieldError(personalInfoForm, 'name')">
+            <i class="pi pi-check"></i>
+            Name format is valid
           </small>
         </div>
 
@@ -152,13 +176,25 @@
             type="email"
             formControlName="email"
             placeholder=" "
-            class="w-full" />
+            class="w-full"
+            [class.border-red-500]="hasFieldError(personalInfoForm, 'email')"
+            [class.border-green-500]="personalInfoForm.get('email')?.valid && personalInfoForm.get('email')?.touched" />
           <label for="email" class="required">Email Address</label>
+          <div class="field-hint" *ngIf="!hasFieldError(personalInfoForm, 'email') && !personalInfoForm.get('email')?.touched">
+            <i class="pi pi-info-circle"></i>
+            We'll use this for order confirmations and updates
+          </div>
           <small 
             class="error-message" 
             *ngIf="hasFieldError(personalInfoForm, 'email')">
             <i class="pi pi-exclamation-triangle"></i>
             {{ getFieldError(personalInfoForm, 'email') }}
+          </small>
+          <small 
+            class="success-message" 
+            *ngIf="personalInfoForm.get('email')?.valid && personalInfoForm.get('email')?.touched && !hasFieldError(personalInfoForm, 'email')">
+            <i class="pi pi-check"></i>
+            Email format is valid
           </small>
         </div>
 
@@ -170,17 +206,25 @@
             type="tel"
             formControlName="phone"
             placeholder=" "
-            class="w-full" />
+            class="w-full"
+            [class.border-red-500]="hasFieldError(personalInfoForm, 'phone')"
+            [class.border-green-500]="personalInfoForm.get('phone')?.valid && personalInfoForm.get('phone')?.touched && personalInfoForm.get('phone')?.value" />
           <label for="phone">Phone Number</label>
-          <div class="field-hint" *ngIf="!hasFieldError(personalInfoForm, 'phone')">
+          <div class="field-hint" *ngIf="!hasFieldError(personalInfoForm, 'phone') && !personalInfoForm.get('phone')?.touched">
             <i class="pi pi-info-circle"></i>
-            Optional - For delivery updates
+            Optional - For delivery updates (format: +57 300 123 4567)
           </div>
           <small 
             class="error-message" 
             *ngIf="hasFieldError(personalInfoForm, 'phone')">
             <i class="pi pi-exclamation-triangle"></i>
             {{ getFieldError(personalInfoForm, 'phone') }}
+          </small>
+          <small 
+            class="success-message" 
+            *ngIf="personalInfoForm.get('phone')?.valid && personalInfoForm.get('phone')?.touched && personalInfoForm.get('phone')?.value && !hasFieldError(personalInfoForm, 'phone')">
+            <i class="pi pi-check"></i>
+            Phone format is valid
           </small>
         </div>
       </div>
@@ -229,13 +273,25 @@
           id="address" 
           formControlName="address"
           placeholder=" "
-          class="w-full" />
+          class="w-full"
+          [class.border-red-500]="hasFieldError(shippingInfoForm, 'address')"
+          [class.border-green-500]="shippingInfoForm.get('address')?.valid && shippingInfoForm.get('address')?.touched" />
         <label for="address" class="required">Street Address</label>
+        <div class="field-hint" *ngIf="!hasFieldError(shippingInfoForm, 'address') && !shippingInfoForm.get('address')?.touched">
+          <i class="pi pi-info-circle"></i>
+          Include street number, street name, and any apartment/unit number
+        </div>
         <small 
           class="error-message" 
           *ngIf="hasFieldError(shippingInfoForm, 'address')">
           <i class="pi pi-exclamation-triangle"></i>
           {{ getFieldError(shippingInfoForm, 'address') }}
+        </small>
+        <small 
+          class="success-message" 
+          *ngIf="shippingInfoForm.get('address')?.valid && shippingInfoForm.get('address')?.touched && !hasFieldError(shippingInfoForm, 'address')">
+          <i class="pi pi-check"></i>
+          Address looks good
         </small>
       </div>
 
@@ -334,7 +390,7 @@
       <div class="p-3 mt-4 rounded-md form-info bg-green-50 dark:bg-green-900/20">
         <div class="flex items-center gap-2 text-sm text-green-600 dark:text-green-300">
           <i class="pi pi-truck"></i>
-          <span>Free shipping on all orders! Your items will be delivered within 3-5 business days.</span>
+          <span>Free shipping on all orders! Your items will be delivered within 5-10 business days.</span>
         </div>
       </div>
     </form>

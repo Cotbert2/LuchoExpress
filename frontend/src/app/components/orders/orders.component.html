@@ -1,11 +1,9 @@
 <div class="container p-4 mx-auto">
-  <!-- Header -->
   <div class="mb-6">
     <h1 class="mb-2 text-3xl font-bold text-gray-800">My Orders</h1>
     <p class="text-gray-600">Manage and review the status of your orders</p>
   </div>
 
-  <!-- Filters -->
   <p-card class="mb-6 ">
     <ng-template pTemplate="header">
       <div class="flex items-center gap-2 py-2 pl-5 text-white rounded-t-lg bg-zinc-800">
@@ -15,7 +13,6 @@
     </ng-template>
     
     <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-      <!-- Text search -->
       <div class="flex flex-col">
         <label for="search" class="mb-1 text-sm font-medium text-gray-700">Search</label>
         <input
@@ -41,7 +38,6 @@
         />
       </div>
 
-      <!-- Date to -->
       <div class="flex flex-col">
         <label for="dateTo" class="mb-1 text-sm font-medium text-gray-700">To</label>
         <p-datepicker
@@ -67,11 +63,10 @@
     </div>
   </p-card>
 
-  <!-- Orders table -->
   <p-card>
     <ng-template pTemplate="header">
       <div class="flex items-center justify-between pl-5 text-white rounded-t-lg bg-zinc-800">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 py-3">
           <i class="text-lg pi pi-shopping-cart"></i>
           <span class="font-semibold">Orders ({{ filteredOrders.length }})</span>
         </div>
@@ -85,12 +80,10 @@
       </div>
     </ng-template>
 
-    <!-- Loading skeleton -->
     <div *ngIf="loading" class="space-y-4">
       <p-skeleton height="4rem" *ngFor="let item of [1,2,3,4,5]"></p-skeleton>
     </div>
 
-    <!-- Table -->
     <p-table 
       *ngIf="!loading"
       [value]="filteredOrders"
@@ -116,13 +109,11 @@
 
       <ng-template pTemplate="body" let-order>
         <tr>
-          <!-- Order number -->
           <td>
             <div class="font-medium text-blue-600">{{ order.orderNumber }}</div>
             <div class="text-xs text-gray-500">ID: {{ order.id }}</div>
           </td>
 
-          <!-- Date -->
           <td>
             <div class="text-sm">{{ formatDate(order.orderDate) }}</div>
             <div class="text-xs text-gray-500" *ngIf="order.estimatedDeliveryDate">
@@ -130,7 +121,6 @@
             </div>
           </td>
 
-          <!-- Status -->
           <td>
             <p-tag 
               [severity]="getStatusSeverity(order.status)"
@@ -139,21 +129,18 @@
             />
           </td>
 
-          <!-- Total -->
           <td>
             <div class="font-semibold text-green-600">
               {{ formatCurrency(order.totalAmount) }}
             </div>
           </td>
 
-          <!-- Address -->
           <td>
             <div class="max-w-xs truncate" [title]="order.deliveryAddress">
               {{ order.deliveryAddress }}
             </div>
           </td>
 
-          <!-- Products -->
           <td>
             <div class="space-y-1">
               <div 
@@ -229,13 +216,10 @@
   </p-card>
 </div>
 
-<!-- Toast Messages -->
 <p-toast />
 
-<!-- Confirmation Dialog -->
 <p-confirmDialog />
 
-<!-- Fast Tracking Modal -->
 <p-dialog 
   [(visible)]="trackingModalVisible"
   [modal]="true"
@@ -267,13 +251,11 @@
   </ng-template>
 
   <div class="min-h-48">
-    <!-- Loading State -->
     <div *ngIf="trackingLoading" class="flex flex-col items-center justify-center py-8">
       <i class="mb-4 text-3xl text-blue-500 pi pi-spin pi-spinner"></i>
       <p class="text-gray-600">Fetching tracking information...</p>
     </div>
 
-    <!-- Error State -->
     <div *ngIf="!trackingLoading && trackingError" class="py-8 text-center">
       <i class="mb-4 text-4xl text-red-500 pi pi-exclamation-triangle" 
          *ngIf="!trackingError.includes('Authentication') && !trackingError.includes('Access denied')"></i>
@@ -304,7 +286,6 @@
       </div>
     </div>
 
-    <!-- Success State -->
     <div *ngIf="!trackingLoading && !trackingError && trackingData" class="space-y-4">
       <!-- Tracking Status Card -->
       <div class="p-4 rounded-lg bg-gray-50">
@@ -342,7 +323,6 @@
 
       <p-divider />
 
-      <!-- Raw Data Section -->
       <div class="p-4 rounded-lg bg-gray-50">
         <h4 class="flex items-center gap-2 mb-3 text-lg font-semibold text-gray-800">
           <i class="pi pi-code"></i>
