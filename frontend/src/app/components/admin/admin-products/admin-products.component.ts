@@ -146,11 +146,8 @@ export class AdminProductsComponent implements OnInit {
       
       this.productManagementService.updateCategory(this.editingCategory.id, updateData).subscribe({
         next: (updatedCategory) => {
-          const index = this.categories.findIndex(c => c.id === this.editingCategory!.id);
-          if (index !== -1) {
-            this.categories[index] = updatedCategory;
-          }
-          this.updateCategoryOptions();
+          // Reload all categories to ensure fresh data
+          this.loadCategories();
           this.categoryDialog = false;
           this.messageService.add({
             severity: 'success',
@@ -171,8 +168,8 @@ export class AdminProductsComponent implements OnInit {
       // Create
       this.productManagementService.createCategory(this.categoryForm).subscribe({
         next: (newCategory) => {
-          this.categories.push(newCategory);
-          this.updateCategoryOptions();
+          // Instead of just pushing, reload all categories to ensure fresh data
+          this.loadCategories();
           this.categoryDialog = false;
           this.messageService.add({
             severity: 'success',
@@ -278,6 +275,16 @@ export class AdminProductsComponent implements OnInit {
       return;
     }
 
+    // Enhanced image URL validation
+    if (this.productForm.imageUrl && !this.isValidImageUrl(this.productForm.imageUrl)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid Image URL',
+        detail: 'Please provide a valid image URL. Supported formats: JPG, JPEG, PNG, GIF, BMP, WEBP, SVG, TIFF, TIF, ICO, AVIF'
+      });
+      return;
+    }
+
     if (this.editingProduct) {
       // Update
       const updateData: UpdateProductRequest = {
@@ -290,10 +297,8 @@ export class AdminProductsComponent implements OnInit {
       
       this.productManagementService.updateProduct(this.editingProduct.id, updateData).subscribe({
         next: (updatedProduct) => {
-          const index = this.products.findIndex(p => p.id === this.editingProduct!.id);
-          if (index !== -1) {
-            this.products[index] = updatedProduct;
-          }
+          // Reload products to ensure fresh data with complete category information
+          this.loadProducts();
           this.productDialog = false;
           this.messageService.add({
             severity: 'success',
@@ -314,7 +319,8 @@ export class AdminProductsComponent implements OnInit {
       // Create
       this.productManagementService.createProduct(this.productForm).subscribe({
         next: (newProduct) => {
-          this.products.push(newProduct);
+          // Reload products to ensure fresh data with complete category information
+          this.loadProducts();
           this.productDialog = false;
           this.messageService.add({
             severity: 'success',
@@ -348,11 +354,81 @@ export class AdminProductsComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('es-CO');
+    if (!dateString) {
+      return 'N/A';
+    }
+    
+    try {
+      const date = new Date(dateString);
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+      
+      // Check if it's the Unix epoch (1970-01-01) which might indicate an error
+      if (date.getFullYear() === 1970 && date.getMonth() === 0 && date.getDate() === 1) {
+        return 'Loading...';
+      }
+      
+      return date.toLocaleDateString('es-CO');
+    } catch (error) {
+      console.error('Error formatting date:', error, 'Input:', dateString);
+      return 'Error formatting date';
+    }
   }
 
-  getCategoryName(categoryId: string): string {
+  getCategoryName(categoryId: string, product?: ProductResponse): string {
+    // First try to get category from the product object itself (if it has category info)
+    if (product && product.category && product.category.name) {
+      return product.category.name;
+    }
+    
+    // Fallback to searching in the categories array
     const category = this.categories.find(c => c.id === categoryId);
     return category ? category.name : 'Unknown';
+  }
+
+  /**
+   * Validates if the provided URL is a valid image URL
+   * Supports multiple image formats: jpg, jpeg, png, gif, bmp, webp, svg, tiff, tif, ico, avif
+   */
+  isValidImageUrl(url: string): boolean {
+    if (!url || !url.trim()) {
+      return true; // Allow empty URLs as they're optional
+    }
+
+    try {
+      // Basic URL validation
+      const urlObj = new URL(url);
+      
+      // Check if it's a valid HTTP/HTTPS URL
+      if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+        return false;
+      }
+
+      // Extract file extension from URL (handling query parameters and fragments)
+      const pathname = urlObj.pathname.toLowerCase();
+      const imageExtensions = [
+        '.jpg', '.jpeg', '.png', '.gif', 
+        '.bmp', '.webp', '.svg', '.tiff', 
+        '.tif', '.ico', '.avif'
+      ];
+
+      // Check if URL ends with a valid image extension
+      const hasValidExtension = imageExtensions.some(ext => pathname.endsWith(ext));
+
+      // Also accept URLs that might not have extensions but contain image-related paths
+      const hasImageKeywords = pathname.includes('/image') || 
+                              pathname.includes('/img') || 
+                              pathname.includes('/photo') || 
+                              pathname.includes('/picture') ||
+                              pathname.includes('/pic');
+
+      return hasValidExtension || hasImageKeywords;
+
+    } catch (error) {
+      // If URL constructor throws an error, it's not a valid URL
+      return false;
+    }
   }
 }

@@ -34,7 +34,12 @@ public class ProductService {
         
         Product product = productMapper.toEntity(request);
         Product savedProduct = productRepository.save(product);
-        return productMapper.toResponse(savedProduct);
+        
+        // Reload the product to ensure the category relationship is fully loaded
+        Product reloadedProduct = productRepository.findById(savedProduct.getId())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found after creation"));
+        
+        return productMapper.toResponse(reloadedProduct);
     }
     
     public ProductResponse updateProduct(UUID id, UpdateProductRequest request) {
@@ -48,7 +53,12 @@ public class ProductService {
         
         productMapper.updateEntityFromRequest(product, request);
         Product updatedProduct = productRepository.save(product);
-        return productMapper.toResponse(updatedProduct);
+        
+        // Reload the product to ensure the category relationship is fully loaded
+        Product reloadedProduct = productRepository.findById(updatedProduct.getId())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found after update"));
+        
+        return productMapper.toResponse(reloadedProduct);
     }
     
     @Transactional(readOnly = true)

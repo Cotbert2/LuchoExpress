@@ -20,8 +20,8 @@ public class CreateProductRequest {
     @Size(max = 100, message = "Name cannot be longer than 100 characters")
     private String name;
     
-    @Pattern(regexp = "^(https?://).*\\.(jpg|jpeg|png|gif|bmp|webp)$", 
-             message = "Image URL must be a valid URL ending with a valid image extension")
+    @Pattern(regexp = "^(https?://).*\\.(jpg|jpeg|png|gif|bmp|webp|svg|tiff|tif|ico|avif|JPG|JPEG|PNG|GIF|BMP|WEBP|SVG|TIFF|TIF|ICO|AVIF)(\\?.*)?$|^(https?://).*(image|img|photo|picture|pic|IMAGE|IMG|PHOTO|PICTURE|PIC).*$", 
+             message = "Image URL must be a valid HTTP/HTTPS URL pointing to an image file or containing image-related keywords")
     private String imageUrl;
     
     @Size(max = 500, message = "Description cannot be longer than 500 characters")
