@@ -23,31 +23,31 @@ spring:
             maxAge: 3600
       routes:
         - id: ms-auth
-          uri: http://localhost:8081
+          uri: http://ms-auth-lucho-express:8081
           predicates:
             - Path=/auth/**
         - id: ms-customer
-          uri: http://localhost:8082
+          uri: http://ms-customer-lucho-express:8082
           predicates:
             - Path=/api/customers/**
         - id: ms-order
-          uri: http://localhost:8084
+          uri: http://ms-orders-lucho-express:8084
           predicates:
             - Path=/api/orders/**
         - id: ms-products
-          uri: http://localhost:8085
+          uri: http://ms-product-lucho-express:8085
           predicates:
             - Path=/api/products/**
         - id: ms-product-categories
-          uri: http://localhost:8085
+          uri: http://ms-product-lucho-express:8085
           predicates:
             - Path=/api/categories-with-products/**
         - id: ms-categories
-          uri: http://localhost:8085
+          uri: http://ms-product-lucho-express:8085
           predicates:
             - Path=/api/categories/**
         - id: ms-tracking-orders
-          uri: http://localhost:8086
+          uri: http://ms-tracking-lucho-express:8086
           predicates:
             - Path=/api/tracking/**
 

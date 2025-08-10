@@ -458,7 +458,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       };
     }
 
-    const minimumOrderValue = 10; 
+    const minimumOrderValue = 9.99; 
+    
     if (totalValue < minimumOrderValue) {
       return {
         isValid: false,
@@ -1050,13 +1051,29 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Format currency
+   * Format currency with fallback for container environments
    */
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    // Ensure we have a proper number and use consistent formatting
+    const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    
+    if (isNaN(numericAmount)) {
+      return '$0.00';
+    }
+    
+    try {
+      // Use a more explicit approach to avoid locale issues in containers
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(numericAmount);
+    } catch (error) {
+      // Fallback for environments where Intl might not work properly
+      console.warn('Intl.NumberFormat failed, using fallback:', error);
+      return `$${numericAmount.toFixed(2)}`;
+    }
   }
 
   /**
