@@ -77,6 +77,7 @@ export class AdminOrdersComponent implements OnInit {
   // Forms
   editOrderForm: UpdateOrderRequest = {};
   selectedOrder: OrderResponse | null = null;
+  deliveryDateError: string | null = null;
   
   // Estados disponibles para actualización
   availableStatuses: StatusOption[] = [
@@ -166,6 +167,7 @@ export class AdminOrdersComponent implements OnInit {
       deliveryAddress: order.deliveryAddress, // keep address unchanged but include it in payload
       estimatedDeliveryDate: order.estimatedDeliveryDate
     };
+    this.deliveryDateError = null; // Reset any validation errors
     this.displayEditDialog = true;
   }
 
@@ -177,6 +179,31 @@ export class AdminOrdersComponent implements OnInit {
   updateOrder() {
     if (!this.selectedOrder) {
       return;
+    }
+
+    // Check if there's a validation error
+    if (this.deliveryDateError) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: this.deliveryDateError
+      });
+      return;
+    }
+
+    // Validate that estimated delivery date is not before order date
+    if (this.editOrderForm.estimatedDeliveryDate) {
+      const orderDate = new Date(this.selectedOrder.orderDate);
+      const deliveryDate = new Date(this.editOrderForm.estimatedDeliveryDate);
+      
+      if (deliveryDate < orderDate) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Invalid Date',
+          detail: 'Estimated delivery date cannot be before the order date'
+        });
+        return;
+      }
     }
 
     this.orderService.updateOrder(this.selectedOrder.id, this.editOrderForm).subscribe({
@@ -198,6 +225,21 @@ export class AdminOrdersComponent implements OnInit {
         });
       }
     });
+  }
+
+  validateDeliveryDate() {
+    this.deliveryDateError = null;
+    
+    if (!this.selectedOrder || !this.editOrderForm.estimatedDeliveryDate) {
+      return;
+    }
+
+    const orderDate = new Date(this.selectedOrder.orderDate);
+    const deliveryDate = new Date(this.editOrderForm.estimatedDeliveryDate);
+    
+    if (deliveryDate < orderDate) {
+      this.deliveryDateError = 'Estimated delivery date cannot be before the order date';
+    }
   }
 
   confirmCancelOrder(order: OrderResponse) {
