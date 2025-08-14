@@ -19,10 +19,7 @@ public class CorsConfig {
         
         // Permitir orígenes específicos
         configuration.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:4200",    // Angular dev server
-            "http://localhost:3000",    // React dev server (si lo usas)
-            "http://127.0.0.1:4200",
-            "http://127.0.0.1:3000"
+            "*"
         ));
         
         // Permitir métodos HTTP

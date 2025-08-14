@@ -46,7 +46,7 @@ services:
 
   # Microservicio de autenticación
   ms-auth-lucho-express:
-    image: luissagx/ms-auth-lucho-express:v2
+    image: luissagx/ms-auth-lucho-express_aws:aws
     container_name: ms-auth-lucho-express
     environment:
       DB_HOST: postgres-auth
@@ -105,7 +105,7 @@ services:
 
   # Microservicio de pedidos
   ms-orders-lucho-express:
-    image: luissagx/ms-orders-lucho-express:v2
+    image: luissagx/ms-orders-lucho-express_aws:aws
     container_name: ms-orders-lucho-express
     environment:
       DB_HOST: order-mysql
@@ -154,7 +154,7 @@ services:
 
   # API Gateway
   api-gateway-lucho-express:
-    image: luissagx/api-gateway-lucho-express:v2
+    image: luissagx/api-gateway-lucho-express_aws:aws
     container_name: api-gateway-lucho-express
     ports:
       - "8080:8080"
