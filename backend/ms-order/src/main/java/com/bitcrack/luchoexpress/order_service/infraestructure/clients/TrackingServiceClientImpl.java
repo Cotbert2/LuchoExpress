@@ -41,9 +41,14 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
                     LocalDateTime.now()
                 );
             
-            trackingOrdersServiceFeignClient.createOrUpdateTracking(apiKey, trackingStatus);
+            // Intentar crear el tracking con reintentos
+            boolean success = updateTrackingWithRetry(trackingStatus, 3);
             
-            log.info("Successfully created tracking for order: {}", order.getId());
+            if (success) {
+                log.info("Successfully created tracking for order: {}", order.getId());
+            } else {
+                log.error("Failed to create tracking for order {} after all retry attempts", order.getId());
+            }
             
         } catch (FeignException e) {
             log.error("Failed to create tracking for order {}: {}", order.getId(), e.getMessage());
@@ -72,9 +77,14 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
                     LocalDateTime.now()
                 );
             
-            trackingOrdersServiceFeignClient.createOrUpdateTracking(apiKey, trackingStatus);
+            // Intentar actualizar el tracking con reintentos
+            boolean success = updateTrackingWithRetry(trackingStatus, 3);
             
-            log.info("Successfully updated tracking for order: {}", order.getId());
+            if (success) {
+                log.info("Successfully updated tracking for order: {}", order.getId());
+            } else {
+                log.error("Failed to update tracking for order {} after all retry attempts", order.getId());
+            }
             
         } catch (FeignException e) {
             log.error("Failed to update tracking for order {}: {}", order.getId(), e.getMessage());
@@ -83,5 +93,29 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
             log.error("Failed to update tracking for order {} due to customer service error: {}", order.getId(), e.getMessage());
             // Don't rethrow - this should not fail the order update
         }
+    }
+    
+    private boolean updateTrackingWithRetry(TrackingOrdersServiceFeignClient.TrackingStatusDto trackingStatus, int maxRetries) {
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                trackingOrdersServiceFeignClient.createOrUpdateTracking(apiKey, trackingStatus);
+                log.info("Tracking update successful on attempt {} for order: {}", attempt, trackingStatus.orderNumber());
+                return true;
+            } catch (Exception e) {
+                log.warn("Tracking update failed on attempt {} for order: {}. Error: {}", 
+                        attempt, trackingStatus.orderNumber(), e.getMessage());
+                
+                if (attempt < maxRetries) {
+                    try {
+                        Thread.sleep(1000 * attempt); // Exponential backoff: 1s, 2s, 3s
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        log.error("Thread interrupted during retry delay for order: {}", trackingStatus.orderNumber());
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

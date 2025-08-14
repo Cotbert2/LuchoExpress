@@ -43,48 +43,81 @@ public class TrackingService {
     }
     
     public TrackingStatus getTrackingStatus(String orderNumber) {
+        return getTrackingStatus(orderNumber, false);
+    }
+    
+    public TrackingStatus getTrackingStatus(String orderNumber, boolean forceRefresh) {
         String key = TRACKING_KEY_PREFIX + orderNumber;
-        log.info("Attempting to retrieve tracking status with key: {}", key);
+        log.info("Attempting to retrieve tracking status with key: {}, forceRefresh: {}", key, forceRefresh);
         
         try {
-            // Verificar si la clave existe
-            Boolean keyExists = redisTemplate.hasKey(key);
-            log.info("Key exists in Redis: {}", keyExists);
+            TrackingStatus cachedStatus = null;
             
-            if (!keyExists) {
-                log.info("Key does not exist in Redis: {}. Trying to load from order service...", key);
+            // Si no se fuerza el refresh, intentar obtener desde Redis
+            if (!forceRefresh) {
+                Boolean keyExists = redisTemplate.hasKey(key);
+                log.info("Key exists in Redis: {}", keyExists);
                 
-                // Intentar cargar desde el servicio de órdenes
-                TrackingStatus trackingFromOrderService = loadTrackingFromOrderService(orderNumber);
-                if (trackingFromOrderService != null) {
-                    // Guardar en caché y retornar
-                    updateTrackingStatus(trackingFromOrderService);
-                    return trackingFromOrderService;
+                if (keyExists) {
+                    cachedStatus = redisTemplate.opsForValue().get(key);
+                    log.info("Retrieved cached object from Redis: {}", cachedStatus);
+                }
+            } else {
+                log.info("Force refresh requested, skipping Redis cache lookup");
+            }
+            
+            // Siempre verificar con el servicio de órdenes para detectar inconsistencias
+            TrackingStatus trackingFromOrderService = loadTrackingFromOrderService(orderNumber);
+            
+            if (trackingFromOrderService == null) {
+                log.info("Order not found in order service: {}", orderNumber);
+                // Si no existe en el servicio de órdenes, eliminar cache obsoleto si existe
+                if (cachedStatus != null) {
+                    log.warn("Removing obsolete cached data for non-existent order: {}", orderNumber);
+                    redisTemplate.delete(key);
+                }
+                return null;
+            }
+            
+            // Si hay datos en cache y no se fuerza el refresh, comparar consistencia
+            if (cachedStatus != null && !forceRefresh) {
+                // Verificar si el estado en cache coincide con el del servicio de órdenes
+                if (cachedStatus.getStatus().equals(trackingFromOrderService.getStatus()) &&
+                    cachedStatus.getUpdatedAt().equals(trackingFromOrderService.getUpdatedAt())) {
+                    log.info("Cache is consistent with order service for order: {} with status: {}", 
+                            orderNumber, cachedStatus.getStatus());
+                    return cachedStatus;
                 } else {
-                    log.info("Order not found in order service: {}", orderNumber);
-                    return null;
+                    log.warn("Cache inconsistency detected for order: {}. Cached status: {}, Order service status: {}. Updating cache.",
+                            orderNumber, cachedStatus.getStatus(), trackingFromOrderService.getStatus());
                 }
             }
             
-            TrackingStatus trackingStatus = redisTemplate.opsForValue().get(key);
-            log.info("Retrieved object from Redis: {}", trackingStatus);
+            // Actualizar cache con los datos más recientes del servicio de órdenes
+            updateTrackingStatus(trackingFromOrderService);
             
-            if (trackingStatus != null) {
-                log.info("Successfully retrieved tracking status for order: {} with status: {}", 
-                        orderNumber, trackingStatus.getStatus());
-            } else {
-                log.warn("Retrieved null value from Redis for existing key: {}", key);
-            }
+            log.info("Successfully retrieved tracking status for order: {} with status: {}", 
+                    orderNumber, trackingFromOrderService.getStatus());
             
-            return trackingStatus;
+            return trackingFromOrderService;
             
         } catch (ClassCastException e) {
             log.warn("Found corrupted data for order: {}. Deleting and returning null. Error: {}", orderNumber, e.getMessage());
-            // Eliminar la clave corrupta para que se pueda crear nuevamente
+            // Eliminar la clave corrupta y intentar cargar desde el servicio de órdenes
             redisTemplate.delete(key);
-            return null;
+            return loadTrackingFromOrderService(orderNumber);
         } catch (Exception e) {
             log.error("Error retrieving tracking status for order: {} with key: {}", orderNumber, key, e);
+            // En caso de error, intentar retornar datos desde cache si existen
+            try {
+                TrackingStatus fallbackStatus = redisTemplate.opsForValue().get(key);
+                if (fallbackStatus != null) {
+                    log.warn("Returning cached data as fallback for order: {}", orderNumber);
+                    return fallbackStatus;
+                }
+            } catch (Exception fallbackException) {
+                log.error("Fallback cache retrieval also failed for order: {}", orderNumber, fallbackException);
+            }
             throw e;
         }
     }

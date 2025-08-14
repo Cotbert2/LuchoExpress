@@ -63,6 +63,18 @@ Content-Type: application/json
 ~~Endpoint protegido con JWT para consultar el estado de una orden.~~ 
 **Endpoint público (autenticación temporalmente deshabilitada)** para consultar el estado de una orden.
 
+**Descripción:** Obtiene el estado actual de tracking de una orden por su número de orden. Utiliza una estrategia de cache inteligente que verifica la consistencia con el servicio de órdenes.
+
+**Parámetros:**
+- `orderNumber` (path): El número de la orden
+- `refresh` (query, opcional): Forzar actualización desde el servicio de órdenes (`true`/`false`, default: `false`)
+
+#### Estrategia de Cache
+- **Cache Hit Consistente**: Si los datos en Redis coinciden con el servicio de órdenes, se retorna el cache
+- **Cache Hit Inconsistente**: Si hay diferencias, se actualiza el cache con los datos más recientes
+- **Cache Miss**: Se carga desde el servicio de órdenes y se guarda en cache
+- **Force Refresh**: Se ignora el cache y se obtienen los datos más recientes
+
 #### ~~Headers Requeridos~~ (Temporalmente no requeridos)
 
 ```
@@ -74,6 +86,9 @@ Content-Type: application/json
 ```bash
 # Consulta pública (sin autenticación)
 curl -X GET http://localhost:8086/api/tracking/ORD-2025-0001
+
+# Consulta con refresh forzado
+curl -X GET "http://localhost:8086/api/tracking/ORD-2025-0001?refresh=true"
 
 # Los siguientes ejemplos con JWT no funcionarán hasta reactivar la autenticación:
 # curl -X GET http://localhost:8086/api/tracking/ORD-2025-0001 \

@@ -4,7 +4,7 @@
 set -e
 
 DOCKER_USERNAME="luissagx"
-VERSION="v2"
+VERSION="v3"
 
 echo "🏷️ Etiquetando y subiendo imágenes a Docker Hub..."
 echo "👤 Usuario: $DOCKER_USERNAME"

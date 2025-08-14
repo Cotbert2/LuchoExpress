@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { TrackingStatus, TrackingResponse, TrackingError } from '../interfaces/tracking.interface';
@@ -17,13 +17,19 @@ export class TrackingService {
     private authService: AuthService
   ) {}
 
-  getTrackingStatus(orderNumber: string): Observable<TrackingResponse> {
+  getTrackingStatus(orderNumber: string, forceRefresh: boolean = false): Observable<TrackingResponse> {
     const startTime = performance.now();
     
     // Crear headers con JWT token
     const headers = this.createAuthHeaders();
     
-    return this.http.get<TrackingStatus>(`${this.apiUrl}/${orderNumber}`, { headers }).pipe(
+    // Agregar parámetro refresh si se solicita
+    let params = new HttpParams();
+    if (forceRefresh) {
+      params = params.set('refresh', 'true');
+    }
+    
+    return this.http.get<TrackingStatus>(`${this.apiUrl}/${orderNumber}`, { headers, params }).pipe(
       map((data: TrackingStatus) => {
         const endTime = performance.now();
         const responseTime = Math.round(endTime - startTime);

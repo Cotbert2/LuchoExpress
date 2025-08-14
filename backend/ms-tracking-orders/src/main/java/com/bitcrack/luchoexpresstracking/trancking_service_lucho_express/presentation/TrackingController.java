@@ -48,11 +48,12 @@ public class TrackingController {
     }
     
     @GetMapping("/{orderNumber}")
-    public ResponseEntity<?> getTrackingStatus(@PathVariable String orderNumber) {
-        log.info("Retrieving tracking status for order: {}", orderNumber);
+    public ResponseEntity<?> getTrackingStatus(@PathVariable String orderNumber,
+                                               @RequestParam(value = "refresh", defaultValue = "false") boolean forceRefresh) {
+        log.info("Retrieving tracking status for order: {} with forceRefresh: {}", orderNumber, forceRefresh);
         
         try {
-            TrackingStatus trackingStatus = trackingService.getTrackingStatus(orderNumber);
+            TrackingStatus trackingStatus = trackingService.getTrackingStatus(orderNumber, forceRefresh);
             
             if (trackingStatus != null) {
                 log.info("Successfully retrieved tracking status for order: {} with status: {}", 

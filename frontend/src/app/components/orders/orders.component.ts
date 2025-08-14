@@ -285,17 +285,26 @@ export class OrdersComponent implements OnInit {
     this.trackingResponseTime = 0;
   }
 
-  fetchTrackingData(orderNumber: string) {
+  fetchTrackingData(orderNumber: string, forceRefresh: boolean = false) {
     this.trackingLoading = true;
     this.trackingError = null;
     this.trackingData = null;
 
     try {
-      this.trackingService.getTrackingStatus(orderNumber).subscribe({
+      this.trackingService.getTrackingStatus(orderNumber, forceRefresh).subscribe({
         next: (response: TrackingResponse) => {
           this.trackingData = response.data;
           this.trackingResponseTime = response.responseTime;
           this.trackingLoading = false;
+          
+          // Si se hizo un refresh forzado, mostrar mensaje informativo
+          if (forceRefresh) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Tracking Refreshed',
+              detail: 'Tracking information has been updated with the latest data'
+            });
+          }
         },
         error: (error) => {
           this.trackingLoading = false;
@@ -342,7 +351,7 @@ export class OrdersComponent implements OnInit {
 
   reloadTrackingData() {
     if (this.currentTrackingOrderNumber) {
-      this.fetchTrackingData(this.currentTrackingOrderNumber);
+      this.fetchTrackingData(this.currentTrackingOrderNumber, true); // Forzar refresh
     }
   }
 

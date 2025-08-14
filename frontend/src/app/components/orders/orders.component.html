@@ -240,11 +240,12 @@
       </div>
       <p-button
         icon="pi pi-refresh"
+        label="Refresh"
         severity="secondary"
         size="small"
         (onClick)="reloadTrackingData()"
         [loading]="trackingLoading"
-        pTooltip="Reload tracking data"
+        pTooltip="Force refresh tracking data from server (bypasses cache)"
         [outlined]="true"
       />
     </div>
