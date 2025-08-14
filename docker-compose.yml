@@ -18,7 +18,7 @@ services:
 
   # Microservicio de productos
   ms-product-lucho-express:
-    image: luissagx/ms-product-lucho-express:v3
+    image: luissagx/ms-product-lucho-express:v2
     container_name: ms-product-lucho-express
     environment:
       DB_HOST: mysql-products:3306
@@ -46,7 +46,7 @@ services:
 
   # Microservicio de autenticación
   ms-auth-lucho-express:
-    image: luissagx/ms-auth-lucho-express:v3
+    image: luissagx/ms-auth-lucho-express_aws:aws
     container_name: ms-auth-lucho-express
     environment:
       DB_HOST: postgres-auth
@@ -75,7 +75,7 @@ services:
 
   # Microservicio de clientes
   ms-customer-lucho-express:
-    image: luissagx/ms-customer-lucho-express:v3
+    image: luissagx/ms-customer-lucho-express:v2
     container_name: ms-customer-lucho-express
     environment:
       DB_HOST: postgres-customers
@@ -105,14 +105,14 @@ services:
 
   # Microservicio de pedidos
   ms-orders-lucho-express:
-    image: luissagx/ms-orders-lucho-express:v3
+    image: luissagx/ms-orders-lucho-express_aws:aws
     container_name: ms-orders-lucho-express
     environment:
       DB_HOST: order-mysql
       DB_PORT: 3306
       PRODUCT_SERVICE_URL: http://ms-product-lucho-express:8085
       CUSTOMER_SERVICE_URL: http://ms-customer-lucho-express:8082
-      Tracking_URL: http://ms-tracking-lucho-express:8086
+      TRACKING_SERVICE_URL: http://ms-tracking-lucho-express:8086
     ports:
       - "8084:8084"
     networks:
@@ -135,7 +135,7 @@ services:
 
   # Microservicio de tracking
   ms-tracking-lucho-express:
-    image: luissagx/ms-tracking-lucho-express:v3
+    image: luissagx/ms-tracking-lucho-express:v2
     container_name: ms-tracking-lucho-express
     environment:
       REDIS_HOST: redis-tracking-service
@@ -154,7 +154,7 @@ services:
 
   # API Gateway
   api-gateway-lucho-express:
-    image: luissagx/api-gateway-lucho-express:v3
+    image: luissagx/api-gateway-lucho-express_aws:aws
     container_name: api-gateway-lucho-express
     ports:
       - "8080:8080"
@@ -170,7 +170,7 @@ services:
 
   # Frontend
   frontend-lucho-express:
-    image: luissagx/frontend-lucho-express:v3
+    image: luissagx/frontend-lucho-express:v2
     container_name: frontend-lucho-express
     ports:
       - "4200:80"
