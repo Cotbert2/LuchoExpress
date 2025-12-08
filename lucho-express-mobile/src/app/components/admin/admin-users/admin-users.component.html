@@ -1,0 +1,229 @@
+<!-- Header -->
+<div class="flex flex-col items-start justify-between gap-4 mb-6 md:flex-row md:items-center">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Users Management</h1>
+    <p class="mt-1 text-gray-600">Manage users in the system</p>
+  </div>
+  <p-button 
+    label="Create User" 
+    icon="pi pi-plus" 
+    class="p-button-primary"
+    (onClick)="openCreateDialog()">
+  </p-button>
+</div>
+
+<!-- Filtros -->
+<p-card class="mb-6">
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2">
+      <i class="text-lg pi pi-filter"></i>
+      <span class="font-semibold">Filters</span>
+    </div>
+  </ng-template>
+  
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <!-- Filtro por rol -->
+    <div class="flex flex-col">
+      <label class="mb-2 text-sm font-medium text-gray-700">Role</label>
+      <p-select 
+        [(ngModel)]="filters.role" 
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select role"
+        (onChange)="onRoleFilterChange()"
+        class="w-full">
+      </p-select>
+    </div>
+    
+    <!-- Filtro por email -->
+    <div class="flex flex-col">
+      <label class="mb-2 text-sm font-medium text-gray-700">Email</label>
+      <input 
+        pInputText
+        type="text"
+        [(ngModel)]="emailFilter"
+        placeholder="Search by email..."
+        (ngModelChange)="onEmailFilterChange()"
+        class="w-full">
+    </div>
+    
+    <!-- Botón limpiar filtros -->
+    <div class="flex flex-col justify-end">
+      <p-button 
+        label="Clear Filters"
+        icon="pi pi-times" 
+        severity="secondary"
+        (onClick)="clearFilters()"
+        class="w-full">
+      </p-button>
+    </div>
+  </div>
+</p-card>
+
+<!-- Tabla de usuarios -->
+<p-card>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2">
+      <i class="text-lg pi pi-users"></i>
+      <span class="font-semibold">Users ({{ filteredUsers.length }})</span>
+    </div>
+  </ng-template>
+  
+  <p-table 
+    [value]="filteredUsers" 
+    [loading]="loading"
+    [paginator]="true" 
+    [rows]="10"
+    [rowsPerPageOptions]="[5,10,20]"
+    styleClass="p-datatable-gridlines"
+    [tableStyle]="{'min-width': '50rem'}"
+    responsiveLayout="scroll">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th>User</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Creation Date</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+              <i class="text-blue-600 pi pi-user"></i>
+            </div>
+            <span class="font-medium">{{ user.username }}</span>
+          </div>
+        </td>
+        <td>{{ user.email }}</td>
+        <td>
+          <p-tag 
+            [value]="user.role" 
+            [severity]="getRoleSeverity(user.role)">
+          </p-tag>
+        </td>
+        <td>
+          <p-tag 
+            [value]="getStatusText(user.enabled)" 
+            [severity]="getStatusSeverity(user.enabled)">
+          </p-tag>
+        </td>
+        <td>{{ user.createdAt | date:'short' }}</td>
+        <td>
+          <div class="flex gap-2">
+            <p-button 
+              *ngIf="canDisableUser(user) && user.enabled"
+              icon="pi pi-ban" 
+              severity="danger"
+              size="small"
+              pTooltip="Deactivate user"
+              (onClick)="confirmDisableUser(user)">
+            </p-button>
+            <p-button
+              *ngIf="!user.enabled"
+              icon="pi pi-check"
+              severity="success"
+              size="small"
+              pTooltip="Activate user"
+              (onClick)="activateUser(user)">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="py-8 text-center">
+          <div class="flex flex-col items-center gap-2">
+            <i class="text-4xl text-gray-400 pi pi-users"></i>
+            <p class="text-gray-500">No users found</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<!-- Dialog Crear Usuario -->
+<p-dialog 
+  header="Create User" 
+  [(visible)]="displayCreateDialog" 
+  [modal]="true" 
+  [style]="{width: '450px'}"
+  [closable]="true">
+  
+  <div class="flex flex-col gap-4 mb-32">
+    <!-- Username -->
+    <div class="flex flex-col">
+      <label class="mb-2 text-sm font-medium text-gray-700">Username *</label>
+      <input 
+        pInputText 
+        type="text" 
+        [(ngModel)]="createUserForm.username"
+        placeholder="Enter your username"
+        class="w-full">
+    </div>
+    
+    <!-- Email -->
+    <div class="flex flex-col">
+      <label class="mb-2 text-sm font-medium text-gray-700">Email *</label>
+      <input 
+        pInputText 
+        type="email" 
+        [(ngModel)]="createUserForm.email"
+        placeholder="Enter your email"
+        class="w-full">
+    </div>
+    
+    <!-- Password -->
+    <div class="flex flex-col">
+      <label class="mb-2 text-sm font-medium text-gray-700">Password *</label>
+      <p-password 
+        [(ngModel)]="createUserForm.password"
+        placeholder="Enter password"
+        [toggleMask]="true"
+        class="w-full">
+      </p-password>
+    </div>
+    
+    <!-- Role -->
+    <div class="flex flex-col">
+      <label class="mb-2 text-sm font-medium text-gray-700">Role *</label>
+      <p-select 
+        [(ngModel)]="createUserForm.role" 
+        [options]="availableRoleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Choose role"
+        class="w-full">
+      </p-select>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <p-button 
+        label="Cancel" 
+        severity="secondary"
+        (onClick)="displayCreateDialog = false">
+      </p-button>
+      <p-button 
+        label="Create User" 
+        (onClick)="createUser()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>
+
+<!-- Confirm Dialog -->
+<p-confirmDialog></p-confirmDialog>

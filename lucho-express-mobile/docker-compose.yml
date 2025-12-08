@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Base de datos para productos
+  mysql-products:
+    image: mysql
+    container_name: mysql-products
+    environment:
+      MYSQL_DATABASE: product_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Base de datos para auth
+  postgres-auth:
+    image: postgres:latest
+    container_name: postgres-auth
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Base de datos para clientes
+  postgres-customers:
+    image: postgres:latest
+    container_name: postgres-customers
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: customers_db
+    ports:
+      - "5432:5432"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Base de datos para pedidos
+  order-mysql:
+    image: mysql
+    container_name: order-mysql
+    environment:
+      MYSQL_DATABASE: orders_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "3307:3306"
+    networks:
+      - lucho-express-network
+    restart: always
+
+  # Redis para el microservicio de tracking (Base de datos en memoria)
+  redis-tracking-service:
+    image: redis:7-alpine
+    container_name: redis-tracking-service
+    ports:
+      - "6379:6379"
+    networks:
+      - lucho-express-network
+    restart: always
+
+networks:
+  lucho-express-network:
+    driver: bridge

@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+.products-swiper {
+  padding-bottom: 1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.swiper-slide {
+  display: flex;
+  height: 100%;
+}
+
+.product-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:active {
+    transform: scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  > .mb-4 {
+    flex-shrink: 0;
+    
+    .h-48 {
+      height: 12rem;
+      min-height: 12rem;
+      max-height: 12rem;
+    }
+  }
+}
+
+ion-img {
+  display: block;
+}
+
+ion-button[shape="round"] {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  
+  ion-icon {
+    font-size: 1.25rem;
+    color: white;
+  }
+}
+

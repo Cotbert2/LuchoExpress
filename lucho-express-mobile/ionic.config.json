@@ -1,0 +1,7 @@
+{
+  "name": "lucho-express-mobile",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CartService, CartItem, CartSummary } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { CustomerService, CreateCustomerRequest, CustomerResponse } from '../../services/customer.service';
@@ -9,46 +9,34 @@ import { OrderService, CreateOrderRequest, CreateOrderProductRequest, OrderRespo
 import { UserResponse } from '../../interfaces/auth.interface';
 import { Subscription } from 'rxjs';
 
-// PrimeNG imports
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
-import { DividerModule } from 'primeng/divider';
-import { TagModule } from 'primeng/tag';
-import { ToolbarModule } from 'primeng/toolbar';
-import { InputTextModule } from 'primeng/inputtext';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { FormsModule } from '@angular/forms';
-
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { DataViewModule } from 'primeng/dataview';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { IonicModule, ToastController } from '@ionic/angular';
+// Ionic imports
+import { IonicModule, ToastController, AlertController } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { 
+  cartOutline, 
+  trashOutline, 
+  arrowBackOutline, 
+  checkmarkCircleOutline, 
+  alertCircleOutline,
+  cardOutline,
+  locationOutline,
+  personOutline,
+  callOutline,
+  mailOutline,
+  homeOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-checkout',
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    DataViewModule,
-    RadioButtonModule,
-    CardModule,
-    ButtonModule,
-    InputNumberModule,
-    ConfirmDialogModule,
-    ToastModule,
-    DividerModule,
-    TagModule,
-    ToolbarModule,
-    InputTextModule,
-    FloatLabelModule,
-    FormsModule
+    FormsModule,
+    IonicModule
   ],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss',
-  providers: [ConfirmationService, MessageService]
+  standalone: true
 })
 export class CheckoutComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
@@ -70,22 +58,39 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   constructor(
     private cartService: CartService,
     private authService: AuthService,
-    private toastController: ToastController,
-
     private customerService: CustomerService,
     private orderService: OrderService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
+    private toastController: ToastController,
+    private alertController: AlertController
   ) {
+    addIcons({
+      cartOutline,
+      trashOutline,
+      arrowBackOutline,
+      checkmarkCircleOutline,
+      alertCircleOutline,
+      cardOutline,
+      locationOutline,
+      personOutline,
+      callOutline,
+      mailOutline,
+      homeOutline
+    });
     this.initializeForms();
   }
 
   ngOnInit(): void {
     // Check if user is authenticated
     if (!this.authService.isLoggedIn()) {
-      this.showToast('Authentication Required: Please log in to access your cart', 'danger' );
-
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Authentication Required',
+        detail: 'Please log in to access your cart',
+        life: 4000
+      });
+      
       setTimeout(() => {
         this.router.navigate(['/login']);
       }, 2000);
@@ -185,8 +190,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error fetching user:', error);
-            this.showToast('Could not load user information', 'danger');
-
+            this.messageService.add({
+              severity: 'error',
+              summary: 'User Error',
+              detail: 'Could not load user information',
+              life: 3000
+            });
           }
         });
       }
@@ -261,7 +270,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   updateQuantity(item: CartItem, newQuantity: number): void {
     // Validate new quantity
     if (newQuantity <= 0) {
-      this.showToast('Invalid Quantity: Quantity must be at least 1. Item will be removed if you want quantity 0.', 'warning');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid Quantity',
+        detail: 'Quantity must be at least 1. Item will be removed if you want quantity 0.',
+        life: 4000
+      });
       this.confirmRemoveItem(item);
       return;
     }
@@ -269,65 +283,103 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Check for reasonable maximum quantity (optional business rule)
     const maxQuantity = 99;
     if (newQuantity > maxQuantity) {
-      this.showToast(`Quantity Too High: Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`, 'warning');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Quantity Too High',
+        detail: `Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`,
+        life: 4000
+      });
       return;
     }
 
     // Validate that quantity is a whole number
     if (newQuantity !== Math.floor(newQuantity)) {
-      this.showToast('Invalid Quantity: Quantity must be a whole number', 'warning');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid Quantity',
+        detail: 'Quantity must be a whole number.',
+        life: 3000
+      });
       return;
     }
 
     try {
       this.cartService.updateItemQuantity(item.id, newQuantity);
-      this.showToast(`Quantity Updated: ${item.name} quantity updated to ${newQuantity}`, 'success');
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Quantity Updated',
+        detail: `${item.name} quantity updated to ${newQuantity}`,
+        life: 2000
+      });
     } catch (error) {
       console.error('Error updating quantity:', error);
-      this.showToast('Update Failed: Failed to update item quantity. Please try again.', 'danger' );
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Update Failed',
+        detail: 'Failed to update item quantity. Please try again.',
+        life: 3000
+      });
     }
   }
 
   /**
    * Remove item from cart with confirmation
    */
-  confirmRemoveItem(item: CartItem): void {
-    this.confirmationService.confirm({
-      message: `Are you sure you want to remove "${item.name}" from your cart?`,
+  async confirmRemoveItem(item: CartItem): Promise<void> {
+    const alert = await this.alertController.create({
       header: 'Remove Item',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger p-button-sm',
-      rejectButtonStyleClass: 'p-button-secondary p-button-sm',
-      accept: () => {
-        this.cartService.removeFromCart(item.id);
-        this.showToast(`Item Removed: ${item.name} has been removed from your cart`);
-      },
-      reject: () => {
-        // User cancelled, no action needed
-      }
+      message: `Are you sure you want to remove "${item.name}" from your cart?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Remove',
+          role: 'destructive',
+          handler: () => {
+            this.cartService.removeFromCart(item.id);
+            this.showToast(`${item.name} has been removed from your cart`, 'success');
+          }
+        }
+      ]
     });
+    await alert.present();
   }
 
   /**
    * Clear entire cart with confirmation
    */
-  confirmClearCart(): void {
+  async confirmClearCart(): Promise<void> {
     if (this.cartItems.length === 0) {
-      this.showToast('Cart Empty: Your cart is already empty', 'warning')
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Cart Empty',
+        detail: 'Your cart is already empty',
+        life: 2000
+      });
       return;
     }
 
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to remove all items from your cart?',
+    const alert = await this.alertController.create({
       header: 'Clear Cart',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-secondary',
-      accept: () => {
-        this.cartService.clearCart();
-        this.showToast('Cart Cleared: All items have been removed from your cart');
-      }
+      message: 'Are you sure you want to remove all items from your cart?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Clear Cart',
+          role: 'destructive',
+          handler: () => {
+            this.cartService.clearCart();
+            this.showToast('All items have been removed from your cart', 'success');
+          }
+        }
+      ]
     });
+    await alert.present();
   }
 
   /**
@@ -337,7 +389,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     const cartValidation = this.validateCartItems();
     
     if (!cartValidation.isValid) {
-      this.showToast(`Cart issues Found ${cartValidation.message}`);
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cart Issues Found',
+        detail: cartValidation.message,
+        life: 4000
+      });
       return;
     }
 
@@ -347,7 +404,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     // Show message if customer data was preloaded
     if (this.existingCustomer) {
-      this.showToast('Customer Information Loaded: Your saved customer information has been preloaded. You can modify it if needed.');
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Customer Information Loaded',
+        detail: 'Your saved customer information has been preloaded. You can modify it if needed.',
+        life: 5000
+      });
     }
   }
 
@@ -467,9 +529,19 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     if (invalidFields.length > 0) {
       const fieldsList = invalidFields.join(', ');
-      this.showToast(`Incomplete ${stepName}: Please fix the following fields: ${fieldsList}`)
+      this.messageService.add({
+        severity: 'warn',
+        summary: `Incomplete ${stepName}`,
+        detail: `Please fix the following fields: ${fieldsList}`,
+        life: 5000
+      });
     } else {
-      this.showToast(`Form Invalid: Please complete all required ${stepName} fields`)
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Form Invalid',
+        detail: `Please complete all required ${stepName} fields`,
+        life: 3000
+      });
     }
   }
 
@@ -487,8 +559,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private createOrUpdateCustomer(): void {
     if (!this.currentUser) {
-      this.showToast('User Error: User information is not availables', 'danger')
-  
+      this.messageService.add({
+        severity: 'error',
+        summary: 'User Error',
+        detail: 'User information is not available',
+        life: 3000
+      });
       return;
     }
 
@@ -523,16 +599,25 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.existingCustomer = customer;
         this.activeStepIndex++;
-
-        this.showToast('Customer Created: Your customer information has been saved successfully.');
-
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Customer Created',
+          detail: 'Your customer information has been saved successfully.',
+          life: 3000
+        });
         
         console.log('Customer created successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error creating customer:', error);
-        this.showToast(`Curstomer Creation Failed: There was an error saving your customer information. Please try again`);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Customer Creation Failed',
+          detail: error.message || 'There was an error saving your customer information. Please try again.',
+          life: 5000
+        });
       }
     });
   }
@@ -557,15 +642,24 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.existingCustomer = customer;
         this.activeStepIndex++;
         
-
-        this.showToast('Customer Updated:Your customer information has been updated successfully.')
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Customer Updated',
+          detail: 'Your customer information has been updated successfully.',
+          life: 3000
+        });
         
         console.log('Customer updated successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error updating customer:', error);
-        this.showToast('Customer Update Failed: There was an error updating your customer information. Please try again.', 'danger')
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Customer Update Failed',
+          detail: error.message || 'There was an error updating your customer information. Please try again.',
+          life: 5000
+        });
       }
     });
   }
@@ -575,7 +669,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private updateCustomerAddress(): void {
     if (!this.existingCustomer) {
-      this.showToast('Customer Error: Customer information is not available. Please go back to the personal information step.', 'danger');
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Customer Error',
+        detail: 'Customer information is not available. Please go back to the personal information step.',
+        life: 3000
+      });
       return;
     }
 
@@ -593,14 +692,25 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.existingCustomer = customer;
         this.activeStepIndex++;
-
-        this.showToast('Address Updated: Your shipping address has been saved successfully.');
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Address Updated',
+          detail: 'Your shipping address has been saved successfully.',
+          life: 3000
+        });
+        
         console.log('Customer address updated successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error updating customer address:', error);
-        this.showToast('Address Update Failes: There was an error saving your shipping address. Please try again.');
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Address Update Failed',
+          detail: error.message || 'There was an error saving your shipping address. Please try again.',
+          life: 5000
+        });
       }
     });
   }
@@ -707,18 +817,33 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
 
     if (!this.currentUser) {
-      this.showToast('Authentication Error: Your session has expired. Please log in again.', 'danger')
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Authentication Error',
+        detail: 'Your session has expired. Please log in again.',
+        life: 4000
+      });
       this.router.navigate(['/login']);
       return;
     }
 
     if (!this.existingCustomer) {
-      this.showToast('Customer Profile Error: Customer profile could not be created. Please try again.', 'danger')
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Customer Profile Error',
+        detail: 'Customer profile could not be created. Please try again.',
+        life: 4000
+      });
       return;
     }
 
     if (this.cartItems.length === 0) {
-      this.showToast('Empty Cart: Your cart is empty. Please add items before proceeding to checkout.', 'warning');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Empty Cart',
+        detail: 'Your cart is empty. Please add items before proceeding to checkout.',
+        life: 4000
+      });
       return;
     }
 
@@ -764,9 +889,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       
       const sectionsList = invalidSections.join(' and ');
       const fieldsList = invalidFields.join(', ');
-
-      this.showToast(`${sectionsList} Incomplete: Please fix the following fields: ${fieldsList}`, 'warning');
-
+      
+      this.messageService.add({
+        severity: 'warn',
+        summary: `${sectionsList} Incomplete`,
+        detail: `Please fix the following fields: ${fieldsList}`,
+        life: 6000
+      });
       
       return false;
     }
@@ -779,7 +908,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private completeOrderProcess(customer: CustomerResponse): void {
     if (this.cartItems.length === 0) {
-      this.showToast('Empty Car: Cannot create order with empty cart')
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Empty Cart',
+        detail: 'Cannot create order with empty cart',
+        life: 3000
+      });
       this.isLoading = false;
       return;
     }
@@ -804,15 +938,23 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       next: (order: OrderResponse) => {
         this.isLoading = false;
         console.log('Order created successfully:', order);
-
-        this.showToast(`Order Placed Successfully!: Thank you ${customer.name}! Your order #${order.orderNumber} has been placed and will be shipped to your address.`)
-
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Order Placed Successfully!',
+          detail: `Thank you ${customer.name}! Your order #${order.orderNumber} has been placed and will be shipped to your address.`,
+          life: 8000
+        });
+        
         // Clear cart after successful order
         this.cartService.clearCart();
+        
         // Reset stepper state and forms
         this.resetCheckoutState();
+        
         // Show order confirmation details
         this.showOrderConfirmation(order);
+        
         // Redirect to home after showing confirmation
         setTimeout(() => {
           this.router.navigate(['/home']);
@@ -833,7 +975,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         } else if (error.status === 400) {
           errorMessage = 'Invalid order data. Please check your information.';
         }
-        this.showToast('Order Creation Failed: ' + errorMessage, 'danger');
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Order Creation Failed',
+          detail: errorMessage,
+          life: 6000
+        });
       }
     });
   }
@@ -852,8 +1000,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    * Show order confirmation details
    */
   private showOrderConfirmation(order: OrderResponse): void {
-    this.showToast(`Order Number: ${order.orderNumber}\nTotal Amount: ${this.formatCurrency(order.totalAmount)}\nEstimated Delivery: ${order.estimatedDeliveryDate || 'TBD'}`, 'info');
-
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Order Details',
+      detail: `Order Number: ${order.orderNumber}\nTotal Amount: ${this.formatCurrency(order.totalAmount)}\nEstimated Delivery: ${order.estimatedDeliveryDate || 'TBD'}`,
+      life: 10000
+    });
   }
 
   /**
@@ -936,15 +1088,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
-
-  private async showToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {
+  /**
+   * Show a toast notification
+   */
+  async showToast(message: string, color: 'success' | 'danger' | 'warning' = 'success'): Promise<void> {
     const toast = await this.toastController.create({
       message,
       duration: 3000,
-      position: 'top',
+      position: 'bottom',
       color
     });
     await toast.present();
   }
-
 }

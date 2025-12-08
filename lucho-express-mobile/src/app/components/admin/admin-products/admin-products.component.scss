@@ -1,0 +1,70 @@
+.field {
+  margin-bottom: 1rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Custom styles for tables */
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background-color: #f9fafb;
+  color: #374151;
+  font-weight: 600;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f3f4f6;
+}
+
+/* Dialog styles */
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 2rem;
+}
+
+/* Button spacing */
+:host ::ng-deep .p-button {
+  margin-right: 0.5rem;
+}
+
+:host ::ng-deep .p-button:last-child {
+  margin-right: 0;
+}
+
+/* Image container styles */
+.product-image-container {
+  width: 48px;
+  height: 48px;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  :host ::ng-deep .p-dialog {
+    width: 95vw !important;
+    margin: 0 auto;
+  }
+}

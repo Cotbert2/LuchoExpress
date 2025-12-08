@@ -1,0 +1,238 @@
+<ion-content class="bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600">
+  <div class="flex items-center justify-center min-h-full p-4">
+    <ion-card class="w-full max-w-md bg-white/95 backdrop-blur-sm">
+      <!-- Usuario autenticado -->
+      @if (currentUser?.id) {
+      <ion-card-header>
+        <ion-card-title class="max-w-md mx-auto">
+      
+          <h3 class="text-2xl font-bold text-green-600">
+            Welcome back, <span class="text-gray-800">{{ currentUser?.username }}</span>!
+          </h3>
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="pb-4 mb-4 border-b border-gray-200">
+          <p class="flex items-center gap-2 mb-2 text-gray-600">
+            <ion-icon name="mail-outline" class="text-green-500"></ion-icon>
+            {{ currentUser?.email }}
+          </p>
+          <p class="flex items-center gap-2 text-sm text-gray-500">
+            <ion-icon name="person-outline" class="text-green-500"></ion-icon>
+            You are: <span class="capitalize">{{ currentUser?.role }}</span>
+          </p>
+        </div>
+
+        <p class="mb-6 text-gray-700">
+          Manage your account settings below.
+        </p>
+
+        <div class="flex flex-col gap-3">
+          <ion-button expand="block" fill="outline" color="success" (click)="openChangePasswordDialog()">
+            <ion-icon slot="start" name="key-outline"></ion-icon>
+            Change Password
+          </ion-button>
+
+          <ion-button expand="block" color="danger" (click)="handleLogOut()">
+            <ion-icon slot="start" name="log-out-outline"></ion-icon>
+            Log Out
+          </ion-button>
+        </div>
+      </ion-card-content>
+      }
+
+      <!-- Formulario Login / Registro -->
+      @if (!currentUser?.id) {
+      <ion-card-header class="text-center">
+        <ion-card-title class="text-2xl font-semibold text-green-600">
+          {{ isLogin ? 'Welcome back' : 'Create your account' }}
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <!-- Registro -->
+        @if (!isLogin) {
+        <form [formGroup]="registerForm" (ngSubmit)="handleSignUp()">
+          <ion-list class="bg-transparent">
+            <ion-item class="mb-4" [class.ion-invalid]="registerUsername?.invalid && registerUsername?.touched">
+              <ion-input
+                label="Username"
+                labelPlacement="floating"
+                formControlName="username"
+                type="text"
+              >
+                <ion-icon name="person-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+            @if (registerUsername?.invalid && registerUsername?.touched) {
+            <ion-text color="danger" class="text-xs ml-4 block mb-2">
+              @if (registerUsername?.errors?.['required']) { <span>Username is required</span> }
+              @if (registerUsername?.errors?.['minlength']) { <span>At least 3 characters</span> }
+              @if (registerUsername?.errors?.['maxlength']) { <span>Max 50 characters</span> }
+            </ion-text>
+            }
+
+            <ion-item class="mb-4" [class.ion-invalid]="registerEmail?.invalid && registerEmail?.touched">
+              <ion-input
+                label="Email"
+                labelPlacement="floating"
+                formControlName="email"
+                type="email"
+              >
+                <ion-icon name="mail-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+            @if (registerEmail?.invalid && registerEmail?.touched) {
+            <ion-text color="danger" class="text-xs ml-4 block mb-2">
+              @if (registerEmail?.errors?.['required']) { <span>Email is required</span> }
+              @if (registerEmail?.errors?.['email']) { <span>Please enter a valid email</span> }
+            </ion-text>
+            }
+
+            <ion-item class="mb-4" [class.ion-invalid]="registerPassword?.invalid && registerPassword?.touched">
+              <ion-input
+                label="Password"
+                labelPlacement="floating"
+                formControlName="password"
+                type="password"
+              >
+                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+            @if (registerPassword?.invalid && registerPassword?.touched) {
+            <ion-text color="danger" class="text-xs ml-4 block mb-2">
+              @if (registerPassword?.errors?.['required']) { <span>Password is required</span> }
+              @if (registerPassword?.errors?.['minlength']) { <span>At least 6 characters</span> }
+            </ion-text>
+            }
+
+            <ion-item class="mb-4" [class.ion-invalid]="registerConfirmPassword?.invalid && registerConfirmPassword?.touched">
+              <ion-input
+                label="Confirm Password"
+                labelPlacement="floating"
+                formControlName="confirmPassword"
+                type="password"
+              >
+                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+            @if (registerConfirmPassword?.errors?.['passwordMismatch'] && registerConfirmPassword?.touched) {
+            <ion-text color="danger" class="text-xs ml-4 block mb-2">
+              <span>Passwords do not match</span>
+            </ion-text>
+            }
+          </ion-list>
+
+          <ion-button expand="block" type="submit" class="mt-6" [disabled]="registerForm.invalid">
+            Sign me Up
+          </ion-button>
+
+          <div class="mt-4 text-center">
+            <ion-text class="text-sm text-gray-600">
+              Already have an account?
+              <a (click)="switchToSignUp()" class="text-blue-600 cursor-pointer font-medium ml-1">
+                Log in
+              </a>
+            </ion-text>
+          </div>
+        </form>
+        }
+
+        <!-- Login -->
+        @if (isLogin) {
+        <form [formGroup]="loginForm" (ngSubmit)="handleLogIn()">
+          <ion-list class="bg-transparent">
+            <ion-item class="mb-4" [class.ion-invalid]="loginUsername?.invalid && loginUsername?.touched">
+              <ion-input
+                label="Username"
+                labelPlacement="floating"
+                formControlName="username"
+                type="text"
+              >
+                <ion-icon name="person-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+
+            <ion-item class="mb-4" [class.ion-invalid]="loginPassword?.invalid && loginPassword?.touched">
+              <ion-input
+                label="Password"
+                labelPlacement="floating"
+                formControlName="password"
+                type="password"
+              >
+                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+          </ion-list>
+
+          <ion-button expand="block" type="submit" class="mt-6" [disabled]="loginForm.invalid">
+            Log In
+          </ion-button>
+
+          <div class="mt-4 text-center">
+            <ion-text class="text-sm text-gray-600">
+              Don't have an account?
+              <a (click)="switchToSignUp()" class="text-blue-600 cursor-pointer font-medium ml-1">
+                Sign up
+              </a>
+            </ion-text>
+          </div>
+        </form>
+        }
+      </ion-card-content>
+      }
+    </ion-card>
+  </div>
+
+  <!-- Modal para cambiar contraseña -->
+  <ion-modal [isOpen]="isChangePasswordModalOpen" (didDismiss)="closeChangePasswordModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Change Password</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeChangePasswordModal()">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <form [formGroup]="changePasswordForm" (ngSubmit)="handleChangePassword()">
+          <ion-list>
+            <ion-item [class.ion-invalid]="newPassword?.invalid && newPassword?.touched">
+              <ion-input
+                label="New Password"
+                labelPlacement="floating"
+                formControlName="password"
+                type="password"
+              >
+                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+
+            <ion-item [class.ion-invalid]="confirmNewPassword?.invalid && confirmNewPassword?.touched">
+              <ion-input
+                label="Confirm New Password"
+                labelPlacement="floating"
+                formControlName="confirmPassword"
+                type="password"
+              >
+                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+            @if (confirmNewPassword?.errors?.['passwordMismatch'] && confirmNewPassword?.touched) {
+            <ion-text color="danger" class="text-xs ml-4 block mt-2">
+              <span>Passwords do not match</span>
+            </ion-text>
+            }
+          </ion-list>
+
+          <ion-button expand="block" type="submit" class="mt-6" [disabled]="changePasswordForm.invalid">
+            Update Password
+          </ion-button>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -1,0 +1,84 @@
+<ion-content fullscreen class="bg-white dark:bg-neutral-900">
+  <!-- Hero Section con imagen de fondo similar al frontend -->
+  <section class="relative h-80 overflow-hidden">
+    <div class="absolute inset-0">
+      <ion-img 
+        src="assets/deliver.webp" 
+        alt="hero" 
+        class="w-full h-full object-cover"
+      ></ion-img>
+    </div>
+    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 px-6">
+      <h2 class="text-4xl md:text-5xl font-bold text-center text-white">
+        {{ currentTitle }}
+      </h2>
+    </div>
+  </section>
+
+  <!-- Products Section -->
+  <section class="">
+    <h3 class="mt-2 mb-2 text-3xl font-semibold text-center text-gray-800 dark:text-white">
+      Our Products
+    </h3>
+
+    <swiper-container 
+      class="products-swiper"
+      slides-per-view="1.2"
+      space-between="12"
+      loop="true"
+      autoplay="true"
+      autoplay-delay="3000"
+      autoplay-disable-on-interaction="false"
+      speed="800"
+    >
+      <swiper-slide *ngFor="let product of productsInfo">
+        <div class="relative p-4 mb-4 transition-transform bg-white border shadow-md rounded-xl dark:bg-gray-900 hover:shadow-lg product-card">
+          <!-- Badge Hot en la esquina superior izquierda -->
+          <div class="absolute left-2 top-2 z-10 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded dark:bg-surface-900">
+            hot
+          </div>
+
+          <!-- Imagen del producto -->
+          <div class="mb-4">
+            <div class="flex items-center justify-center w-full h-48 overflow-hidden bg-gray-100 rounded-lg dark:bg-gray-800">
+              <ion-img
+                [src]="product.imageUrl"
+                [alt]="product.name"
+                class="w-full h-full"
+                style="object-fit: contain; max-width: 70%; max-height: 70%;"
+              ></ion-img>
+            </div>
+          </div>
+
+          <!-- Nombre del producto -->
+          <div class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
+            {{ product.name }}
+          </div>
+
+          <!-- Precio y botón -->
+          <div class="flex items-center justify-between mt-3">
+            <div class="text-xl font-semibold text-gray-900 dark:text-white">
+              ${{ product.price }}
+            </div>
+            <ion-button 
+              fill="solid"
+              color="primary"
+              shape="round"
+              size="small"
+              (click)="goToProduct(product)"
+            >
+            <ion-label>Ver</ion-label>
+<ion-icon name="logo-ionic"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </swiper-slide>
+    </swiper-container>
+
+    <div class="py-12 text-center text-gray-500 dark:text-gray-300" *ngIf="productsInfo.length === 0">
+      Cargando productos...
+    </div>
+  </section>
+
+  <div class="mb-32"></div>
+</ion-content>

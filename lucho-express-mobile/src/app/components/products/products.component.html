@@ -1,0 +1,125 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Products</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="p-4">
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="mb-2 text-2xl font-bold text-gray-800">Our Products</h1>
+      <p class="text-sm text-gray-600">Explore our wide selection of products</p>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="mb-6">
+      <!-- Búsqueda -->
+      <ion-searchbar
+        [(ngModel)]="searchTerm"
+        (ionInput)="onSearchChange()"
+        placeholder="Search by name or description..."
+        debounce="300"
+        animated="true">
+      </ion-searchbar>
+
+
+      <!-- Filtro por categoría -->
+      <div class="mt-4">
+        <ion-item lines="none" class="rounded-lg">
+          <ion-icon name="filter-outline" slot="start"></ion-icon>
+          <ion-select
+            [(ngModel)]="selectedCategory"
+            (ionChange)="onCategoryChange()"
+            placeholder="Filter by category"
+            interface="popover">
+            @for (category of categories; track category.value) {
+              <ion-select-option [value]="category.value">
+                {{ category.label }}
+              </ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <!-- Resultados counter -->
+      <div class="mt-3 text-xs text-gray-600">
+        Showing {{ filteredProducts.length }} of {{ products.length }} products
+      </div>
+    </div>
+
+    <!-- Mensaje si no hay productos -->
+    @if (filteredProducts.length === 0 && products.length > 0) {
+      <div class="flex flex-col items-center justify-center py-12">
+        <ion-icon name="search-outline" class="text-6xl text-gray-400 mb-4"></ion-icon>
+        <h3 class="text-lg font-semibold text-gray-600 mb-2">
+          No products found
+        </h3>
+        <p class="text-sm text-gray-500">
+          Try adjusting your search filters
+        </p>
+      </div>
+    }
+
+    <!-- Grid de productos -->
+    @if (filteredProducts.length > 0) {
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        @for (product of filteredProducts; track product.id) {
+          <ion-card class="m-0 cursor-pointer" (click)="showProductDetails(product)">
+            <!-- Chip de categoría -->
+            @if (product.category) {
+              <ion-chip class="absolute top-2 right-2 z-10" color="primary">
+                <ion-label class="text-xs">{{ product.category.name }}</ion-label>
+              </ion-chip>
+            }
+
+            <!-- Imagen del producto -->
+            <div class="flex items-center justify-center w-full h-48 bg-gray-100">
+              <ion-img
+                [src]="product.imageUrl"
+                [alt]="product.name"
+                class="object-cover w-full h-full">
+              </ion-img>
+            </div>
+
+            <!-- Información del producto -->
+            <ion-card-content>
+              <h3 class="mb-2 text-base font-semibold line-clamp-2">
+                {{ product.name }}
+              </h3>
+              
+              @if (product.description) {
+                <p class="mb-3 text-sm text-gray-600 line-clamp-2">
+                  {{ product.description }}
+                </p>
+              }
+
+              <!-- Precio y acciones -->
+              <div class="flex items-center justify-between mt-3">
+                <div class="text-xl font-bold text-blue-600">
+                  ${{ product.price }}
+                </div>
+                
+                <ion-button
+                  size="small"
+                  fill="outline"
+                  (click)="showProductDetails(product); $event.stopPropagation()">
+                  <ion-icon slot="start" name="eye-outline"></ion-icon>
+                  View
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        }
+      </div>
+    }
+
+    <!-- Loading state -->
+    @if (products.length === 0) {
+      <div class="flex flex-col items-center justify-center py-12">
+        <ion-spinner name="crescent" class="mb-4"></ion-spinner>
+        <p class="text-gray-600">Loading products...</p>
+      </div>
+    }
+  </div>
+</ion-content>

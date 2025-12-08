@@ -1,0 +1,123 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Product Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (isLoading) {
+    <div class="flex items-center justify-center min-h-full">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else {
+    <div class="flex flex-col items-center justify-center min-h-full p-4">
+      <div class="flex flex-col gap-6 w-full max-w-4xl">
+      
+      <!-- Imagen del producto -->
+      <ion-card class="m-0">
+        <ion-img 
+          [src]="product.imageUrl" 
+          [alt]="product.name"
+          class="w-full h-auto">
+        </ion-img>
+      </ion-card>
+
+      <!-- Información del producto -->
+      <ion-card class="m-0">
+        <ion-card-header>
+          <ion-card-title class="text-2xl font-bold text-center">
+            {{ product.name }}
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <!-- Descripción -->
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Description:</h3>
+            <p class="text-gray-600">{{ product.description }}</p>
+          </div>
+
+          <!-- Stock disponible -->
+          <div class="mb-4">
+            <ion-badge [color]="stock > 10 ? 'success' : stock > 0 ? 'warning' : 'danger'">
+              {{ stock }} items available
+            </ion-badge>
+          </div>
+
+          <!-- Rating -->
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-gray-700 font-medium">Our Rating:</span>
+            <div class="flex gap-1">
+              @for (star of [1,2,3,4,5]; track star) {
+                <ion-icon 
+                  [name]="star <= rating ? 'star' : 'star-outline'"
+                  [color]="star <= rating ? 'warning' : 'medium'"
+                  class="text-xl">
+                </ion-icon>
+              }
+            </div>
+          </div>
+
+          <!-- Precio -->
+          <div class="mb-6">
+            <div class="flex items-center gap-2">
+              @if (product.discount) {
+                <ion-badge color="danger">
+                  {{ product.discount }}% OFF
+                </ion-badge>
+              }
+              <h2 class="text-3xl font-bold text-blue-600">
+                ${{ product.price }}
+              </h2>
+            </div>
+          </div>
+
+          <!-- Selector de cantidad -->
+          <div class="mb-6">
+            <label class="text-gray-700 font-medium mb-2 block">Quantity:</label>
+            <div class="flex items-center gap-4">
+              <ion-button 
+                (click)="decreaseQuantity()" 
+                [disabled]="cuantity <= 1"
+                fill="outline"
+                size="default">
+                <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+              </ion-button>
+              
+              <ion-input 
+                [(ngModel)]="cuantity" 
+                type="number" 
+                [min]="1" 
+                [max]="stock"
+                class="text-center font-bold text-xl w-20"
+                readonly>
+              </ion-input>
+              
+              <ion-button 
+                (click)="increaseQuantity()" 
+                [disabled]="cuantity >= stock"
+                fill="outline"
+                size="default">
+                <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- Botón de compra -->
+          <ion-button 
+            expand="block" 
+            (click)="addToCart()"
+            color="primary"
+            size="large">
+            <ion-icon slot="start" name="cart-outline"></ion-icon>
+            Add to Cart
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+      </div>
+    </div>
+  }
+</ion-content>
