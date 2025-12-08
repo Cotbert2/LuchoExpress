@@ -3,6 +3,9 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { ProductsService } from '../../services/products.service';
+import { addIcons } from 'ionicons';
+import { eyeOutline } from 'ionicons/icons';
+
 @Component({
   standalone: true,
   selector: 'app-home',
@@ -39,7 +42,9 @@ export class HomeComponent implements OnInit {
   constructor(
     private readonly productsService: ProductsService,
     private readonly router: Router,
-  ) {}
+  ) {
+    addIcons({ eyeOutline });
+  }
 
   ngOnInit(): void {
     this.productsService.getAllProducts().subscribe({
