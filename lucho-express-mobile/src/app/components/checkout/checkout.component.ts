@@ -8,6 +8,7 @@ import { CustomerService, CreateCustomerRequest, CustomerResponse } from '../../
 import { OrderService, CreateOrderRequest, CreateOrderProductRequest, OrderResponse } from '../../services/order.service';
 import { UserResponse } from '../../interfaces/auth.interface';
 import { Subscription } from 'rxjs';
+import { ViewWillEnter } from '@ionic/angular';
 
 // Ionic imports
 import { IonicModule, ToastController, AlertController } from '@ionic/angular';
@@ -38,7 +39,7 @@ import {
   styleUrl: './checkout.component.scss',
   standalone: true
 })
-export class CheckoutComponent implements OnInit, OnDestroy {
+export class CheckoutComponent implements OnInit, OnDestroy, ViewWillEnter {
   cartItems: CartItem[] = [];
   cartSummary: CartSummary = { items: [], totalItems: 0, totalAmount: 0 };
   isLoading: boolean = false;
@@ -93,6 +94,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
 
     this.loadUserAndCart();
+  }
+
+  ionViewWillEnter(): void {
+    // Reload cart data every time the view is entered
+    this.loadCart();
   }
 
   ngOnDestroy(): void {
@@ -248,6 +254,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
   private loadCart(): void {
+    // Unsubscribe from previous subscription if exists
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
+    }
+    
+    // Get current cart state immediately
+    this.cartItems = this.cartService.getCartItems();
+    this.cartSummary = this.cartService.getCartSummary();
+    console.log('Cart loaded:', this.cartSummary);
+    
+    // Subscribe to future changes
     this.cartSubscription = this.cartService.cartItems$.subscribe(items => {
       this.cartItems = items;
       this.cartSummary = this.cartService.getCartSummary();
