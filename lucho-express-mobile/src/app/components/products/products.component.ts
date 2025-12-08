@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { 
   searchOutline, 
@@ -11,6 +11,7 @@ import {
   cubeOutline 
 } from 'ionicons/icons';
 import { ProductsService } from '../../services/products.service';
+import { CartService } from '../../services/cart.service';
 import { ProductResponse, CategoryWithProductsResponse } from '../../interfaces/product.interface';
 
 @Component({
@@ -37,6 +38,8 @@ export class ProductsComponent implements OnInit {
 
   constructor(
     private productsService: ProductsService,
+    private cartService: CartService,
+    private toastController: ToastController,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -168,10 +171,34 @@ export class ProductsComponent implements OnInit {
   /**
    * Manejar evento de agregar al carrito
    */
-  onAddToCart(event: any): void {
+  async onAddToCart(event: any): Promise<void> {
     console.log('Producto agregado al carrito:', event);
-    // Aquí puedes implementar la lógica para agregar al carrito
-    // Por ejemplo, usar un servicio de carrito
+    
+    if (!event || !event.product) {
+      await this.showToast('Invalid product data', 'danger');
+      return;
+    }
+
+    const quantity = event.cuantity || 1;
+    
+    // Agregar al carrito usando el servicio
+    this.cartService.addToCart(event.product, quantity);
+    
+    // Mostrar mensaje de éxito
+    await this.showToast(`${quantity} x ${event.product.name} added to cart`, 'success');
+  }
+
+  /**
+   * Mostrar mensaje toast
+   */
+  async showToast(message: string, color: string = 'success'): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'bottom',
+      color
+    });
+    await toast.present();
   }
 
   /**

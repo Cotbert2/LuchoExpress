@@ -60,16 +60,20 @@ export class CartService {
    * Add item to cart or update quantity if item already exists
    */
   addToCart(product: any, quantity: number = 1): void {
+    console.log('addToCart called with product:', product, 'quantity:', quantity);
     const currentItems = this.cartItemsSubject.value;
+    console.log('Current cart items before adding:', currentItems);
     const existingItemIndex = currentItems.findIndex(item => item.id === product.id);
 
     if (existingItemIndex !== -1) {
       // Item exists, update quantity
+      console.log('Item already exists in cart, updating quantity');
       const updatedItems = [...currentItems];
       updatedItems[existingItemIndex].quantity += quantity;
       this.updateCart(updatedItems);
     } else {
       // New item, add to cart
+      console.log('Adding new item to cart');
       const newItem: CartItem = {
         id: product.id,
         name: product.name,
@@ -80,11 +84,14 @@ export class CartService {
         categoryId: product.categoryId
       };
       
+      console.log('New cart item created:', newItem);
       const updatedItems = [...currentItems, newItem];
+      console.log('Updated cart items array:', updatedItems);
       this.updateCart(updatedItems);
     }
 
     console.log(`Added ${quantity} of ${product.name} to cart`);
+    console.log('Current cart state after add:', this.cartItemsSubject.value);
   }
 
   /**

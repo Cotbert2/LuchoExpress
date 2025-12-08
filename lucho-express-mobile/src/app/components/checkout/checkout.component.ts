@@ -58,12 +58,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   constructor(
     private cartService: CartService,
     private authService: AuthService,
+    private toastController: ToastController,
+    private alertController: AlertController,
     private customerService: CustomerService,
     private orderService: OrderService,
     private router: Router,
-    private formBuilder: FormBuilder,
-    private toastController: ToastController,
-    private alertController: AlertController
+    private formBuilder: FormBuilder
   ) {
     addIcons({
       cartOutline,
@@ -84,8 +84,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Check if user is authenticated
     if (!this.authService.isLoggedIn()) {
-      this.showToast('Please log in to access your cart', 'warning');
-      
+      this.showToast('Authentication Required: Please log in to access your cart', 'danger' );
+
       setTimeout(() => {
         this.router.navigate(['/login']);
       }, 2000);
@@ -185,7 +185,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error fetching user:', error);
-            this.showToast('Error fetching user information. Please log in again.', 'danger');
+            this.showToast('Could not load user information', 'danger');
+
           }
         });
       }
@@ -260,7 +261,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   updateQuantity(item: CartItem, newQuantity: number): void {
     // Validate new quantity
     if (newQuantity <= 0) {
-      this.showToast('Quantity must be at least 1. Item will be removed if you want quantity 0.', 'warning');
+      this.showToast('Invalid Quantity: Quantity must be at least 1. Item will be removed if you want quantity 0.', 'warning');
       this.confirmRemoveItem(item);
       return;
     }
@@ -268,22 +269,22 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Check for reasonable maximum quantity (optional business rule)
     const maxQuantity = 99;
     if (newQuantity > maxQuantity) {
-      this.showToast(`Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`, 'warning');
+      this.showToast(`Quantity Too High: Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`, 'warning');
       return;
     }
 
     // Validate that quantity is a whole number
     if (newQuantity !== Math.floor(newQuantity)) {
-      this.showToast('Quantity must be a whole number.', 'warning');
+      this.showToast('Invalid Quantity: Quantity must be a whole number', 'warning');
       return;
     }
 
     try {
       this.cartService.updateItemQuantity(item.id, newQuantity);
-      this.showToast(`${item.name} quantity updated to ${newQuantity}`, 'success');
+      this.showToast(`Quantity Updated: ${item.name} quantity updated to ${newQuantity}`, 'success');
     } catch (error) {
       console.error('Error updating quantity:', error);
-      this.showToast('Failed to update item quantity. Please try again.', 'danger');
+      this.showToast('Update Failed: Failed to update item quantity. Please try again.', 'danger' );
     }
   }
 
@@ -304,11 +305,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           role: 'destructive',
           handler: () => {
             this.cartService.removeFromCart(item.id);
-            this.showToast(`${item.name} has been removed from your cart`, 'success');
+            this.showToast(`Item Removed: ${item.name} has been removed from your cart`);
           }
         }
       ]
     });
+
     await alert.present();
   }
 
@@ -317,7 +319,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   async confirmClearCart(): Promise<void> {
     if (this.cartItems.length === 0) {
-      this.showToast('Cart Empty: Your cart is already empty');
+      this.showToast('Cart Empty: Your cart is already empty', 'warning')
       return;
     }
 
@@ -330,15 +332,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           role: 'cancel'
         },
         {
-          text: 'Clear Cart',
+          text: 'Clear All',
           role: 'destructive',
           handler: () => {
             this.cartService.clearCart();
-            this.showToast('All items have been removed from your cart', 'success');
+            this.showToast('Cart Cleared: All items have been removed from your cart');
           }
         }
       ]
     });
+
     await alert.present();
   }
 
@@ -349,7 +352,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     const cartValidation = this.validateCartItems();
     
     if (!cartValidation.isValid) {
-      this.showToast(cartValidation.message, 'warning');
+      this.showToast(`Cart issues Found ${cartValidation.message}`);
       return;
     }
 
@@ -359,7 +362,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     // Show message if customer data was preloaded
     if (this.existingCustomer) {
-      this.showToast('Your saved customer information has been preloaded. You can modify it if needed.', );
+      this.showToast('Customer Information Loaded: Your saved customer information has been preloaded. You can modify it if needed.');
     }
   }
 
@@ -479,10 +482,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     if (invalidFields.length > 0) {
       const fieldsList = invalidFields.join(', ');
-      this.showToast(`Please fix the following fields: ${fieldsList}`, 'danger');
+      this.showToast(`Incomplete ${stepName}: Please fix the following fields: ${fieldsList}`)
     } else {
-      this.showToast(`Please complete all required ${stepName} fields`, 'danger');
-     
+      this.showToast(`Form Invalid: Please complete all required ${stepName} fields`)
     }
   }
 
@@ -500,8 +502,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private createOrUpdateCustomer(): void {
     if (!this.currentUser) {
-
-      this.showToast('User Error: User information is not available', 'danger');
+      this.showToast('User Error: User information is not availables', 'danger')
+  
       return;
     }
 
@@ -536,16 +538,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.existingCustomer = customer;
         this.activeStepIndex++;
-        
 
-        this.showToast('Your customer information has been saved successfully.', 'success');
+        this.showToast('Customer Created: Your customer information has been saved successfully.');
+
         
         console.log('Customer created successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error creating customer:', error);
-        this.showToast('There was an error saving your customer information. Please try again.', 'danger');
+        this.showToast(`Curstomer Creation Failed: There was an error saving your customer information. Please try again`);
       }
     });
   }
@@ -569,16 +571,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.existingCustomer = customer;
         this.activeStepIndex++;
+        
 
-        this.showToast('Your customer information has been updated successfully.', 'success');
+        this.showToast('Customer Updated:Your customer information has been updated successfully.')
         
         console.log('Customer updated successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error updating customer:', error);
-        this.showToast('There was an error updating your customer information. Please try again.', 'danger');
-
+        this.showToast('Customer Update Failed: There was an error updating your customer information. Please try again.', 'danger')
       }
     });
   }
@@ -606,16 +608,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.existingCustomer = customer;
         this.activeStepIndex++;
-        
-        this.showToast('Your shipping address has been saved successfully.', 'success');
-        
+
+        this.showToast('Address Updated: Your shipping address has been saved successfully.');
         console.log('Customer address updated successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error updating customer address:', error);
-        this.showToast('There was an error saving your shipping address. Please try again.', 'danger');
-       
+        this.showToast('Address Update Failes: There was an error saving your shipping address. Please try again.');
       }
     });
   }
@@ -722,19 +722,18 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
 
     if (!this.currentUser) {
-      this.showToast('User Error: User information is not available', 'danger');
+      this.showToast('Authentication Error: Your session has expired. Please log in again.', 'danger')
       this.router.navigate(['/login']);
       return;
     }
 
     if (!this.existingCustomer) {
-      this.showToast('Customer Error: Customer profile is not available', 'danger');
+      this.showToast('Customer Profile Error: Customer profile could not be created. Please try again.', 'danger')
       return;
     }
 
     if (this.cartItems.length === 0) {
       this.showToast('Empty Cart: Your cart is empty. Please add items before proceeding to checkout.', 'warning');
-  
       return;
     }
 
@@ -780,8 +779,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       
       const sectionsList = invalidSections.join(' and ');
       const fieldsList = invalidFields.join(', ');
-      
-      this.showToast(`${sectionsList} Incomplete: Please fix the following fields: ${fieldsList}`, 'danger');
+
+      this.showToast(`${sectionsList} Incomplete: Please fix the following fields: ${fieldsList}`, 'warning');
+
       
       return false;
     }
@@ -794,7 +794,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private completeOrderProcess(customer: CustomerResponse): void {
     if (this.cartItems.length === 0) {
-      this.showToast('Cannot create order with empty cart', 'danger');
+      this.showToast('Empty Car: Cannot create order with empty cart')
       this.isLoading = false;
       return;
     }
@@ -819,16 +819,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       next: (order: OrderResponse) => {
         this.isLoading = false;
         console.log('Order created successfully:', order);
-        this.showToast(`Order #${order.orderNumber} placed successfully! Total: ${this.formatCurrency(order.totalAmount)}. Estimated Delivery: ${order.estimatedDeliveryDate || 'TBD'}`, 'success');
+
+        this.showToast(`Order Placed Successfully!: Thank you ${customer.name}! Your order #${order.orderNumber} has been placed and will be shipped to your address.`)
+
         // Clear cart after successful order
         this.cartService.clearCart();
-        
         // Reset stepper state and forms
         this.resetCheckoutState();
-        
         // Show order confirmation details
         this.showOrderConfirmation(order);
-        
         // Redirect to home after showing confirmation
         setTimeout(() => {
           this.router.navigate(['/home']);
@@ -849,8 +848,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         } else if (error.status === 400) {
           errorMessage = 'Invalid order data. Please check your information.';
         }
-
-        this.showToast(errorMessage, 'danger');
+        this.showToast('Order Creation Failed: ' + errorMessage, 'danger');
       }
     });
   }
@@ -869,7 +867,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    * Show order confirmation details
    */
   private showOrderConfirmation(order: OrderResponse): void {
-    this.showToast(`Order #${order.orderNumber} placed successfully! Total: ${this.formatCurrency(order.totalAmount)}. Estimated Delivery: ${order.estimatedDeliveryDate || 'TBD'}`, 'success');
+    this.showToast(`Order Number: ${order.orderNumber}\nTotal Amount: ${this.formatCurrency(order.totalAmount)}\nEstimated Delivery: ${order.estimatedDeliveryDate || 'TBD'}`, 'primary');
 
   }
 
@@ -953,16 +951,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
-  /**
-   * Show a toast notification
-   */
-  async showToast(message: string, color: 'success' | 'danger' | 'warning' = 'success'): Promise<void> {
+
+  private async showToast(message: string, color: 'success' | 'danger' | 'warning' | 'primary' = 'success') {
     const toast = await this.toastController.create({
       message,
       duration: 3000,
-      position: 'bottom',
+      position: 'top',
       color
     });
     await toast.present();
   }
+
 }
