@@ -4,12 +4,14 @@ import com.bitcrack.luchoexpress.luchoexpress_auth_service.application.dto.*;
 import com.bitcrack.luchoexpress.luchoexpress_auth_service.application.mapper.UserMapper;
 import com.bitcrack.luchoexpress.luchoexpress_auth_service.domain.RoleEnum;
 import com.bitcrack.luchoexpress.luchoexpress_auth_service.domain.User;
+import com.bitcrack.luchoexpress.luchoexpress_auth_service.infraestructure.clients.ChatServiceFeignClient;
 import com.bitcrack.luchoexpress.luchoexpress_auth_service.infraestructure.exceptions.InvalidCredentialsException;
 import com.bitcrack.luchoexpress.luchoexpress_auth_service.infraestructure.exceptions.UnauthorizedOperationException;
 import com.bitcrack.luchoexpress.luchoexpress_auth_service.infraestructure.exceptions.UserAlreadyExistsException;
 import com.bitcrack.luchoexpress.luchoexpress_auth_service.infraestructure.exceptions.UserNotFoundException;
 import com.bitcrack.luchoexpress.luchoexpress_auth_service.persistance.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -23,12 +25,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final ChatServiceFeignClient chatServiceFeignClient;
     
     public UserResponse register(RegisterRequest request) {
         // Verificar que no exista el usuario
@@ -44,6 +48,48 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         User user = userMapper.toEntity(request, encodedPassword);
         User savedUser = userRepository.save(user);
+        
+        return userMapper.toResponse(savedUser);
+    }
+    
+    public UserResponse registerPersonalShopper(RegisterPersonalShopperRequest request) {
+        // Verificar que no exista el usuario
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new UserAlreadyExistsException("Username already exists: " + request.getUsername());
+        }
+        
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new UserAlreadyExistsException("Email already exists: " + request.getEmail());
+        }
+        
+        // Crear usuario con rol PS
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPasswordHash(encodedPassword);
+        user.setRole(RoleEnum.PS);
+        user.setEnabled(true);
+        
+        User savedUser = userRepository.save(user);
+        
+        // Create personal shopper record in ms-chat
+        try {
+            ChatServiceFeignClient.CreatePersonalShopperDto psDto = 
+                new ChatServiceFeignClient.CreatePersonalShopperDto(
+                    savedUser.getId(),
+                    request.getName(),
+                    savedUser.getEmail(),
+                    request.getPhone()
+                );
+            chatServiceFeignClient.createPersonalShopper(psDto);
+            log.info("Personal shopper record created in ms-chat for user: {}", savedUser.getId());
+        } catch (Exception e) {
+            log.error("Failed to create personal shopper record in ms-chat: {}", e.getMessage());
+            // Rollback user creation
+            userRepository.delete(savedUser);
+            throw new RuntimeException("Failed to create personal shopper record. Please try again.", e);
+        }
         
         return userMapper.toResponse(savedUser);
     }
@@ -118,6 +164,26 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         User user = userMapper.toEntity(request, encodedPassword);
         User savedUser = userRepository.save(user);
+        
+        // If user is personal shopper, create record in ms-chat
+        if (request.getRole() == RoleEnum.PS) {
+            try {
+                ChatServiceFeignClient.CreatePersonalShopperDto psDto = 
+                    new ChatServiceFeignClient.CreatePersonalShopperDto(
+                        savedUser.getId(),
+                        request.getName() != null ? request.getName() : request.getUsername(),
+                        savedUser.getEmail(),
+                        request.getPhone() != null ? request.getPhone() : ""
+                    );
+                chatServiceFeignClient.createPersonalShopper(psDto);
+                log.info("Personal shopper record created in ms-chat for user: {}", savedUser.getId());
+            } catch (Exception e) {
+                log.error("Failed to create personal shopper record in ms-chat: {}", e.getMessage());
+                // Rollback user creation
+                userRepository.delete(savedUser);
+                throw new RuntimeException("Failed to create personal shopper record", e);
+            }
+        }
         
         return userMapper.toResponse(savedUser);
     }

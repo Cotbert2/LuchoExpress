@@ -1,0 +1,72 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'/personal-shopper/order/' + orderId"></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="order">
+      Chat - Orden #{{ order.orderNumber }}
+    </ion-title>
+    <ion-title *ngIf="!order">Chat</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" #chatContent>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center h-full">
+    <ion-spinner color="primary"></ion-spinner>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="!loading" class="messages-container pb-4">
+    <ng-container *ngFor="let message of messages; let i = index">
+      <!-- Date Divider -->
+      <div *ngIf="shouldShowDateDivider(i)" class="date-divider my-4">
+        <span class="bg-gray-200 px-3 py-1 rounded-full text-xs text-gray-600">
+          {{ formatDate(message.createdAt) }}
+        </span>
+      </div>
+
+      <!-- Message Bubble -->
+      <div [class]="isMyMessage(message) ? 'message-row my-message' : 'message-row customer-message'">
+        <div [class]="isMyMessage(message) ? 'message-bubble my-bubble' : 'message-bubble customer-bubble'">
+          <div class="message-content">
+            <p class="message-text">{{ message.content }}</p>
+            <span class="message-time">{{ formatTime(message.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Empty State -->
+    <div *ngIf="messages.length === 0" class="text-center py-12 text-gray-500">
+      <p>No hay mensajes aún</p>
+      <p class="text-sm">Inicia la conversación con el cliente</p>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <div class="message-input-container p-4 bg-white border-t border-gray-200">
+    <div class="flex items-end gap-2">
+      <ion-textarea
+        [(ngModel)]="newMessage"
+        placeholder="Escribe un mensaje..."
+        [autoGrow]="true"
+        [rows]="1"
+        [maxlength]="500"
+        class="flex-1"
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+      ></ion-textarea>
+      
+      <ion-button
+        (click)="sendMessage()"
+        [disabled]="!newMessage.trim() || sending"
+        color="primary"
+        class="send-button"
+      >
+        <ion-spinner *ngIf="sending" slot="icon-only"></ion-spinner>
+        <ion-icon *ngIf="!sending" slot="icon-only" name="send-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+</ion-footer>

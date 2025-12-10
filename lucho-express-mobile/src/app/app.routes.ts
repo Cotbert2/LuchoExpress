@@ -30,4 +30,27 @@ export const routes: Routes = [
     path: 'product/:id',
     loadComponent: () => import('./components/product/product.component').then((m) => m.ProductComponent),
   },
+  {
+    path: 'personal-shopper',
+    canActivate: [() => import('./guards/personal-shopper.guard').then(m => m.personalShopperGuard)],
+    children: [
+      {
+        path: 'orders',
+        loadComponent: () => import('./personal-shopper/orders/orders.page').then((m) => m.OrdersPage),
+      },
+      {
+        path: 'order/:id',
+        loadComponent: () => import('./personal-shopper/order-detail/order-detail.page').then((m) => m.OrderDetailPage),
+      },
+      {
+        path: 'chat/:orderId',
+        loadComponent: () => import('./personal-shopper/chat/chat.page').then((m) => m.ChatPage),
+      },
+      {
+        path: '',
+        redirectTo: 'orders',
+        pathMatch: 'full'
+      }
+    ]
+  },
 ];

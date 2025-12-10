@@ -1,9 +1,7 @@
 package com.bitcrack.luchoexpress.luchoexpress_auth_service.application.dto;
 
-import com.bitcrack.luchoexpress.luchoexpress_auth_service.domain.RoleEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -13,27 +11,25 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateUserRequest {
+public class RegisterPersonalShopperRequest {
     
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String username;
     
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
-    private String password;
-    
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
-    @Size(max = 100, message = "Email cannot exceed 100 characters")
     private String email;
     
-    @NotNull(message = "Role is required")
-    private RoleEnum role;
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
+    private String password;
     
-    // Optional fields for Personal Shopper (PS role)
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
     private String name;
     
-    @Pattern(regexp = "^[+]?[0-9]{10,15}$|^$", message = "Phone number must be valid or empty")
+    @NotBlank(message = "Phone is required")
+    @Pattern(regexp = "^[+]?[0-9]{10,15}$", message = "Phone number must be valid")
     private String phone;
 }

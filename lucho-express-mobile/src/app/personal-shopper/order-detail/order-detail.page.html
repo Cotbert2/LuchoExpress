@@ -1,0 +1,150 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/personal-shopper/orders"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Orden</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <ion-spinner color="primary"></ion-spinner>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="text-center py-8">
+    <p class="text-red-500">{{ error }}</p>
+  </div>
+
+  <!-- Order Detail -->
+  <div *ngIf="order && !loading" class="space-y-4">
+    <!-- Order Header -->
+    <ion-card>
+      <ion-card-header>
+        <div class="flex justify-between items-center">
+          <ion-card-title class="text-2xl font-bold">
+            Orden #{{ order.orderNumber }}
+          </ion-card-title>
+          <ion-badge [color]="getStatusColor(order.status)" class="text-lg px-4 py-2">
+            {{ getStatusLabel(order.status) }}
+          </ion-badge>
+        </div>
+        <p class="text-sm text-gray-500 mt-2">
+          Creada: {{ formatDate(order.createdAt) }}
+        </p>
+      </ion-card-header>
+    </ion-card>
+
+    <!-- Customer Information -->
+    <ion-card *ngIf="order.customerInfo">
+      <ion-card-header>
+        <ion-card-title class="flex items-center">
+          <ion-icon name="person-outline" class="mr-2"></ion-icon>
+          Información del Cliente
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item>
+            <ion-icon name="person-outline" slot="start" class="text-gray-500"></ion-icon>
+            <ion-label>
+              <h3 class="font-semibold">Nombre</h3>
+              <p>{{ order.customerInfo.name }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-icon name="mail-outline" slot="start" class="text-gray-500"></ion-icon>
+            <ion-label>
+              <h3 class="font-semibold">Email</h3>
+              <p>{{ order.customerInfo.email }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-icon name="call-outline" slot="start" class="text-gray-500"></ion-icon>
+            <ion-label>
+              <h3 class="font-semibold">Teléfono</h3>
+              <p>{{ order.customerInfo.phone }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-icon name="location-outline" slot="start" class="text-gray-500"></ion-icon>
+            <ion-label>
+              <h3 class="font-semibold">Dirección</h3>
+              <p>{{ order.customerInfo.address }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Order Products -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title class="flex items-center">
+          <ion-icon name="cart-outline" class="mr-2"></ion-icon>
+          Productos ({{ order.orderProducts.length }})
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let product of order.orderProducts">
+            <ion-label>
+              <h3 class="font-semibold">{{ product.productName }}</h3>
+              <p class="text-sm text-gray-600">
+                Cantidad: {{ product.quantity }} x {{ formatCurrency(product.price) }}
+              </p>
+            </ion-label>
+            <div slot="end" class="text-right">
+              <p class="font-bold text-lg">{{ formatCurrency(product.subtotal) }}</p>
+            </div>
+          </ion-item>
+        </ion-list>
+
+        <div class="border-t border-gray-200 mt-4 pt-4">
+          <div class="flex justify-between items-center">
+            <span class="text-xl font-semibold">Total:</span>
+            <span class="text-2xl font-bold text-primary">
+              {{ formatCurrency(order.totalAmount) }}
+            </span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Action Buttons -->
+    <div class="space-y-3 pb-6">
+      <!-- Chat Button -->
+      <ion-button 
+        expand="block" 
+        color="tertiary"
+        (click)="openChat()"
+        class="h-14"
+      >
+        <ion-icon slot="start" name="chatbubble-outline"></ion-icon>
+        Abrir Chat con Cliente
+      </ion-button>
+
+      <!-- Update Status Button -->
+      <ion-button 
+        *ngIf="canUpdateStatus()"
+        expand="block" 
+        [color]="getStatusColor(getNextStatus()!)"
+        (click)="confirmStatusChange(getNextStatus()!)"
+        [disabled]="updating"
+        class="h-14"
+      >
+        <ion-spinner *ngIf="updating" slot="start"></ion-spinner>
+        <ion-icon *ngIf="!updating" slot="start" name="checkmark-circle-outline"></ion-icon>
+        {{ updating ? 'Actualizando...' : 'Marcar como ' + getNextStatusLabel() }}
+      </ion-button>
+
+      <!-- Delivered State -->
+      <div *ngIf="order.status === 'DELIVERED'" class="text-center py-4">
+        <ion-icon name="checkmark-circle-outline" class="text-6xl text-green-500"></ion-icon>
+        <p class="text-lg font-semibold text-gray-700 mt-2">Orden completada</p>
+      </div>
+    </div>
+  </div>
+</ion-content>

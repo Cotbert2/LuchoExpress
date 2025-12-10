@@ -95,6 +95,42 @@ public class TrackingServiceClientImpl implements TrackingServiceClient {
         }
     }
     
+    @Override
+    @Async
+    public void notifyOrderStatusUpdated(Order order) {
+        try {
+            log.info("Updating tracking status for order: {}", order.getId());
+            
+            // Get customer information to obtain userId
+            CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerById(order.getCustomerId());
+            
+            TrackingOrdersServiceFeignClient.TrackingStatusDto trackingStatus = 
+                new TrackingOrdersServiceFeignClient.TrackingStatusDto(
+                    order.getId(),
+                    order.getOrderNumber(),
+                    customerInfo.userId(),
+                    order.getStatus().name(),
+                    LocalDateTime.now()
+                );
+            
+            // Intentar actualizar el tracking con reintentos
+            boolean success = updateTrackingWithRetry(trackingStatus, 3);
+            
+            if (success) {
+                log.info("Successfully updated tracking status for order: {}", order.getId());
+            } else {
+                log.error("Failed to update tracking status for order {} after all retry attempts", order.getId());
+            }
+            
+        } catch (FeignException e) {
+            log.error("Failed to update tracking status for order {}: {}", order.getId(), e.getMessage());
+            // Don't rethrow - this should not fail the order status update
+        } catch (Exception e) {
+            log.error("Failed to update tracking status for order {} due to customer service error: {}", order.getId(), e.getMessage());
+            // Don't rethrow - this should not fail the order status update
+        }
+    }
+    
     private boolean updateTrackingWithRetry(TrackingOrdersServiceFeignClient.TrackingStatusDto trackingStatus, int maxRetries) {
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {

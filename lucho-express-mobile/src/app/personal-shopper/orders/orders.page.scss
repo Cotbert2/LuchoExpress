@@ -1,0 +1,19 @@
+ion-card {
+  @apply shadow-md rounded-lg;
+}
+
+ion-card-header {
+  @apply pb-2;
+}
+
+ion-card-title {
+  @apply text-gray-800;
+}
+
+ion-badge {
+  @apply font-semibold px-3 py-1;
+}
+
+.text-primary {
+  color: var(--ion-color-primary);
+}

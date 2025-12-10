@@ -38,6 +38,7 @@ public class SecurityConfig {
                 // Endpoints públicos
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/register/personal-shopper").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/token").permitAll()
                 
                 // Endpoints protegidos

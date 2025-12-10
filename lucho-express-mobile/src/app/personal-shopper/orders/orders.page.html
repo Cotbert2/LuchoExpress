@@ -1,0 +1,94 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Mis Órdenes Asignadas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="loadOrders($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <ion-spinner color="primary"></ion-spinner>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="text-center py-8">
+    <p class="text-red-500 mb-4">{{ error }}</p>
+    <ion-button (click)="loadOrders()" color="primary">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && orders.length === 0" class="text-center py-12">
+    <ion-icon name="cart-outline" class="text-6xl text-gray-400 mb-4"></ion-icon>
+    <h2 class="text-xl font-semibold text-gray-600 mb-2">No tienes órdenes asignadas</h2>
+    <p class="text-gray-500">Las nuevas órdenes aparecerán aquí automáticamente</p>
+  </div>
+
+  <!-- Orders List -->
+  <div *ngIf="!loading && orders.length > 0" class="space-y-4">
+    <ion-card 
+      *ngFor="let order of orders" 
+      (click)="viewOrderDetail(order.id)"
+      class="cursor-pointer hover:shadow-lg transition-shadow duration-200"
+    >
+      <ion-card-header>
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <ion-card-title class="text-lg font-bold">
+              Orden #{{ order.orderNumber }}
+            </ion-card-title>
+            <p class="text-sm text-gray-500 mt-1">
+              {{ formatDate(order.createdAt) }}
+            </p>
+          </div>
+          <ion-badge [color]="getStatusColor(order.status)" class="ml-2">
+            {{ getStatusLabel(order.status) }}
+          </ion-badge>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="space-y-3">
+          <!-- Customer Info -->
+          <div class="flex items-center text-sm" *ngIf="order.customerInfo">
+            <ion-icon name="person-outline" class="mr-2 text-gray-500"></ion-icon>
+            <span class="font-medium">{{ order.customerInfo.name }}</span>
+          </div>
+
+          <!-- Products Count -->
+          <div class="flex items-center text-sm">
+            <ion-icon name="cart-outline" class="mr-2 text-gray-500"></ion-icon>
+            <span>{{ order.orderProducts.length }} producto(s)</span>
+          </div>
+
+          <!-- Total Amount -->
+          <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-200">
+            <div class="flex items-center text-sm">
+              <ion-icon name="cash-outline" class="mr-2 text-gray-500"></ion-icon>
+              <span class="font-semibold">Total:</span>
+            </div>
+            <span class="text-xl font-bold text-primary">
+              {{ formatCurrency(order.totalAmount) }}
+            </span>
+          </div>
+
+          <!-- Action Button -->
+          <ion-button 
+            expand="block" 
+            [color]="getStatusColor(order.status)"
+            class="mt-4"
+          >
+            <ion-icon slot="start" [name]="getStatusIcon(order.status)"></ion-icon>
+            Ver Detalles
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

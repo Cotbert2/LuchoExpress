@@ -1,35 +1,51 @@
 <ion-app>
   <ion-tabs>
     <ion-tab-bar slot="bottom" class="custom-tab-bar">
-      <ion-tab-button tab="home">
-        <ion-icon name="home-outline"></ion-icon>
-        <ion-label>Home</ion-label>
-      </ion-tab-button>
+      <!-- Personal Shopper Tabs -->
+      <ng-container *ngIf="isPersonalShopper">
+        <ion-tab-button tab="personal-shopper/orders">
+          <ion-icon name="list-outline"></ion-icon>
+          <ion-label>Órdenes</ion-label>
+        </ion-tab-button>
 
-      <ion-tab-button tab="products">
-        <ion-icon name="bag-outline"></ion-icon>
-        <ion-label>Products</ion-label>
-      </ion-tab-button>
+        <ion-tab-button tab="profile">
+          <ion-icon name="person-outline"></ion-icon>
+          <ion-label>Perfil</ion-label>
+        </ion-tab-button>
+      </ng-container>
 
-      <ion-tab-button tab="orders">
-        <ion-icon name="cube-outline"></ion-icon>
-        <ion-label>Orders</ion-label>
-      </ion-tab-button>
+      <!-- Regular User Tabs -->
+      <ng-container *ngIf="!isPersonalShopper">
+        <ion-tab-button tab="home">
+          <ion-icon name="home-outline"></ion-icon>
+          <ion-label>Home</ion-label>
+        </ion-tab-button>
 
-      <ion-tab-button tab="cart">
-        <ion-icon name="cart-outline"></ion-icon>
-        <ion-label>Cart</ion-label>
-        @if (cartItemsCount > 0) {
-          <ion-badge color="danger" class="cart-badge">
-            {{ cartItemsCount }}
-          </ion-badge>
-        }
-      </ion-tab-button>
+        <ion-tab-button tab="products">
+          <ion-icon name="bag-outline"></ion-icon>
+          <ion-label>Products</ion-label>
+        </ion-tab-button>
 
-      <ion-tab-button tab="profile">
-        <ion-icon name="person-outline"></ion-icon>
-        <ion-label>Profile</ion-label>
-      </ion-tab-button>
+        <ion-tab-button tab="orders">
+          <ion-icon name="cube-outline"></ion-icon>
+          <ion-label>Orders</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="cart">
+          <ion-icon name="cart-outline"></ion-icon>
+          <ion-label>Cart</ion-label>
+          @if (cartItemsCount > 0) {
+            <ion-badge color="danger" class="cart-badge">
+              {{ cartItemsCount }}
+            </ion-badge>
+          }
+        </ion-tab-button>
+
+        <ion-tab-button tab="profile">
+          <ion-icon name="person-outline"></ion-icon>
+          <ion-label>Profile</ion-label>
+        </ion-tab-button>
+      </ng-container>
     </ion-tab-bar>
   </ion-tabs>
 </ion-app>

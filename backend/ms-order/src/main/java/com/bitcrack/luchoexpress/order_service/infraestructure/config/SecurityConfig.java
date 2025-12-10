@@ -41,9 +41,12 @@ public class SecurityConfig {
                 // Protected endpoints - Orders
                 .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("USER", "ADMIN", "ROOT")
                 .requestMatchers(HttpMethod.GET, "/api/orders/me").hasRole("USER")
+                .requestMatchers(HttpMethod.GET, "/api/orders/personal-shopper/my-orders").hasRole("PS")
+                .requestMatchers(HttpMethod.PATCH, "/api/orders/*/status").hasAnyRole("PS", "ADMIN", "ROOT")
                 .requestMatchers(HttpMethod.GET, "/api/orders").hasAnyRole("ADMIN", "ROOT")
                 .requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("ADMIN", "ROOT", "USER")
+                .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasAnyRole("ADMIN", "ROOT", "USER")
 
 
                 // All other requests require authentication

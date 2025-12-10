@@ -174,6 +174,16 @@ export class LoginComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.showToast('Login successful!');
+          // Redirect based on user role
+          this.authService.getCurrentUser().subscribe({
+            next: (user) => {
+              if (user.role === 'PS') {
+                this.router.navigate(['/personal-shopper/orders']);
+              } else {
+                this.router.navigate(['/home']);
+              }
+            }
+          });
         },
         error: (error) => {
           console.error('Login error:', error);

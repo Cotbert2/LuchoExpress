@@ -131,6 +131,14 @@ export class AuthService {
     return role === 'USER' || role === 'CLIENTE';
   }
 
+  /**
+   * Check if user is personal shopper
+   */
+  isPersonalShopper(): boolean {
+    const role = this.getUserRole();
+    return role === 'PS';
+  }
+
 
   getToken(): string | null {
     return localStorage.getItem('access_token');

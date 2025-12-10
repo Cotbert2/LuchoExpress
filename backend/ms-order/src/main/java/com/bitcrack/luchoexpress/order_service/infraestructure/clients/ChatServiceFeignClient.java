@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @FeignClient(name = "chat-service", url = "${chat.service.url:http://localhost:3000}")
@@ -36,7 +35,7 @@ public interface ChatServiceFeignClient {
         String status,
         int activeOrders,
         boolean enabled,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        String createdAt,
+        String updatedAt
     ) {}
 }

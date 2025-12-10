@@ -7,4 +7,6 @@ public interface TrackingServiceClient {
     void notifyOrderCreated(Order order);
     
     void notifyOrderUpdated(Order order);
+    
+    void notifyOrderStatusUpdated(Order order);
 }

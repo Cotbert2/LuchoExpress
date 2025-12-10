@@ -35,6 +35,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
+    @PostMapping("/register/personal-shopper")
+    public ResponseEntity<UserResponse> registerPersonalShopper(@Valid @RequestBody RegisterPersonalShopperRequest request) {
+        UserResponse response = userService.registerPersonalShopper(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
     @PostMapping("/token")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
         TokenResponse response = userService.login(request);
