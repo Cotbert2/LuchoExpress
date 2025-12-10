@@ -3,6 +3,7 @@ package com.bitcrack.luchoexpress.order_service.presentation;
 import com.bitcrack.luchoexpress.order_service.application.dto.CreateOrderRequest;
 import com.bitcrack.luchoexpress.order_service.application.dto.OrderResponse;
 import com.bitcrack.luchoexpress.order_service.application.dto.UpdateOrderRequest;
+import com.bitcrack.luchoexpress.order_service.application.dto.UpdateOrderStatusRequest;
 import com.bitcrack.luchoexpress.order_service.application.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,14 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
     
+    @GetMapping("/personal-shopper/my-orders")
+    @PreAuthorize("hasRole('PS')")
+    public ResponseEntity<List<OrderResponse>> getMyOrdersAsPersonalShopper(Authentication authentication) {
+        log.info("Fetching orders for personal shopper");
+        List<OrderResponse> orders = orderService.getMyOrdersAsPersonalShopper(authentication);
+        return ResponseEntity.ok(orders);
+    }
+    
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ROOT')")
     public ResponseEntity<List<OrderResponse>> getAllOrders(Authentication authentication) {
@@ -69,15 +78,26 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
     
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ROOT')")
     public ResponseEntity<OrderResponse> updateOrder(
-            @PathVariable UUID id,
-            @Valid @RequestBody UpdateOrderRequest request,
+            @PathVariable UUID id, 
+            @Valid @RequestBody UpdateOrderRequest request, 
             Authentication authentication) {
         log.info("Updating order with ID: {}", id);
-        OrderResponse order = orderService.updateOrder(id, request, authentication);
-        return ResponseEntity.ok(order);
+        OrderResponse response = orderService.updateOrder(id, request, authentication);
+        return ResponseEntity.ok(response);
+    }
+    
+    @PatchMapping("/{orderId}/status")
+    @PreAuthorize("hasRole('PS') or hasRole('ADMIN') or hasRole('ROOT')")
+    public ResponseEntity<OrderResponse> updateOrderStatus(
+            @PathVariable UUID orderId,
+            @Valid @RequestBody UpdateOrderStatusRequest request,
+            Authentication authentication) {
+        log.info("Updating order {} status to: {}", orderId, request.getStatus());
+        OrderResponse response = orderService.updateOrderStatus(orderId, request.getStatus(), authentication);
+        return ResponseEntity.ok(response);
     }
     
     @PutMapping("/{id}/cancel")

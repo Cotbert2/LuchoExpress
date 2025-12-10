@@ -18,4 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findAllByOrderByCreatedAtDesc();
     
     Optional<Order> findByOrderNumber(String orderNumber);
+    
+    List<Order> findByPersonalShopperIdOrderByCreatedAtDesc(UUID personalShopperId);
 }

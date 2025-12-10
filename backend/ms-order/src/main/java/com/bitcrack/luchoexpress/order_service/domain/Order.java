@@ -29,6 +29,9 @@ public class Order {
     @Column(nullable = false)
     private UUID customerId;
     
+    @Column(name = "personal_shopper_id")
+    private UUID personalShopperId;
+    
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<OrderProduct> products = new ArrayList<>();
     

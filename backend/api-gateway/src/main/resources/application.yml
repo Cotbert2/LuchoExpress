@@ -52,6 +52,10 @@ spring:
           uri: http://localhost:8086
           predicates:
             - Path=/api/tracking/**
+        - id: ms-chat
+          uri: http://localhost:3000
+          predicates:
+            - Path=/api/personal-shoppers/**,/api/messages/**
 
 server:
   port: 8080

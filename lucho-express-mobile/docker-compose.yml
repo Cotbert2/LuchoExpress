@@ -81,6 +81,20 @@ services:
       - lucho-express-network
     restart: always
 
+  # Base de datos para ms-chat
+  postgres-chat:
+    image: postgres:latest
+    container_name: postgres-chat
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: chat_db
+    ports:
+      - "5434:5432"
+    networks:
+      - lucho-express-network
+    restart: always
+
 networks:
   lucho-express-network:
     driver: bridge

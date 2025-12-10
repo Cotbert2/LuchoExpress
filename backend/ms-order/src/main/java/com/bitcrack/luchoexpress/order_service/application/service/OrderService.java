@@ -4,6 +4,9 @@ import com.bitcrack.luchoexpress.order_service.application.dto.*;
 import com.bitcrack.luchoexpress.order_service.application.mapper.OrderMapper;
 import com.bitcrack.luchoexpress.order_service.domain.Order;
 import com.bitcrack.luchoexpress.order_service.domain.OrderProduct;
+import com.bitcrack.luchoexpress.order_service.domain.OrderStatusEnum;
+import com.bitcrack.luchoexpress.order_service.infraestructure.clients.ChatServiceClient;
+import com.bitcrack.luchoexpress.order_service.infraestructure.clients.ChatServiceFeignClient;
 import com.bitcrack.luchoexpress.order_service.infraestructure.exceptions.OrderNotFoundException;
 import com.bitcrack.luchoexpress.order_service.infraestructure.exceptions.ProductNotFoundException;
 import com.bitcrack.luchoexpress.order_service.infraestructure.exceptions.UnauthorizedAccessException;
@@ -30,6 +33,7 @@ public class OrderService {
     private final ProductServiceClient productServiceClient;
     private final TrackingServiceClient trackingServiceClient;
     private final CustomerServiceClient customerServiceClient;
+    private final ChatServiceClient chatServiceClient;
     
     public OrderResponse createOrder(CreateOrderRequest request, Authentication authentication) {
         log.info("Creating order for customer: {}", request.getCustomerId());
@@ -60,6 +64,17 @@ public class OrderService {
         
         // Calculate total amount
         order.calculateTotalAmount();
+        
+        // Assign personal shopper
+        try {
+            ChatServiceFeignClient.PersonalShopperDto personalShopper = chatServiceClient.assignAvailablePersonalShopper();
+            order.setPersonalShopperId(personalShopper.id());
+            chatServiceClient.assignToOrder(personalShopper.id());
+            log.info("Personal shopper {} assigned to order", personalShopper.id());
+        } catch (Exception e) {
+            log.error("Failed to assign personal shopper: {}", e.getMessage());
+            // Continue without personal shopper - can be assigned later
+        }
         
         // Save order
         Order savedOrder = orderRepository.save(order);
@@ -101,6 +116,27 @@ public class OrderService {
         return orders.stream()
                 .map(orderMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+    
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getMyOrdersAsPersonalShopper(Authentication authentication) {
+        // Extract userId from token to get the personal shopper
+        UUID userId = extractUserIdFromToken(authentication);
+        
+        try {
+            // Get personal shopper from ms-chat by userId
+            ChatServiceFeignClient.PersonalShopperDto personalShopper = chatServiceClient.getPersonalShopperByUserId(userId);
+            
+            log.info("Fetching orders for personal shopper: {} (user: {})", personalShopper.id(), userId);
+            
+            List<Order> orders = orderRepository.findByPersonalShopperIdOrderByCreatedAtDesc(personalShopper.id());
+            return orders.stream()
+                    .map(orderMapper::toResponse)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Failed to fetch personal shopper for user {}: {}", userId, e.getMessage());
+            throw new UnauthorizedAccessException("You are not registered as a personal shopper");
+        }
     }
     
     @Transactional(readOnly = true)
@@ -170,6 +206,85 @@ public class OrderService {
         return orderMapper.toResponse(order);
     }
     
+    public OrderResponse updateOrderStatus(UUID orderId, OrderStatusEnum newStatus, Authentication authentication) {
+        log.info("Updating order {} status to: {}", orderId, newStatus);
+        
+        // Get the role to determine permissions
+        String role = extractRoleFromToken(authentication);
+        UUID userId = extractUserIdFromToken(authentication);
+        
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with ID " + orderId + " not found"));
+        
+        // Validate permissions based on role
+        if ("PS".equals(role)) {
+            // Personal shopper can only update their assigned orders
+            try {
+                ChatServiceFeignClient.PersonalShopperDto personalShopper = chatServiceClient.getPersonalShopperByUserId(userId);
+                if (!personalShopper.id().equals(order.getPersonalShopperId())) {
+                    throw new UnauthorizedAccessException("You can only update orders assigned to you");
+                }
+                
+                // Personal shoppers can only transition through specific states
+                validatePersonalShopperStatusTransition(order.getStatus(), newStatus);
+            } catch (Exception e) {
+                log.error("Failed to validate personal shopper access: {}", e.getMessage());
+                throw new UnauthorizedAccessException("You don't have permission to update this order");
+            }
+        } else if ("ADMIN".equals(role) || "ROOT".equals(role)) {
+            // Admin and ROOT can update to any status
+            log.info("Admin/Root updating order status");
+        } else {
+            throw new UnauthorizedAccessException("Only personal shoppers and admins can update order status");
+        }
+        
+        // Store old status for comparison
+        OrderStatusEnum oldStatus = order.getStatus();
+        
+        // Update status
+        order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
+        
+        // If order status changed to DELIVERED, unassign personal shopper
+        if (updatedOrder.getPersonalShopperId() != null && 
+            newStatus == OrderStatusEnum.DELIVERED &&
+            oldStatus != OrderStatusEnum.DELIVERED) {
+            try {
+                chatServiceClient.unassignFromOrder(updatedOrder.getPersonalShopperId());
+                log.info("Personal shopper {} unassigned from delivered order", updatedOrder.getPersonalShopperId());
+            } catch (Exception e) {
+                log.error("Failed to unassign personal shopper: {}", e.getMessage());
+            }
+        }
+        
+        // Notify tracking service asynchronously
+        try {
+            trackingServiceClient.notifyOrderStatusUpdated(updatedOrder);
+        } catch (Exception e) {
+            log.error("Failed to notify tracking service for order status update: {}", updatedOrder.getId(), e);
+        }
+        
+        log.info("Order status updated successfully: {} -> {}", oldStatus, newStatus);
+        return orderMapper.toResponse(updatedOrder);
+    }
+    
+    private void validatePersonalShopperStatusTransition(OrderStatusEnum currentStatus, OrderStatusEnum newStatus) {
+        // Define allowed transitions for personal shoppers
+        boolean isValidTransition = switch (currentStatus) {
+            case PENDING -> newStatus == OrderStatusEnum.CONFIRMED;
+            case CONFIRMED -> newStatus == OrderStatusEnum.SHIPPED;
+            case SHIPPED -> newStatus == OrderStatusEnum.DELIVERED;
+            case DELIVERED, CANCELLED -> false; // Cannot change from terminal states
+        };
+        
+        if (!isValidTransition) {
+            throw new UnauthorizedAccessException(
+                String.format("Invalid status transition: %s -> %s. Personal shoppers must follow the workflow: PENDING -> CONFIRMED -> SHIPPED -> DELIVERED", 
+                    currentStatus, newStatus)
+            );
+        }
+    }
+    
     public OrderResponse updateOrder(UUID id, UpdateOrderRequest request, Authentication authentication) {
         log.info("Updating order with ID: {}", id);
         
@@ -181,10 +296,25 @@ public class OrderService {
         
         orderMapper.updateEntityFromRequest(order, request);
         
+        // Check if order is being completed or delivered
+        OrderStatusEnum oldStatus = order.getStatus();
+        
         // Recalculate total if needed
         order.calculateTotalAmount();
         
         Order updatedOrder = orderRepository.save(order);
+        
+        // If order status changed to DELIVERED or COMPLETED, unassign personal shopper
+        if (updatedOrder.getPersonalShopperId() != null && 
+            (updatedOrder.getStatus() == OrderStatusEnum.DELIVERED) &&
+            (oldStatus != OrderStatusEnum.DELIVERED)) {
+            try {
+                chatServiceClient.unassignFromOrder(updatedOrder.getPersonalShopperId());
+                log.info("Personal shopper {} unassigned from completed order", updatedOrder.getPersonalShopperId());
+            } catch (Exception e) {
+                log.error("Failed to unassign personal shopper: {}", e.getMessage());
+            }
+        }
         
         // Notify tracking service asynchronously
         try {
@@ -230,6 +360,16 @@ public class OrderService {
         // Cancel the order
         order.cancel();
         Order cancelledOrder = orderRepository.save(order);
+        
+        // Unassign personal shopper if assigned
+        if (cancelledOrder.getPersonalShopperId() != null) {
+            try {
+                chatServiceClient.unassignFromOrder(cancelledOrder.getPersonalShopperId());
+                log.info("Personal shopper {} unassigned from cancelled order", cancelledOrder.getPersonalShopperId());
+            } catch (Exception e) {
+                log.error("Failed to unassign personal shopper: {}", e.getMessage());
+            }
+        }
         
         // Notify tracking service asynchronously
         try {
