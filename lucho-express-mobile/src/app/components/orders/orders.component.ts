@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { IonicModule, ToastController, AlertController, ModalController } from '@ionic/angular';
+import { ViewWillEnter } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { 
   cartOutline, 
@@ -17,6 +19,7 @@ import {
 } from 'ionicons/icons';
 import { OrderService, OrderResponse } from '../../services/order.service';
 import { TrackingService } from '../../services/tracking.service';
+import { AuthService } from '../../services/auth.service';
 import { OrderStatus } from '../../interfaces/order.interface';
 import { TrackingStatus, TrackingResponse, OrderStatusEnum } from '../../interfaces/tracking.interface';
 
@@ -31,7 +34,7 @@ import { TrackingStatus, TrackingResponse, OrderStatusEnum } from '../../interfa
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.scss'
 })
-export class OrdersComponent implements OnInit {
+export class OrdersComponent implements OnInit, ViewWillEnter {
   orders: OrderResponse[] = [];
   filteredOrders: OrderResponse[] = [];
   loading = false;
@@ -58,7 +61,9 @@ export class OrdersComponent implements OnInit {
     private trackingService: TrackingService,
     private toastController: ToastController,
     private alertController: AlertController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private authService: AuthService,
+    private router: Router
   ) {
     // Register Ionicons
     addIcons({
@@ -76,6 +81,18 @@ export class OrdersComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Initial setup
+  }
+
+  ionViewWillEnter(): void {
+    // Check if user is authenticated when view is about to enter
+    if (!this.authService.isLoggedIn()) {
+      this.showToast('Authentication Required: Please log in to view your orders', 'danger');
+      this.router.navigate(['/profile']);
+      return;
+    }
+
+    // Load orders when entering the view
     this.loadOrders();
   }
 

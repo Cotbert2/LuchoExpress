@@ -69,6 +69,18 @@ services:
       - lucho-express-network
     restart: always
 
+  # RabbitMQ para mensajería
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - lucho-express-network
+    restart: always
+
 networks:
   lucho-express-network:
     driver: bridge

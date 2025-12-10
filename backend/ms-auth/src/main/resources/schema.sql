@@ -16,7 +16,7 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    role VARCHAR(10) NOT NULL CHECK (role IN ('ROOT', 'ADMIN', 'USER')),
+    role VARCHAR(10) NOT NULL CHECK (role IN ('ROOT', 'ADMIN', 'USER', 'PS')),
     enabled BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -30,5 +30,10 @@ CREATE INDEX idx_users_enabled ON users(enabled);
 -- Insertar usuario ROOT inicial
 INSERT INTO users (username, password_hash, email, role, enabled) 
 VALUES ('root', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'root@luchoexpress.com', 'ROOT', true);
+-- Password: password (solo para desarrollo)
+
+-- Insertar usuario Personal Shopper para desarrollo
+INSERT INTO users (username, password_hash, email, role, enabled) 
+VALUES ('personalshopper', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'ps@luchoexpress.com', 'PS', true);
 -- Password: password (solo para desarrollo)
 */

@@ -83,22 +83,20 @@ export class CheckoutComponent implements OnInit, OnDestroy, ViewWillEnter {
   }
 
   ngOnInit(): void {
-    // Check if user is authenticated
-    if (!this.authService.isLoggedIn()) {
-      this.showToast('Authentication Required: Please log in to access your cart', 'danger' );
-
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 2000);
-      return;
-    }
-
-    this.loadUserAndCart();
+    // Initial setup
   }
 
   ionViewWillEnter(): void {
+    // Check if user is authenticated when view is about to enter
+    if (!this.authService.isLoggedIn()) {
+      this.showToast('Authentication Required: Please log in to access your cart', 'success');
+      this.router.navigate(['/profile']);
+      return;
+    }
+    
     // Reload cart data every time the view is entered
     this.loadCart();
+    this.loadUserAndCart();
   }
 
   ngOnDestroy(): void {

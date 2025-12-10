@@ -66,21 +66,23 @@ public class User {
     
     public boolean canCreateRole(RoleEnum targetRole) {
         return switch (this.role) {
-            case ROOT -> targetRole == RoleEnum.ROOT || targetRole == RoleEnum.ADMIN || targetRole == RoleEnum.USER;
-            case ADMIN -> targetRole == RoleEnum.ADMIN || targetRole == RoleEnum.USER;
+            case ROOT -> targetRole == RoleEnum.ROOT || targetRole == RoleEnum.ADMIN || targetRole == RoleEnum.USER || targetRole == RoleEnum.PS;
+            case ADMIN -> targetRole == RoleEnum.ADMIN || targetRole == RoleEnum.USER || targetRole == RoleEnum.PS;
             case USER -> false;
+            case PS -> false;
         };
     }
     
     public boolean canDisableUser(User targetUser) {
-        if (this.id.equals(targetUser.getId()) && this.role == RoleEnum.USER) {
-            return true; // User can disable their own account
+        if (this.id.equals(targetUser.getId()) && (this.role == RoleEnum.USER || this.role == RoleEnum.PS)) {
+            return true; // User and PS can disable their own account
         }
         
         return switch (this.role) {
             case ROOT -> !targetUser.getId().equals(this.id); // ROOT can disable anyone except themselves
-            case ADMIN -> targetUser.getRole() == RoleEnum.USER || targetUser.getRole() == RoleEnum.ADMIN;
+            case ADMIN -> targetUser.getRole() == RoleEnum.USER || targetUser.getRole() == RoleEnum.ADMIN || targetUser.getRole() == RoleEnum.PS;
             case USER -> targetUser.getId().equals(this.id); // Only themselves
+            case PS -> targetUser.getId().equals(this.id); // Only themselves
         };
     }
     
@@ -91,8 +93,9 @@ public class User {
         
         return switch (this.role) {
             case ROOT -> true;
-            case ADMIN -> targetUser.getRole() == RoleEnum.USER || targetUser.getRole() == RoleEnum.ADMIN;
+            case ADMIN -> targetUser.getRole() == RoleEnum.USER || targetUser.getRole() == RoleEnum.ADMIN || targetUser.getRole() == RoleEnum.PS;
             case USER -> false;
+            case PS -> false;
         };
     }
     
@@ -103,8 +106,9 @@ public class User {
         
         return switch (this.role) {
             case ROOT -> true;
-            case ADMIN -> targetUser.getRole() == RoleEnum.USER || targetUser.getRole() == RoleEnum.ADMIN;
+            case ADMIN -> targetUser.getRole() == RoleEnum.USER || targetUser.getRole() == RoleEnum.ADMIN || targetUser.getRole() == RoleEnum.PS;
             case USER -> false;
+            case PS -> false;
         };
     }
 }

@@ -25,7 +25,6 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { DataViewModule } from 'primeng/dataview';
 import { RadioButtonModule } from 'primeng/radiobutton';
-import { IonicModule, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-checkout',
@@ -70,13 +69,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   constructor(
     private cartService: CartService,
     private authService: AuthService,
-    private toastController: ToastController,
-
     private customerService: CustomerService,
     private orderService: OrderService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) {
     this.initializeForms();
   }
@@ -84,7 +82,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Check if user is authenticated
     if (!this.authService.isLoggedIn()) {
-      this.showToast('Authentication Required: Please log in to access your cart', 'danger' );
+      this.showToast('Authentication Required: Please log in to access your cart', 'success' );
 
       setTimeout(() => {
         this.router.navigate(['/login']);
@@ -261,7 +259,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   updateQuantity(item: CartItem, newQuantity: number): void {
     // Validate new quantity
     if (newQuantity <= 0) {
-      this.showToast('Invalid Quantity: Quantity must be at least 1. Item will be removed if you want quantity 0.', 'warning');
+      this.showToast('Invalid Quantity: Quantity must be at least 1. Item will be removed if you want quantity 0.', 'warn');
       this.confirmRemoveItem(item);
       return;
     }
@@ -269,13 +267,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Check for reasonable maximum quantity (optional business rule)
     const maxQuantity = 99;
     if (newQuantity > maxQuantity) {
-      this.showToast(`Quantity Too High: Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`, 'warning');
+      this.showToast(`Quantity Too High: Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`, 'warn');
       return;
     }
 
     // Validate that quantity is a whole number
     if (newQuantity !== Math.floor(newQuantity)) {
-      this.showToast('Invalid Quantity: Quantity must be a whole number', 'warning');
+      this.showToast('Invalid Quantity: Quantity must be a whole number', 'warn');
       return;
     }
 
@@ -313,7 +311,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   confirmClearCart(): void {
     if (this.cartItems.length === 0) {
-      this.showToast('Cart Empty: Your cart is already empty', 'warning')
+      this.showToast('Cart Empty: Your cart is already empty', 'warn')
       return;
     }
 
@@ -718,7 +716,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
 
     if (this.cartItems.length === 0) {
-      this.showToast('Empty Cart: Your cart is empty. Please add items before proceeding to checkout.', 'warning');
+      this.showToast('Empty Cart: Your cart is empty. Please add items before proceeding to checkout.', 'warn');
       return;
     }
 
@@ -765,7 +763,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       const sectionsList = invalidSections.join(' and ');
       const fieldsList = invalidFields.join(', ');
 
-      this.showToast(`${sectionsList} Incomplete: Please fix the following fields: ${fieldsList}`, 'warning');
+      this.showToast(`${sectionsList} Incomplete: Please fix the following fields: ${fieldsList}`, 'warn');
 
       
       return false;
@@ -937,14 +935,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
 
-  private async showToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {
-    const toast = await this.toastController.create({
-      message,
-      duration: 3000,
-      position: 'top',
-      color
+  private showToast(message: string, severity: 'success' | 'error' | 'warn' | 'info' = 'success') {
+    this.messageService.add({
+      severity,
+      summary: severity.charAt(0).toUpperCase() + severity.slice(1),
+      detail: message,
+      life: 3000
     });
-    await toast.present();
   }
 
 }

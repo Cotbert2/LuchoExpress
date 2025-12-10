@@ -20,6 +20,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         initializeRootUser();
+        initializePersonalShopperUser();
     }
     
     private void initializeRootUser() {
@@ -38,6 +39,25 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Please change this password in production!");
         } else {
             log.info("Root user already exists");
+        }
+    }
+    
+    private void initializePersonalShopperUser() {
+        if (!userRepository.existsByUsername("personalshopper")) {
+            User personalShopperUser = new User(
+                "personalshopper",
+                passwordEncoder.encode("pspassword123"),
+                "ps@luchoexpress.com",
+                RoleEnum.PS
+            );
+            
+            userRepository.save(personalShopperUser);
+            log.info("Personal Shopper user created successfully");
+            log.info("Username: personalshopper");
+            log.info("Password: pspassword123");
+            log.info("Please change this password in production!");
+        } else {
+            log.info("Personal Shopper user already exists");
         }
     }
 }
