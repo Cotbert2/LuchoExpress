@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucho Express</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #4A90E2 0%, #357ABD 50%, #63B3ED 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Geometric background patterns */
+    .background-pattern {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .triangle {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    .triangle-1 {
+      top: 0;
+      left: 0;
+      border-width: 0 0 200px 200px;
+      border-color: transparent transparent rgba(255, 192, 203, 0.3) transparent;
+    }
+
+    .triangle-2 {
+      bottom: 0;
+      right: 0;
+      border-width: 200px 200px 0 0;
+      border-color: rgba(255, 192, 203, 0.3) transparent transparent transparent;
+    }
+
+    .circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 235, 100, 0.6);
+    }
+
+    .circle-1 {
+      width: 150px;
+      height: 150px;
+      top: 50px;
+      right: 100px;
+    }
+
+    .circle-2 {
+      width: 100px;
+      height: 100px;
+      bottom: 100px;
+      left: 80px;
+    }
+
+    .grid-pattern {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 60%;
+      height: 60%;
+      background-image: 
+        linear-gradient(rgba(200, 200, 255, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200, 200, 255, 0.3) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    .wave {
+      position: absolute;
+      width: 120px;
+      height: 40px;
+      stroke: #4A90E2;
+      stroke-width: 4;
+      fill: none;
+    }
+
+    .wave-1 {
+      bottom: 120px;
+      left: 30px;
+    }
+
+    .wave-2 {
+      top: 150px;
+      left: 40px;
+    }
+
+    /* Main container */
+    .splash-container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Shopper illustration */
+    .shopper-container {
+      width: 280px;
+      height: 280px;
+      margin: 0 auto 30px;
+      position: relative;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .shopper-card {
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .character {
+      width: 140px;
+      height: 140px;
+      background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+      border-radius: 50%;
+      position: relative;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+    }
+
+    .bags-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .bag {
+      width: 40px;
+      height: 50px;
+      border-radius: 5px;
+      position: relative;
+      animation: swing 2s ease-in-out infinite;
+    }
+
+    .bag-1 { 
+      background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+      animation-delay: 0s;
+    }
+    .bag-2 { 
+      background: linear-gradient(135deg, #FF6B9D 0%, #E91E63 100%);
+      animation-delay: 0.2s;
+    }
+    .bag-3 { 
+      background: linear-gradient(135deg, #4DB6AC 0%, #26A69A 100%);
+      animation-delay: 0.4s;
+    }
+
+    @keyframes swing {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    .bag::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      border: 2px solid rgba(0, 0, 0, 0.3);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+    }
+
+    /* Brand section */
+    .brand-container {
+      margin-bottom: 30px;
+    }
+
+    .brand-name {
+      display: inline-block;
+      background: linear-gradient(135deg, #4DB6AC 0%, #26A69A 100%);
+      color: white;
+      font-size: 36px;
+      font-weight: bold;
+      padding: 10px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(77, 182, 172, 0.4);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .brand-tagline {
+      font-size: 24px;
+      font-weight: 600;
+      color: #7B1FA2;
+      font-style: italic;
+      margin-top: 5px;
+    }
+
+    /* CTA Button */
+    .cta-button {
+      background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 50px;
+      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Loading animation */
+    .loading-container {
+      margin-top: 30px;
+    }
+
+    .loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4DB6AC;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+
+    .dot:nth-child(1) { animation-delay: 0s; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-15px); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .shopper-container {
+        width: 240px;
+        height: 240px;
+      }
+
+      .brand-name {
+        font-size: 28px;
+        padding: 8px 20px;
+      }
+
+      .brand-tagline {
+        font-size: 20px;
+      }
+
+      .cta-button {
+        font-size: 16px;
+        padding: 12px 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background patterns -->
+  <div class="background-pattern">
+    <div class="triangle triangle-1"></div>
+    <div class="triangle triangle-2"></div>
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="grid-pattern"></div>
+    
+    <svg class="wave wave-1" viewBox="0 0 120 40">
+      <path d="M 0 20 Q 15 10, 30 20 T 60 20 T 90 20 T 120 20" />
+    </svg>
+    
+    <svg class="wave wave-2" viewBox="0 0 120 40">
+      <path d="M 0 20 Q 15 10, 30 20 T 60 20 T 90 20 T 120 20" />
+    </svg>
+  </div>
+
+  <!-- Main content -->
+  <div class="splash-container">
+    <div class="shopper-container">
+      <div class="shopper-card">
+        <div class="character">🛍️</div>
+        <div class="bags-container">
+          <div class="bag bag-1"></div>
+          <div class="bag bag-2"></div>
+          <div class="bag bag-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-container">
+      <div class="brand-name">LUCHO EXPRESS</div>
+      <div class="brand-tagline">Personal Shopper</div>
+    </div>
+
+    <button class="cta-button">START SHOPPING NOW!</button>
+
+    <div class="loading-container">
+      <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -32,31 +32,30 @@
       speed="800"
     >
       <swiper-slide *ngFor="let product of productsInfo">
-        <div class="relative p-4 mb-4 transition-transform bg-white border shadow-md rounded-xl dark:bg-gray-900 hover:shadow-lg product-card">
+        <div class="relative p-4 mb-4 h-80 flex flex-col transition-transform bg-white border shadow-md rounded-xl dark:bg-gray-900 hover:shadow-lg product-card">
           <!-- Badge Hot en la esquina superior izquierda -->
           <div class="absolute left-2 top-2 z-10 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded dark:bg-surface-900">
             hot
           </div>
 
           <!-- Imagen del producto -->
-          <div class="mb-4">
+          <div class="mb-4 flex-shrink-0">
             <div class="flex items-center justify-center w-full h-48 overflow-hidden bg-gray-100 rounded-lg dark:bg-gray-800">
               <ion-img
                 [src]="product.imageUrl"
                 [alt]="product.name"
-                class="w-full h-full"
-                style="object-fit: contain; max-width: 70%; max-height: 70%;"
+                class="w-full h-full object-cover"
               ></ion-img>
             </div>
           </div>
 
           <!-- Nombre del producto -->
-          <div class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-            {{ product.name }}
+          <div class="mb-2 text-lg font-medium text-gray-900 dark:text-white flex-grow overflow-hidden">
+            <div class="line-clamp-2">{{ product.name }}</div>
           </div>
 
           <!-- Precio y botón -->
-          <div class="flex items-center justify-between mt-3">
+          <div class="flex items-center justify-between mt-auto">
             <div class="text-xl font-semibold text-gray-900 dark:text-white">
               ${{ product.price }}
             </div>
