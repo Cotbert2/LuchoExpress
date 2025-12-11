@@ -94,7 +94,14 @@ export class ChatPage implements OnInit, OnDestroy {
       this.authService.currentUser$.subscribe(user => {
         if (user) {
           this.currentUserId = user.id;
-          this.loadPersonalShopperInfo();
+          
+          // Check if user is a personal shopper
+          if (this.authService.isPersonalShopper()) {
+            this.loadPersonalShopperInfo();
+          } else {
+            // For customers, connect directly to socket
+            this.connectToSocket();
+          }
         }
       });
 
@@ -149,10 +156,12 @@ export class ChatPage implements OnInit, OnDestroy {
 
     this.socket.on('connect', () => {
       console.log('Connected to chat server');
-      if (this.socket && this.personalShopperId) {
+      if (this.socket) {
+        // Register user (personal shopper or customer)
+        const isPS = this.authService.isPersonalShopper();
         this.socket.emit('register', { 
-          userId: this.personalShopperId, 
-          role: 'personal-shopper' 
+          userId: isPS ? this.personalShopperId : this.currentUserId, 
+          role: isPS ? 'personal-shopper' : 'customer'
         });
         this.socket.emit('joinOrder', { orderId: this.orderId });
       }
@@ -171,7 +180,17 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   sendMessage() {
-    if (!this.newMessage.trim() || !this.order || !this.personalShopperId) {
+    if (!this.newMessage.trim() || !this.order) {
+      return;
+    }
+
+    const isPS = this.authService.isPersonalShopper();
+    
+    // For customers, get personalShopperId from order
+    const psId = isPS ? this.personalShopperId : this.order.personalShopperId;
+    
+    if (!psId) {
+      console.error('No personal shopper assigned to this order');
       return;
     }
 
@@ -179,11 +198,11 @@ export class ChatPage implements OnInit, OnDestroy {
     const messageDto: CreateMessageDto = {
       orderId: this.orderId,
       customerId: this.order.customerId,
-      personalShopperId: this.personalShopperId,
+      personalShopperId: psId,
       content: this.newMessage.trim(),
       type: MessageType.TEXT,
-      senderType: 'personal-shopper',
-      senderId: this.personalShopperId,
+      senderType: isPS ? 'personal-shopper' : 'customer',
+      senderId: isPS ? this.personalShopperId : this.currentUserId,
       senderName: this.getUserName()
     };
 
@@ -217,7 +236,8 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   isMyMessage(message: Message): boolean {
-    return message.senderId === this.personalShopperId;
+    const isPS = this.authService.isPersonalShopper();
+    return message.senderId === (isPS ? this.personalShopperId : this.currentUserId);
   }
 
   formatTime(dateString: string): string {
