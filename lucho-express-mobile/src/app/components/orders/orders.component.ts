@@ -15,7 +15,8 @@ import {
   cubeOutline,
   checkmarkCircle,
   timeOutline,
-  closeCircle
+  closeCircle,
+  chatbubbleOutline
 } from 'ionicons/icons';
 import { OrderService, OrderResponse } from '../../services/order.service';
 import { TrackingService } from '../../services/tracking.service';
@@ -76,7 +77,8 @@ export class OrdersComponent implements OnInit, ViewWillEnter {
       cubeOutline,
       checkmarkCircle,
       timeOutline,
-      closeCircle
+      closeCircle,
+      chatbubbleOutline
     });
   }
 
@@ -402,5 +404,18 @@ export class OrdersComponent implements OnInit, ViewWillEnter {
       default:
         return status;
     }
+  }
+
+  openChatWithPersonalShopper(order: OrderResponse) {
+    if (order.personalShopperId) {
+      // Navigate to chat with personal shopper
+      this.router.navigate(['/chat', order.id]);
+    } else {
+      this.showToast('No personal shopper assigned to this order yet', 'warning');
+    }
+  }
+
+  hasPersonalShopper(order: OrderResponse): boolean {
+    return !!order.personalShopperId;
   }
 }

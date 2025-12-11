@@ -31,6 +31,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/product/product.component').then((m) => m.ProductComponent),
   },
   {
+    path: 'chat/:orderId',
+    loadComponent: () => import('./personal-shopper/chat/chat.page').then((m) => m.ChatPage),
+  },
+  {
     path: 'personal-shopper',
     canActivate: [() => import('./guards/personal-shopper.guard').then(m => m.personalShopperGuard)],
     children: [

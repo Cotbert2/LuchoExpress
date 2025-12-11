@@ -14,16 +14,10 @@ async function bootstrap() {
     }),
   );
 
-  // Enable CORS for frontend
-  app.enableCors({
-    origin: [
-      'http://localhost:4200',
-      'http://localhost:8100',
-      'http://127.0.0.1:4200',
-      'http://127.0.0.1:8100',
-    ],
-    credentials: true,
-  });
+  // CORS is handled by:
+  // - API Gateway for HTTP requests
+  // - Socket.io Gateway for WebSocket connections
+  // Do not enable CORS globally here to avoid duplicate headers
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

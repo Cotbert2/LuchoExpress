@@ -139,8 +139,8 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   connectToSocket() {
-    const chatUrl = environment.apiUrl.replace('/api', '');
-    this.socket = io(chatUrl, {
+    // Connect directly to ms-chat for WebSocket (bypass API Gateway)
+    this.socket = io(environment.chatSocketUrl || 'http://localhost:3000', {
       transports: ['websocket'],
       auth: {
         token: this.authService.getToken()

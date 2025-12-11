@@ -28,6 +28,7 @@ export interface OrderResponse {
   id: string;
   orderNumber: string;
   customerId: string;
+  personalShopperId?: string;
   products: OrderProductResponse[];
   deliveryAddress: string;
   status: string;

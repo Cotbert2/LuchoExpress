@@ -5,5 +5,6 @@ export const environment = {
   productsUrl: 'http://localhost:8080/api',
   customersUrl: 'http://localhost:8080',
   ordersUrl: 'http://localhost:8080/api',
-  trackingApiUrl: 'http://localhost:8080'
+  trackingApiUrl: 'http://localhost:8080',
+  chatSocketUrl: 'http://localhost:3000'  // Direct connection to ms-chat for WebSocket
 };

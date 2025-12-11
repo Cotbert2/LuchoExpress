@@ -142,6 +142,18 @@
 
               <!-- Actions -->
               <div class="flex gap-2 mt-3">
+                <!-- Chat button (if personal shopper assigned) -->
+                @if (hasPersonalShopper(order)) {
+                  <ion-button
+                    size="small"
+                    fill="solid"
+                    color="success"
+                    (click)="openChatWithPersonalShopper(order)">
+                    <ion-icon slot="start" name="chatbubble-outline"></ion-icon>
+                    Chat
+                  </ion-button>
+                }
+
                 <!-- Tracking button -->
                 <ion-button
                   size="small"

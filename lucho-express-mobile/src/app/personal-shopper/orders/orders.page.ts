@@ -119,7 +119,8 @@ export class OrdersPage implements OnInit {
   }
 
   viewOrderDetail(orderId: string) {
-    this.router.navigate(['/personal-shopper/order', orderId]);
+    // Navigate to chat page to communicate with customer
+    this.router.navigate(['/personal-shopper/chat', orderId]);
   }
 
   getStatusColor(status: OrderStatus): string {
