@@ -24,9 +24,6 @@ import { MessageController } from './presentation/controllers/message.controller
 // Gateways
 import { ChatGateway } from './presentation/gateways/chat.gateway';
 
-// Seeders
-import { PersonalShopperSeeder } from './infrastructure/seeders/personal-shopper.seeder';
-
 @Module({
   imports: [
     TypeOrmModule.forRoot(databaseConfig),
@@ -51,8 +48,6 @@ import { PersonalShopperSeeder } from './infrastructure/seeders/personal-shopper
     RabbitMQService,
     // Gateways
     ChatGateway,
-    // Seeders
-    PersonalShopperSeeder,
   ],
 })
 export class AppModule {}

@@ -1,10 +1,10 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-production-api.com',
-  authUrl: 'https://your-production-api.com/auth',
-  productsUrl: 'https://your-production-api.com:8085/api',
-  customersUrl: 'https://your-production-api.com:8082',
-  ordersUrl: 'https://your-production-api.com:8084/api',
-  trackingApiUrl: 'https://your-production-api.com:8086',
-  chatSocketUrl: 'https://your-production-chat.com:3000'  // Direct connection to ms-chat for WebSocket
+  apiUrl: 'https://10.9.7.221.com',
+  authUrl: 'https://10.9.7.221.com/auth',
+  productsUrl: 'https://10.9.7.221.com:8085/api',
+  customersUrl: 'https://10.9.7.221.com:8082',
+  ordersUrl: 'https://10.9.7.221.com:8084/api',
+  trackingApiUrl: 'https://10.9.7.221.com:8086',
+  chatSocketUrl: 'https://10.9.7.221:3000'  // Direct connection to ms-chat for WebSocket
 };
