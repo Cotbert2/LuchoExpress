@@ -111,7 +111,7 @@ export class OrdersPage implements OnInit {
       },
       error: (err) => {
         console.error('Error loading orders:', err);
-        this.error = 'No se pudieron cargar las órdenes';
+        this.error = 'Could not load orders';
         this.loading = false;
         if (event) event.target.complete();
       }
@@ -136,11 +136,11 @@ export class OrdersPage implements OnInit {
 
   getStatusLabel(status: OrderStatus): string {
     const labels: Record<OrderStatus, string> = {
-      [OrderStatus.PENDING]: 'Pendiente',
-      [OrderStatus.CONFIRMED]: 'Confirmado',
-      [OrderStatus.SHIPPED]: 'Enviado',
-      [OrderStatus.DELIVERED]: 'Entregado',
-      [OrderStatus.CANCELLED]: 'Cancelado'
+      [OrderStatus.PENDING]: 'Pending',
+      [OrderStatus.CONFIRMED]: 'Confirmed',
+      [OrderStatus.SHIPPED]: 'Shipped',
+      [OrderStatus.DELIVERED]: 'Delivered',
+      [OrderStatus.CANCELLED]: 'Cancelled'
     };
     return labels[status] || status;
   }

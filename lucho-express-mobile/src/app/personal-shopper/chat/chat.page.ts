@@ -61,6 +61,7 @@ export class ChatPage implements OnInit, OnDestroy {
   newMessage: string = '';
   loading = true;
   sending = false;
+  backUrl: string = '/';
   
   private socket: Socket | null = null;
   private currentUserId: string = '';
@@ -97,9 +98,11 @@ export class ChatPage implements OnInit, OnDestroy {
           
           // Check if user is a personal shopper
           if (this.authService.isPersonalShopper()) {
+            this.backUrl = '/personal-shopper/order/' + this.orderId;
             this.loadPersonalShopperInfo();
           } else {
-            // For customers, connect directly to socket
+            // For customers, set back URL to orders list
+            this.backUrl = '/orders';
             this.connectToSocket();
           }
         }
@@ -229,7 +232,7 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   scrollToBottom() {
-    if (this.chatContent) {
+    if (this.chatContent && this.chatContent.nativeElement) {
       const element = this.chatContent.nativeElement;
       element.scrollTop = element.scrollHeight;
     }
@@ -242,7 +245,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
   formatTime(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('es-ES', {
+    return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -254,10 +257,10 @@ export class ChatPage implements OnInit, OnDestroy {
     const isToday = date.toDateString() === today.toDateString();
     
     if (isToday) {
-      return 'Hoy';
+      return 'Today';
     }
     
-    return date.toLocaleDateString('es-ES', {
+    return date.toLocaleDateString('en-US', {
       day: '2-digit',
       month: 'short'
     });

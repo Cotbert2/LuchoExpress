@@ -1,10 +1,10 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="'/personal-shopper/order/' + orderId"></ion-back-button>
+      <ion-back-button [defaultHref]="backUrl"></ion-back-button>
     </ion-buttons>
     <ion-title *ngIf="order">
-      Chat - Orden #{{ order.orderNumber }}
+      Chat - Order #{{ order.orderNumber }}
     </ion-title>
     <ion-title *ngIf="!order">Chat</ion-title>
   </ion-toolbar>
@@ -39,8 +39,8 @@
 
     <!-- Empty State -->
     <div *ngIf="messages.length === 0" class="text-center py-12 text-gray-500">
-      <p>No hay mensajes aún</p>
-      <p class="text-sm">Inicia la conversación con el cliente</p>
+      <p>No messages yet</p>
+      <p class="text-sm">Start the conversation with the customer</p>
     </div>
   </div>
 </ion-content>
@@ -50,7 +50,7 @@
     <div class="flex items-end gap-2">
       <ion-textarea
         [(ngModel)]="newMessage"
-        placeholder="Escribe un mensaje..."
+        placeholder="Type a message..."
         [autoGrow]="true"
         [rows]="1"
         [maxlength]="500"

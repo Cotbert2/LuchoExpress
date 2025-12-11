@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Mis Órdenes Asignadas</ion-title>
+    <ion-title>My Assigned Orders</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -19,15 +19,15 @@
     <p class="text-red-500 mb-4">{{ error }}</p>
     <ion-button (click)="loadOrders()" color="primary">
       <ion-icon slot="start" name="refresh-outline"></ion-icon>
-      Reintentar
+      Retry
     </ion-button>
   </div>
 
   <!-- Empty State -->
   <div *ngIf="!loading && !error && orders.length === 0" class="text-center py-12">
     <ion-icon name="cart-outline" class="text-6xl text-gray-400 mb-4"></ion-icon>
-    <h2 class="text-xl font-semibold text-gray-600 mb-2">No tienes órdenes asignadas</h2>
-    <p class="text-gray-500">Las nuevas órdenes aparecerán aquí automáticamente</p>
+    <h2 class="text-xl font-semibold text-gray-600 mb-2">You have no assigned orders</h2>
+    <p class="text-gray-500">New orders will appear here automatically</p>
   </div>
 
   <!-- Orders List -->
@@ -41,7 +41,7 @@
         <div class="flex justify-between items-start">
           <div class="flex-1">
             <ion-card-title class="text-lg font-bold">
-              Orden #{{ order.orderNumber }}
+              Order #{{ order.orderNumber }}
             </ion-card-title>
             <p class="text-sm text-gray-500 mt-1">
               {{ formatDate(order.createdAt) }}
@@ -64,7 +64,7 @@
           <!-- Products Count -->
           <div class="flex items-center text-sm">
             <ion-icon name="cart-outline" class="mr-2 text-gray-500"></ion-icon>
-            <span>{{ order.orderProducts.length }} producto(s)</span>
+            <span>{{ order.orderProducts.length }} product(s)</span>
           </div>
 
           <!-- Total Amount -->
@@ -85,7 +85,7 @@
             class="mt-4"
           >
             <ion-icon slot="start" [name]="getStatusIcon(order.status)"></ion-icon>
-            Ver Detalles
+            View Details
           </ion-button>
         </div>
       </ion-card-content>

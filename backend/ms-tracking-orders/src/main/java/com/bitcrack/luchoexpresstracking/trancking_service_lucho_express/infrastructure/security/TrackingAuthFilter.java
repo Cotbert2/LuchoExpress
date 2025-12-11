@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.application.TrackingService;
 import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.domain.TrackingStatus;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.OrderServiceFeignClient;
+import com.bitcrack.luchoexpresstracking.trancking_service_lucho_express.infrastructure.clients.CustomerServiceFeignClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,8 @@ public class TrackingAuthFilter implements Filter {
 
     private final JwtUtil jwtUtil;
     private final TrackingService trackingService;
+    private final OrderServiceFeignClient orderServiceClient;
+    private final CustomerServiceFeignClient customerServiceClient;
     
     @Value("${tracking.post.api-key}")
     private String trackingPostApiKey;
@@ -132,10 +136,35 @@ public class TrackingAuthFilter implements Filter {
         try {
             TrackingStatus trackingStatus = trackingService.getTrackingStatus(orderNumber);
             if (trackingStatus != null) {
-                boolean isOwner = userIdFromToken.equals(trackingStatus.getUserId());
-                log.debug("Ownership check for order {}: user {} owns it: {}", 
-                         orderNumber, userIdFromToken, isOwner);
-                return isOwner;
+                // First check if userId in tracking matches (this would be the user's ID from auth)
+                boolean isOwnerByUserId = userIdFromToken.equals(trackingStatus.getUserId());
+                
+                if (isOwnerByUserId) {
+                    log.debug("Ownership check for order {}: user {} owns it by userId", 
+                             orderNumber, userIdFromToken);
+                    return true;
+                }
+                
+                // If userId doesn't match, get the order and check the customer's userId
+                try {
+                    OrderServiceFeignClient.OrderDto orderDto = orderServiceClient.getOrderByOrderNumber(orderNumber);
+                    if (orderDto != null && orderDto.customerId() != null) {
+                        // Get the customer to find their userId
+                        CustomerServiceFeignClient.CustomerDto customerDto = customerServiceClient.getCustomerById(orderDto.customerId());
+                        if (customerDto != null && customerDto.userId() != null) {
+                            boolean isOwnerByCustomerUserId = userIdFromToken.equals(customerDto.userId());
+                            log.debug("Ownership check for order {}: user {} owns it by customer userId: {}", 
+                                     orderNumber, userIdFromToken, isOwnerByCustomerUserId);
+                            return isOwnerByCustomerUserId;
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Error fetching order/customer for ownership check: {}", orderNumber, e);
+                }
+                
+                log.debug("Ownership check for order {}: user {} does not own it", 
+                         orderNumber, userIdFromToken);
+                return false;
             }
             log.warn("Tracking status not found for order: {}", orderNumber);
             return false;
