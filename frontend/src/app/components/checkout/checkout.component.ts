@@ -82,8 +82,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Check if user is authenticated
     if (!this.authService.isLoggedIn()) {
-      this.showToast('Authentication Required: Please log in to access your cart', 'success' );
-
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Authentication Required',
+        detail: 'Please log in to access your cart',
+        life: 4000
+      });
+      
       setTimeout(() => {
         this.router.navigate(['/login']);
       }, 2000);
@@ -183,8 +188,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error fetching user:', error);
-            this.showToast('Could not load user information', 'danger');
-
+            this.messageService.add({
+              severity: 'error',
+              summary: 'User Error',
+              detail: 'Could not load user information',
+              life: 3000
+            });
           }
         });
       }
@@ -259,7 +268,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   updateQuantity(item: CartItem, newQuantity: number): void {
     // Validate new quantity
     if (newQuantity <= 0) {
-      this.showToast('Invalid Quantity: Quantity must be at least 1. Item will be removed if you want quantity 0.', 'warn');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid Quantity',
+        detail: 'Quantity must be at least 1. Item will be removed if you want quantity 0.',
+        life: 4000
+      });
       this.confirmRemoveItem(item);
       return;
     }
@@ -267,22 +281,42 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Check for reasonable maximum quantity (optional business rule)
     const maxQuantity = 99;
     if (newQuantity > maxQuantity) {
-      this.showToast(`Quantity Too High: Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`, 'warn');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Quantity Too High',
+        detail: `Maximum quantity per item is ${maxQuantity}. Please contact us for bulk orders.`,
+        life: 4000
+      });
       return;
     }
 
     // Validate that quantity is a whole number
     if (newQuantity !== Math.floor(newQuantity)) {
-      this.showToast('Invalid Quantity: Quantity must be a whole number', 'warn');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid Quantity',
+        detail: 'Quantity must be a whole number.',
+        life: 3000
+      });
       return;
     }
 
     try {
       this.cartService.updateItemQuantity(item.id, newQuantity);
-      this.showToast(`Quantity Updated: ${item.name} quantity updated to ${newQuantity}`, 'success');
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Quantity Updated',
+        detail: `${item.name} quantity updated to ${newQuantity}`,
+        life: 2000
+      });
     } catch (error) {
       console.error('Error updating quantity:', error);
-      this.showToast('Update Failed: Failed to update item quantity. Please try again.', 'danger' );
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Update Failed',
+        detail: 'Failed to update item quantity. Please try again.',
+        life: 3000
+      });
     }
   }
 
@@ -298,7 +332,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       rejectButtonStyleClass: 'p-button-secondary p-button-sm',
       accept: () => {
         this.cartService.removeFromCart(item.id);
-        this.showToast(`Item Removed: ${item.name} has been removed from your cart`);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Item Removed',
+          detail: `${item.name} has been removed from your cart`,
+          life: 3000
+        });
       },
       reject: () => {
         // User cancelled, no action needed
@@ -311,7 +350,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   confirmClearCart(): void {
     if (this.cartItems.length === 0) {
-      this.showToast('Cart Empty: Your cart is already empty', 'warn')
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Cart Empty',
+        detail: 'Your cart is already empty',
+        life: 2000
+      });
       return;
     }
 
@@ -323,7 +367,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       rejectButtonStyleClass: 'p-button-secondary',
       accept: () => {
         this.cartService.clearCart();
-        this.showToast('Cart Cleared: All items have been removed from your cart');
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Cart Cleared',
+          detail: 'All items have been removed from your cart',
+          life: 3000
+        });
       }
     });
   }
@@ -335,7 +384,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     const cartValidation = this.validateCartItems();
     
     if (!cartValidation.isValid) {
-      this.showToast(`Cart issues Found ${cartValidation.message}`);
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cart Issues Found',
+        detail: cartValidation.message,
+        life: 4000
+      });
       return;
     }
 
@@ -345,7 +399,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     // Show message if customer data was preloaded
     if (this.existingCustomer) {
-      this.showToast('Customer Information Loaded: Your saved customer information has been preloaded. You can modify it if needed.');
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Customer Information Loaded',
+        detail: 'Your saved customer information has been preloaded. You can modify it if needed.',
+        life: 5000
+      });
     }
   }
 
@@ -465,9 +524,19 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     if (invalidFields.length > 0) {
       const fieldsList = invalidFields.join(', ');
-      this.showToast(`Incomplete ${stepName}: Please fix the following fields: ${fieldsList}`)
+      this.messageService.add({
+        severity: 'warn',
+        summary: `Incomplete ${stepName}`,
+        detail: `Please fix the following fields: ${fieldsList}`,
+        life: 5000
+      });
     } else {
-      this.showToast(`Form Invalid: Please complete all required ${stepName} fields`)
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Form Invalid',
+        detail: `Please complete all required ${stepName} fields`,
+        life: 3000
+      });
     }
   }
 
@@ -485,8 +554,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private createOrUpdateCustomer(): void {
     if (!this.currentUser) {
-      this.showToast('User Error: User information is not availables', 'danger')
-  
+      this.messageService.add({
+        severity: 'error',
+        summary: 'User Error',
+        detail: 'User information is not available',
+        life: 3000
+      });
       return;
     }
 
@@ -521,16 +594,25 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.existingCustomer = customer;
         this.activeStepIndex++;
-
-        this.showToast('Customer Created: Your customer information has been saved successfully.');
-
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Customer Created',
+          detail: 'Your customer information has been saved successfully.',
+          life: 3000
+        });
         
         console.log('Customer created successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error creating customer:', error);
-        this.showToast(`Curstomer Creation Failed: There was an error saving your customer information. Please try again`);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Customer Creation Failed',
+          detail: error.message || 'There was an error saving your customer information. Please try again.',
+          life: 5000
+        });
       }
     });
   }
@@ -555,15 +637,24 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.existingCustomer = customer;
         this.activeStepIndex++;
         
-
-        this.showToast('Customer Updated:Your customer information has been updated successfully.')
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Customer Updated',
+          detail: 'Your customer information has been updated successfully.',
+          life: 3000
+        });
         
         console.log('Customer updated successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error updating customer:', error);
-        this.showToast('Customer Update Failed: There was an error updating your customer information. Please try again.', 'danger')
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Customer Update Failed',
+          detail: error.message || 'There was an error updating your customer information. Please try again.',
+          life: 5000
+        });
       }
     });
   }
@@ -573,7 +664,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private updateCustomerAddress(): void {
     if (!this.existingCustomer) {
-      this.showToast('Customer Error: Customer information is not available. Please go back to the personal information step.', 'danger');
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Customer Error',
+        detail: 'Customer information is not available. Please go back to the personal information step.',
+        life: 3000
+      });
       return;
     }
 
@@ -591,14 +687,25 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.existingCustomer = customer;
         this.activeStepIndex++;
-
-        this.showToast('Address Updated: Your shipping address has been saved successfully.');
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Address Updated',
+          detail: 'Your shipping address has been saved successfully.',
+          life: 3000
+        });
+        
         console.log('Customer address updated successfully:', customer);
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error updating customer address:', error);
-        this.showToast('Address Update Failes: There was an error saving your shipping address. Please try again.');
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Address Update Failed',
+          detail: error.message || 'There was an error saving your shipping address. Please try again.',
+          life: 5000
+        });
       }
     });
   }
@@ -705,18 +812,33 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
 
     if (!this.currentUser) {
-      this.showToast('Authentication Error: Your session has expired. Please log in again.', 'danger')
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Authentication Error',
+        detail: 'Your session has expired. Please log in again.',
+        life: 4000
+      });
       this.router.navigate(['/login']);
       return;
     }
 
     if (!this.existingCustomer) {
-      this.showToast('Customer Profile Error: Customer profile could not be created. Please try again.', 'danger')
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Customer Profile Error',
+        detail: 'Customer profile could not be created. Please try again.',
+        life: 4000
+      });
       return;
     }
 
     if (this.cartItems.length === 0) {
-      this.showToast('Empty Cart: Your cart is empty. Please add items before proceeding to checkout.', 'warn');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Empty Cart',
+        detail: 'Your cart is empty. Please add items before proceeding to checkout.',
+        life: 4000
+      });
       return;
     }
 
@@ -762,9 +884,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       
       const sectionsList = invalidSections.join(' and ');
       const fieldsList = invalidFields.join(', ');
-
-      this.showToast(`${sectionsList} Incomplete: Please fix the following fields: ${fieldsList}`, 'warn');
-
+      
+      this.messageService.add({
+        severity: 'warn',
+        summary: `${sectionsList} Incomplete`,
+        detail: `Please fix the following fields: ${fieldsList}`,
+        life: 6000
+      });
       
       return false;
     }
@@ -777,7 +903,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    */
   private completeOrderProcess(customer: CustomerResponse): void {
     if (this.cartItems.length === 0) {
-      this.showToast('Empty Car: Cannot create order with empty cart')
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Empty Cart',
+        detail: 'Cannot create order with empty cart',
+        life: 3000
+      });
       this.isLoading = false;
       return;
     }
@@ -802,15 +933,23 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       next: (order: OrderResponse) => {
         this.isLoading = false;
         console.log('Order created successfully:', order);
-
-        this.showToast(`Order Placed Successfully!: Thank you ${customer.name}! Your order #${order.orderNumber} has been placed and will be shipped to your address.`)
-
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Order Placed Successfully!',
+          detail: `Thank you ${customer.name}! Your order #${order.orderNumber} has been placed and will be shipped to your address.`,
+          life: 8000
+        });
+        
         // Clear cart after successful order
         this.cartService.clearCart();
+        
         // Reset stepper state and forms
         this.resetCheckoutState();
+        
         // Show order confirmation details
         this.showOrderConfirmation(order);
+        
         // Redirect to home after showing confirmation
         setTimeout(() => {
           this.router.navigate(['/home']);
@@ -831,7 +970,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         } else if (error.status === 400) {
           errorMessage = 'Invalid order data. Please check your information.';
         }
-        this.showToast('Order Creation Failed: ' + errorMessage, 'danger');
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Order Creation Failed',
+          detail: errorMessage,
+          life: 6000
+        });
       }
     });
   }
@@ -850,8 +995,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    * Show order confirmation details
    */
   private showOrderConfirmation(order: OrderResponse): void {
-    this.showToast(`Order Number: ${order.orderNumber}\nTotal Amount: ${this.formatCurrency(order.totalAmount)}\nEstimated Delivery: ${order.estimatedDeliveryDate || 'TBD'}`, 'info');
-
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Order Details',
+      detail: `Order Number: ${order.orderNumber}\nTotal Amount: ${this.formatCurrency(order.totalAmount)}\nEstimated Delivery: ${order.estimatedDeliveryDate || 'TBD'}`,
+      life: 10000
+    });
   }
 
   /**
@@ -933,15 +1082,4 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   trackByItemId(index: number, item: CartItem): string {
     return item.id;
   }
-
-
-  private showToast(message: string, severity: 'success' | 'error' | 'warn' | 'info' = 'success') {
-    this.messageService.add({
-      severity,
-      summary: severity.charAt(0).toUpperCase() + severity.slice(1),
-      detail: message,
-      life: 3000
-    });
-  }
-
 }

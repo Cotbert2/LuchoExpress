@@ -23,7 +23,26 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Chat Service (ms-chat) - Microservicio de mensajería y gestión de Personal Shoppers para LuchoExpress.
+
+### Características
+
+- Gestión de Personal Shoppers (CRUD)
+- Sistema de mensajería en tiempo real con WebSockets
+- Asignación automática de Personal Shoppers a órdenes
+- Integración con RabbitMQ para mensajería asíncrona
+
+### Datos de prueba (Seeders)
+
+El servicio incluye datos de prueba que se cargan automáticamente al iniciar:
+
+**Personal Shopper de prueba:**
+- Usuario: `personalshopper` (del seeder de ms-auth)
+- Email: `ps@luchoexpress.com`
+- UserID: `821dfbc5-920a-416b-ae40-ad9689c84f25`
+- Teléfono: `+34600000001`
+
+Los seeders se ejecutan automáticamente al iniciar la aplicación y solo crean los datos si no existen previamente.
 
 ## Project setup
 
