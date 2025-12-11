@@ -133,6 +133,11 @@ public class Order {
         return this.customerId.equals(userId);
     }
     
+    public boolean canBeViewedByPersonalShopper(UUID personalShopperId) {
+        // Personal shopper can only view their assigned orders
+        return this.personalShopperId != null && this.personalShopperId.equals(personalShopperId);
+    }
+    
     @PrePersist
     private void generateOrderNumber() {
         if (this.orderNumber == null) {

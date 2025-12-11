@@ -29,6 +29,17 @@ public class ApiKeyFilter implements Filter {
         String requestURI = httpRequest.getRequestURI();
         String method = httpRequest.getMethod();
         
+        // Check if request has Bearer token (user authentication)
+        String authHeader = httpRequest.getHeader("Authorization");
+        boolean hasBearerToken = authHeader != null && authHeader.startsWith("Bearer ");
+        
+        // Si la petición tiene Bearer token, es de un usuario autenticado, permitir que pase
+        if (hasBearerToken) {
+            log.debug("Request with Bearer token, delegating to JWT authentication: {} {}", method, requestURI);
+            chain.doFilter(request, response);
+            return;
+        }
+        
         // Solo aplicar filtro a endpoints específicos de comunicación entre microservicios
         if (shouldApplyApiKeyFilter(requestURI, method)) {
             

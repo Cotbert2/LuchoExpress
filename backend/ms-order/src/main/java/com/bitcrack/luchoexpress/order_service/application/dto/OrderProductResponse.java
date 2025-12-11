@@ -14,8 +14,8 @@ public class OrderProductResponse {
     
     private UUID id;
     private UUID productId;
-    private int quantity;
     private String productName;
-    private BigDecimal unitPrice;
-    private BigDecimal totalPrice;
+    private int quantity;
+    private BigDecimal price;  // unit price
+    private BigDecimal subtotal;  // totalPrice
 }

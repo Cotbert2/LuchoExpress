@@ -20,6 +20,8 @@ export class PersonalShopperSeeder implements OnModuleInit {
   async seed() {
     try {
       // Personal Shopper from ms-auth seeder
+      // Username: personalshopper
+      // Password: pspassword123
       const psUserId = '821dfbc5-920a-416b-ae40-ad9689c84f25';
 
       // Check if personal shopper already exists

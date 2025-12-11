@@ -26,6 +26,7 @@ public class OrderMapper {
             order.getId(),
             order.getOrderNumber(),
             order.getCustomerId(),
+            order.getPersonalShopperId(),
             order.getProducts().stream()
                     .map(this::toProductResponse)
                     .collect(Collectors.toList()),
@@ -43,8 +44,8 @@ public class OrderMapper {
         return new OrderProductResponse(
             orderProduct.getId(),
             orderProduct.getProductId(),
-            orderProduct.getQuantity(),
             orderProduct.getProductName(),
+            orderProduct.getQuantity(),
             orderProduct.getUnitPrice(),
             orderProduct.getTotalPrice()
         );

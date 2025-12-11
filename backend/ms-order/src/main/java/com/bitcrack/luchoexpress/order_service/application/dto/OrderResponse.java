@@ -19,7 +19,8 @@ public class OrderResponse {
     private UUID id;
     private String orderNumber;
     private UUID customerId;
-    private List<OrderProductResponse> products;
+    private UUID personalShopperId;
+    private List<OrderProductResponse> orderProducts;
     private String deliveryAddress;
     private OrderStatusEnum status;
     private LocalDate orderDate;

@@ -148,17 +148,29 @@ public class OrderService {
         
         // Check access permissions
         String role = extractRoleFromToken(authentication);
+        UUID userId = extractUserIdFromToken(authentication);
         
-        UUID customerId;
+        // Admin/Root can view any order
         if ("ADMIN".equals(role) || "ROOT".equals(role)) {
-            // Admin/Root can view any order, use the order's customerId
-            customerId = order.getCustomerId();
-        } else {
-            // For regular users, get their customerId from the customer service
-            UUID userId = extractUserIdFromToken(authentication);
-            CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerByUserId(userId);
-            customerId = customerInfo.customerId();
+            return orderMapper.toResponse(order);
         }
+        
+        // Personal Shopper can view their assigned orders
+        if ("PS".equals(role)) {
+            try {
+                ChatServiceFeignClient.PersonalShopperDto personalShopper = chatServiceClient.getPersonalShopperByUserId(userId);
+                if (order.canBeViewedByPersonalShopper(personalShopper.id())) {
+                    return orderMapper.toResponse(order);
+                }
+            } catch (Exception e) {
+                log.error("Failed to fetch personal shopper for user {}: {}", userId, e.getMessage());
+            }
+            throw new UnauthorizedAccessException("You don't have permission to view this order");
+        }
+        
+        // For regular users, get their customerId from the customer service
+        CustomerServiceClient.CustomerInfo customerInfo = customerServiceClient.getCustomerByUserId(userId);
+        UUID customerId = customerInfo.customerId();
         
         if (!order.canBeViewedBy(role, customerId)) {
             throw new UnauthorizedAccessException("You don't have permission to view this order");
