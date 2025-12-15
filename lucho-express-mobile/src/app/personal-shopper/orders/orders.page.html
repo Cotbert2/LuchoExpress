@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>My Assigned Orders</ion-title>
+    <ion-buttons slot="end">
+      <ion-button> 
+      <ion-icon slot="icon-only" name="refresh-outline" (click)="ngOnInit()"></ion-icon>  
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

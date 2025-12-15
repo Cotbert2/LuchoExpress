@@ -22,7 +22,6 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         initializeRootUser();
-        initializePersonalShopperUser();
     }
     
     private void initializeRootUser() {
@@ -44,39 +43,4 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
     
-    private void initializePersonalShopperUser() {
-        if (!userRepository.existsByUsername("personalshopper")) {
-            User personalShopperUser = new User(
-                "personalshopper",
-                passwordEncoder.encode("pspassword123"),
-                "ps@luchoexpress.com",
-                RoleEnum.PS
-            );
-            
-            User savedUser = userRepository.save(personalShopperUser);
-            log.info("Personal Shopper user created successfully");
-            log.info("Username: personalshopper");
-            log.info("Password: pspassword123");
-            log.info("User ID: {}", savedUser.getId());
-            log.info("Please change this password in production!");
-            
-            // Create personal shopper record in ms-chat
-            try {
-                ChatServiceFeignClient.CreatePersonalShopperDto psDto = 
-                    new ChatServiceFeignClient.CreatePersonalShopperDto(
-                        savedUser.getId(),
-                        "Personal Shopper",
-                        savedUser.getEmail(),
-                        "+1234567890"
-                    );
-                chatServiceFeignClient.createPersonalShopper(psDto);
-                log.info("Personal shopper record created in ms-chat for user: {}", savedUser.getId());
-            } catch (Exception e) {
-                log.error("Failed to create personal shopper record in ms-chat: {}", e.getMessage());
-                log.warn("Personal shopper user exists in ms-auth but not in ms-chat. Please sync manually or restart ms-chat.");
-            }
-        } else {
-            log.info("Personal Shopper user already exists");
-        }
-    }
 }

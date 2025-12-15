@@ -19,8 +19,7 @@ import {
   IonButton,
   IonIcon,
   IonSpinner,
-  IonChip
-} from '@ionic/angular/standalone';
+  IonChip, IonButtons } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   cartOutline, 
@@ -39,7 +38,7 @@ import { Order, OrderStatus } from '../../interfaces/personal-shopper.interface'
   templateUrl: './orders.page.html',
   styleUrls: ['./orders.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonButtons, 
     CommonModule,
     IonHeader,
     IonToolbar,

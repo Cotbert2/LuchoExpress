@@ -72,7 +72,7 @@ services:
   # RabbitMQ para mensajería
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: rabbitmq2
     hostname: rabbitmq
     ports:
       - "5672:5672"
