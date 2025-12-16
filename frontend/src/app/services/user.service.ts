@@ -11,6 +11,14 @@ export interface CreateUserRequest {
   role: string;
 }
 
+export interface RegisterPersonalShopperRequest {
+  username: string;
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+}
+
 export interface UpdateUserRequest {
   // Only password is updatable in backend
   password?: string;
@@ -60,6 +68,10 @@ export class UserService {
     });
   }
 
+  registerPersonalShopper(request: RegisterPersonalShopperRequest): Observable<UserResponse> {
+    return this.http.post<UserResponse>(`${this.API_URL}/register/personal-shopper`, request);
+  }
+
   updateUser(id: string, request: UpdateUserRequest): Observable<UserResponse> {
     return this.http.patch<UserResponse>(`${this.API_URL}/users/${id}`, request, {
       headers: this.authService.getAuthHeaders()
@@ -97,9 +109,9 @@ export class UserService {
 
   getAvailableRoles(currentUserRole: string): string[] {
     if (currentUserRole === 'ROOT') {
-      return ['ROOT', 'ADMIN', 'USER'];
+      return ['ROOT', 'ADMIN', 'USER', 'PS'];
     } else if (currentUserRole === 'ADMIN') {
-      return ['ADMIN', 'USER'];
+      return ['ADMIN', 'USER', 'PS'];
     }
     return ['USER'];
   }

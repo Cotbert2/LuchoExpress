@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/personal-shopper/orders"></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle de Orden</ion-title>
+    <ion-title>Order Details</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -25,14 +25,14 @@
       <ion-card-header>
         <div class="flex justify-between items-center">
           <ion-card-title class="text-2xl font-bold">
-            Orden #{{ order.orderNumber }}
+            Order #{{ order.orderNumber }}
           </ion-card-title>
           <ion-badge [color]="getStatusColor(order.status)" class="text-lg px-4 py-2">
             {{ getStatusLabel(order.status) }}
           </ion-badge>
         </div>
         <p class="text-sm text-gray-500 mt-2">
-          Creada: {{ formatDate(order.createdAt) }}
+          Created at: {{ formatDate(order.createdAt) }}
         </p>
       </ion-card-header>
     </ion-card>
@@ -93,7 +93,7 @@
             <ion-label>
               <h3 class="font-semibold">{{ product.productName }}</h3>
               <p class="text-sm text-gray-600">
-                Cantidad: {{ product.quantity }} x {{ formatCurrency(product.price) }}
+                Quantity: {{ product.quantity }} x {{ formatCurrency(product.price) }}
               </p>
             </ion-label>
             <div slot="end" class="text-right">
@@ -123,7 +123,7 @@
         class="h-14"
       >
         <ion-icon slot="start" name="chatbubble-outline"></ion-icon>
-        Abrir Chat con Cliente
+        Open Chat with Customer
       </ion-button>
 
       <!-- Update Status Button -->
@@ -137,13 +137,13 @@
       >
         <ion-spinner *ngIf="updating" slot="start"></ion-spinner>
         <ion-icon *ngIf="!updating" slot="start" name="checkmark-circle-outline"></ion-icon>
-        {{ updating ? 'Actualizando...' : 'Marcar como ' + getNextStatusLabel() }}
+        {{ updating ? 'Updating...' : 'Mark as ' + getNextStatusLabel() }}
       </ion-button>
 
       <!-- Delivered State -->
       <div *ngIf="order.status === 'DELIVERED'" class="text-center py-4">
         <ion-icon name="checkmark-circle-outline" class="text-6xl text-green-500"></ion-icon>
-        <p class="text-lg font-semibold text-gray-700 mt-2">Orden completada</p>
+        <p class="text-lg font-semibold text-gray-700 mt-2">Order Completed</p>
       </div>
     </div>
   </div>

@@ -15,7 +15,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
-import { UserService, UserResponse, CreateUserRequest, UserFilters } from '../../../services/user.service';
+import { UserService, UserResponse, CreateUserRequest, UserFilters, RegisterPersonalShopperRequest } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
 
 interface RoleOption {
@@ -57,7 +57,8 @@ export class AdminUsersComponent implements OnInit {
     { label: 'All roles', value: '' },
     { label: 'ROOT', value: 'ROOT' },
     { label: 'ADMIN', value: 'ADMIN' },
-    { label: 'USER', value: 'USER' }
+    { label: 'USER', value: 'USER' },
+    { label: 'Personal Shopper', value: 'PS' }
   ];
   emailFilter = '';
   
@@ -70,6 +71,12 @@ export class AdminUsersComponent implements OnInit {
     email: '',
     password: '',
     role: 'USER'
+  };
+  
+  // Personal Shopper additional fields
+  personalShopperForm = {
+    name: '',
+    phone: ''
   };
   
   selectedUser: UserResponse | null = null;
@@ -99,7 +106,8 @@ export class AdminUsersComponent implements OnInit {
         this.availableRoleOptions = [
           { label: 'USER', value: 'USER' },
           { label: 'ADMIN', value: 'ADMIN' },
-          { label: 'ROOT', value: 'ROOT' }
+          { label: 'ROOT', value: 'ROOT' },
+          { label: 'Personal Shopper', value: 'PS' }
         ].filter(option => this.availableRoles.includes(option.value));
       }
     });
@@ -153,6 +161,10 @@ export class AdminUsersComponent implements OnInit {
       password: '',
       role: 'USER'
     };
+    this.personalShopperForm = {
+      name: '',
+      phone: ''
+    };
     this.displayCreateDialog = true;
   }
 
@@ -163,49 +175,79 @@ export class AdminUsersComponent implements OnInit {
 
     console.log('Creating user with data:', this.createUserForm);
 
-    this.userService.createUser(this.createUserForm).subscribe({
-      next: (user) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'User created successfully'
-        });
-        this.displayCreateDialog = false;
-        this.loadUsers();
-      },
-      error: (error) => {
-        console.error('Error creating user:', error);
-        
-        let errorMessage = 'Error creating user';
-        
-        // Handle specific validation errors
-        if (error.error && error.error.fieldErrors) {
-          const fieldErrors = error.error.fieldErrors;
-          const errorMessages = [];
-          
-          for (const field in fieldErrors) {
-            if (fieldErrors[field] && fieldErrors[field].length > 0) {
-              errorMessages.push(fieldErrors[field][0]);
-            }
-          }
-          
-          if (errorMessages.length > 0) {
-            errorMessage = errorMessages.join(', ');
-          }
-        } else if (error.error && error.error.message) {
-          errorMessage = error.error.message;
-        } else if (error.status === 400) {
-          errorMessage = 'Invalid user data';
-        } else if (error.status === 409) {
-          errorMessage = 'User or email already exists';
+    // Si el rol es PS, usar el endpoint de personal shopper
+    if (this.createUserForm.role === 'PS') {
+      const psRequest: RegisterPersonalShopperRequest = {
+        username: this.createUserForm.username,
+        email: this.createUserForm.email,
+        password: this.createUserForm.password,
+        name: this.personalShopperForm.name,
+        phone: this.personalShopperForm.phone
+      };
+
+      this.userService.registerPersonalShopper(psRequest).subscribe({
+        next: (user) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Personal Shopper created successfully'
+          });
+          this.displayCreateDialog = false;
+          this.loadUsers();
+        },
+        error: (error) => {
+          console.error('Error creating personal shopper:', error);
+          this.handleCreateUserError(error);
         }
-        
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage
-        });
+      });
+    } else {
+      this.userService.createUser(this.createUserForm).subscribe({
+        next: (user) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'User created successfully'
+          });
+          this.displayCreateDialog = false;
+          this.loadUsers();
+        },
+        error: (error) => {
+          console.error('Error creating user:', error);
+          this.handleCreateUserError(error);
+        }
+      });
+    }
+  }
+
+  private handleCreateUserError(error: any) {
+    let errorMessage = 'Error creating user';
+    
+    // Handle specific validation errors
+    if (error.error && error.error.fieldErrors) {
+      const fieldErrors = error.error.fieldErrors;
+      const errorMessages = [];
+      
+      for (const field in fieldErrors) {
+        if (fieldErrors[field] && fieldErrors[field].length > 0) {
+          errorMessages.push(fieldErrors[field][0]);
+        }
       }
+      
+      if (errorMessages.length > 0) {
+        errorMessage = errorMessages.join(', ');
+      }
+    } else if (error.error && error.error.message) {
+      errorMessage = error.error.message;
+    } else if (error.status === 400) {
+      errorMessage = 'Invalid user data';
+    } else if (error.status === 409) {
+      errorMessage = 'User or email already exists';
+    }
+    
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: errorMessage
     });
   }
 
@@ -361,6 +403,46 @@ export class AdminUsersComponent implements OnInit {
       return false;
     }
 
+    // Personal Shopper specific validations
+    if (this.createUserForm.role === 'PS') {
+      if (!this.personalShopperForm.name.trim()) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Name is required for Personal Shoppers'
+        });
+        return false;
+      }
+
+      if (this.personalShopperForm.name.trim().length < 2 || this.personalShopperForm.name.trim().length > 100) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Name must be between 2 and 100 characters'
+        });
+        return false;
+      }
+
+      if (!this.personalShopperForm.phone.trim()) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Phone is required for Personal Shoppers'
+        });
+        return false;
+      }
+
+      const phoneRegex = /^[+]?[0-9]{10,15}$/;
+      if (!phoneRegex.test(this.personalShopperForm.phone.trim())) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Please enter a valid phone number (10-15 digits)'
+        });
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -370,6 +452,8 @@ export class AdminUsersComponent implements OnInit {
         return 'danger';
       case 'ADMIN':
         return 'warning';
+      case 'PS':
+        return 'primary';
       case 'USER':
         return 'info';
       default:
@@ -391,5 +475,9 @@ export class AdminUsersComponent implements OnInit {
 
   canDisableUser(user: UserResponse): boolean {
     return user.role !== 'ROOT' && this.currentUser?.id !== user.id;
+  }
+
+  isPersonalShopperRole(): boolean {
+    return this.createUserForm.role === 'PS';
   }
 }

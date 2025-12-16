@@ -160,6 +160,19 @@
   [closable]="true">
   
   <div class="flex flex-col gap-4 mb-32">
+     <!-- Role -->
+    <div class="flex flex-col">
+      <label class="mb-2 text-sm font-medium text-gray-700">Role *</label>
+      <p-select 
+        [(ngModel)]="createUserForm.role" 
+        [options]="availableRoleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Choose role"
+        class="w-full">
+      </p-select>
+    </div>
+    
     <!-- Username -->
     <div class="flex flex-col">
       <label class="mb-2 text-sm font-medium text-gray-700">Username *</label>
@@ -193,17 +206,34 @@
       </p-password>
     </div>
     
-    <!-- Role -->
-    <div class="flex flex-col">
-      <label class="mb-2 text-sm font-medium text-gray-700">Role *</label>
-      <p-select 
-        [(ngModel)]="createUserForm.role" 
-        [options]="availableRoleOptions"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Choose role"
-        class="w-full">
-      </p-select>
+   
+
+    <!-- Personal Shopper specific fields -->
+    <div *ngIf="isPersonalShopperRole()" class="p-4 border-t-2 border-blue-500 rounded-lg bg-blue-50">
+      <h3 class="mb-3 text-sm font-semibold text-blue-900">Personal Shopper Information</h3>
+      
+      <!-- Name -->
+      <div class="flex flex-col mb-3">
+        <label class="mb-2 text-sm font-medium text-gray-700">Full Name *</label>
+        <input 
+          pInputText 
+          type="text" 
+          [(ngModel)]="personalShopperForm.name"
+          placeholder="Enter full name"
+          class="w-full">
+      </div>
+      
+      <!-- Phone -->
+      <div class="flex flex-col">
+        <label class="mb-2 text-sm font-medium text-gray-700">Phone *</label>
+        <input 
+          pInputText 
+          type="tel" 
+          [(ngModel)]="personalShopperForm.phone"
+          placeholder="Enter phone number (e.g., +1234567890)"
+          class="w-full">
+        <small class="mt-1 text-gray-500">Format: 10-15 digits, can start with +</small>
+      </div>
     </div>
   </div>
   

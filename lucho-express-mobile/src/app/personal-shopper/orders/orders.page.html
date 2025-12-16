@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>My Assigned Orders</ion-title>
+    <ion-buttons slot="end">
+      <ion-button> 
+      <ion-icon slot="icon-only" name="refresh-outline" (click)="ngOnInit()"></ion-icon>  
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -78,15 +83,27 @@
             </span>
           </div>
 
-          <!-- Action Button -->
-          <ion-button 
-            expand="block" 
-            [color]="getStatusColor(order.status)"
-            class="mt-4"
-          >
-            <ion-icon slot="start" [name]="getStatusIcon(order.status)"></ion-icon>
-            View Details
-          </ion-button>
+          <!-- Action Buttons -->
+          <div class="mt-4 space-y-2">
+            <!-- Chat Button -->
+            <ion-button 
+              expand="block" 
+              color="secondary"
+              (click)="openChat($event, order.id)"
+            >
+              <ion-icon slot="start" name="chatbubbles-outline"></ion-icon>
+              Chat with Customer
+            </ion-button>
+
+            <!-- View Details Button -->
+            <ion-button 
+              expand="block" 
+              [color]="getStatusColor(order.status)"
+            >
+              <ion-icon slot="start" [name]="getStatusIcon(order.status)"></ion-icon>
+              View Details
+            </ion-button>
+          </div>
         </div>
       </ion-card-content>
     </ion-card>
