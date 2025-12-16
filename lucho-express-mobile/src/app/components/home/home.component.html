@@ -31,8 +31,8 @@
       autoplay-disable-on-interaction="false"
       speed="800"
     >
-      <swiper-slide *ngFor="let product of productsInfo">
-        <div class="relative p-4 mb-4 h-80 flex flex-col transition-transform bg-white border shadow-md rounded-xl dark:bg-gray-900 hover:shadow-lg product-card">
+      <swiper-slide *ngFor="let product of productsInfo" class="h-80">
+        <div class="relative p-4 h-full flex flex-col transition-transform bg-white border shadow-md rounded-xl dark:bg-gray-900 hover:shadow-lg product-card">
           <!-- Badge Hot en la esquina superior izquierda -->
           <div class="absolute left-2 top-2 z-10 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded dark:bg-surface-900">
             hot
@@ -40,11 +40,11 @@
 
           <!-- Imagen del producto -->
           <div class="mb-4 flex-shrink-0">
-            <div class="flex items-center justify-center w-full h-48 overflow-hidden bg-gray-100 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-center w-full h-40 overflow-hidden bg-gray-100 rounded-lg dark:bg-gray-800">
               <ion-img
                 [src]="product.imageUrl"
                 [alt]="product.name"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover image-banner"
               ></ion-img>
             </div>
           </div>
