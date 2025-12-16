@@ -117,15 +117,15 @@ export class OrderDetailPage implements OnInit {
 
   async confirmStatusChange(newStatus: OrderStatus) {
     const alert = await this.alertController.create({
-      header: 'Confirmar cambio de estado',
-      message: `¿Estás seguro de cambiar el estado a ${this.getStatusLabel(newStatus)}?`,
+      header: 'Confirm Status Change',
+      message: `Are you sure you want to change the status to ${this.getStatusLabel(newStatus)}?`,
       buttons: [
         {
-          text: 'Cancelar',
+          text: 'Cancel',
           role: 'cancel'
         },
         {
-          text: 'Confirmar',
+          text: 'Confirm',
           handler: () => {
             this.updateOrderStatus(newStatus);
           }
@@ -149,15 +149,15 @@ export class OrderDetailPage implements OnInit {
       error: (err) => {
         console.error('Error updating status:', err);
         this.updating = false;
-        this.showErrorAlert(err.error?.message || 'No se pudo actualizar el estado');
+        this.showErrorAlert(err.error?.message || 'Failed to update status');
       }
     });
   }
 
   async showSuccessAlert() {
     const alert = await this.alertController.create({
-      header: 'Éxito',
-      message: 'Estado actualizado correctamente',
+      header: 'Success',
+      message: 'Status updated successfully',
       buttons: ['OK']
     });
     await alert.present();
@@ -216,11 +216,11 @@ export class OrderDetailPage implements OnInit {
 
   getStatusLabel(status: OrderStatus): string {
     const labels: Record<OrderStatus, string> = {
-      [OrderStatus.PENDING]: 'Pendiente',
-      [OrderStatus.CONFIRMED]: 'Confirmado',
-      [OrderStatus.SHIPPED]: 'Enviado',
-      [OrderStatus.DELIVERED]: 'Entregado',
-      [OrderStatus.CANCELLED]: 'Cancelado'
+      [OrderStatus.PENDING]: 'Pending',
+      [OrderStatus.CONFIRMED]: 'Confirmed',
+      [OrderStatus.SHIPPED]: 'Shipped',
+      [OrderStatus.DELIVERED]: 'Delivered',
+      [OrderStatus.CANCELLED]: 'Cancelled'
     };
     return labels[status] || status;
   }

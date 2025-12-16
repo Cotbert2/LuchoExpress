@@ -28,7 +28,8 @@ import {
   arrowForwardOutline,
   refreshOutline,
   personOutline,
-  cashOutline
+  cashOutline,
+  chatbubblesOutline
 } from 'ionicons/icons';
 import { PersonalShopperService } from '../../services/personal-shopper.service';
 import { Order, OrderStatus } from '../../interfaces/personal-shopper.interface';
@@ -76,7 +77,8 @@ export class OrdersPage implements OnInit {
       arrowForwardOutline,
       refreshOutline,
       personOutline,
-      cashOutline
+      cashOutline,
+      chatbubblesOutline
     });
   }
 
@@ -118,6 +120,13 @@ export class OrdersPage implements OnInit {
   }
 
   viewOrderDetail(orderId: string) {
+    // Navigate to order detail page
+    this.router.navigate(['/personal-shopper/order', orderId]);
+  }
+
+  openChat(event: Event, orderId: string) {
+    // Stop propagation to prevent card click
+    event.stopPropagation();
     // Navigate to chat page to communicate with customer
     this.router.navigate(['/personal-shopper/chat', orderId]);
   }

@@ -97,4 +97,5 @@ services:
 
 networks:
   lucho-express-network:
+    name: lucho-express-network
     driver: bridge
