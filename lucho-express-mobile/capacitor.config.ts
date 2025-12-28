@@ -4,6 +4,11 @@ const config: CapacitorConfig = {
   appId: 'com.luchoexpress.app',
   appName: 'Lucho Express',
   webDir: 'www',
+  server: {
+    androidScheme: 'http',
+    iosScheme: 'http',
+    cleartext: true
+  },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,

@@ -1,10 +1,10 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://luchoexpress.site.com',
-  authUrl: 'https://luchoexpress.site.com/auth',
-  productsUrl: 'https://luchoexpress.site.com:8085/api',
-  customersUrl: 'https://luchoexpress.site.com:8082',
-  ordersUrl: 'https://luchoexpress.site.com:8084/api',
-  trackingApiUrl: 'https://luchoexpress.site.com:8086',
-  chatSocketUrl: 'https://luchoexpress.site:3000'  // Direct connection to ms-chat for WebSocket
+  apiUrl: 'http://luchoexpress.site:8080',
+  authUrl: 'http://luchoexpress.site:8080/auth',
+  productsUrl: 'http://luchoexpress.site:8080/api',
+  customersUrl: 'http://luchoexpress.site:8080',
+  ordersUrl: 'http://luchoexpress.site:8080/api',
+  trackingApiUrl: 'http://luchoexpress.site:8080',
+  chatSocketUrl: 'http://luchoexpress.site:3000'  // Direct connection to ms-chat for WebSocket
 };
