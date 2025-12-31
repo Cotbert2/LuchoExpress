@@ -18,7 +18,7 @@
     </div>
 
     <!-- Filtros -->
-    <ion-card class="mb-4">
+    <!-- <ion-card class="mb-4">
       <ion-card-header>
         <ion-card-title class="text-base">
           <ion-icon name="search-outline" class="mr-2"></ion-icon>
@@ -26,7 +26,7 @@
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <!-- B\u00fasqueda -->
+       
         <ion-searchbar
           [(ngModel)]="searchValue"
           (ionInput)="applyFilters()"
@@ -35,7 +35,6 @@
           animated="true">
         </ion-searchbar>
 
-        <!-- Fechas -->
         <div class="grid grid-cols-2 gap-2 mt-3">
           <ion-item lines="none">
             <ion-label position="stacked">From</ion-label>
@@ -68,14 +67,12 @@
             </ion-datetime>
           </ng-template>
         </ion-modal>
-
-        <!-- Bot\u00f3n de limpiar filtros -->
         <ion-button expand="block" fill="outline" (click)="clearFilters()" class="mt-3">
           <ion-icon slot="start" name="close-outline"></ion-icon>
           Clear Filters
         </ion-button>
       </ion-card-content>
-    </ion-card>
+    </ion-card> -->
 
     <!-- Lista de \u00f3rdenes -->
     <div class="mb-3 flex items-center justify-between">

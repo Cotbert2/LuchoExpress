@@ -33,11 +33,12 @@ import {
     IonTextarea,
     IonText,
     IonSkeletonText,
+    IonDatetime,
     IonDatetimeButton,
     IonModal
  } from '@ionic/angular/standalone';
 
-import { ViewWillEnter } from '@ionic/angular';
+import { ViewWillEnter } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   cartOutline, 
@@ -79,6 +80,8 @@ import { TrackingStatus, TrackingResponse, OrderStatusEnum } from '../../interfa
       IonSkeletonText,
       IonChip,
       IonLabel,
+      IonDatetime,
+      IonDatetimeButton,
       IonContent,
       IonList,
       IonItem,
