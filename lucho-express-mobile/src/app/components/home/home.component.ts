@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
 import { ProductsService } from '../../services/products.service';
 import { addIcons } from 'ionicons';
 import { eyeOutline } from 'ionicons/icons';
@@ -9,7 +8,7 @@ import { eyeOutline } from 'ionicons/icons';
 @Component({
   standalone: true,
   selector: 'app-home',
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],

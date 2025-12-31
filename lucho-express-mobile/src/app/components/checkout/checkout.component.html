@@ -10,7 +10,7 @@
       <ion-chip color="primary">
         <ion-label>{{ cartSummary.totalItems }} items</ion-label>
       </ion-chip>
-      <ion-button 
+      <ion-button  
         (click)="confirmClearCart()"
         [disabled]="cartItems.length === 0"
         color="danger">

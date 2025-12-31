@@ -2,8 +2,39 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { 
+  IonHeader,
+  IonToolbar,
+  ToastController,
+  IonButtons,
+  IonBackButton,
+  IonSegmentButton,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonCardSubtitle,
+  IonTitle,
+  IonChip,
+  IonLabel,
+  IonContent,
+  IonList,
+  IonItem,
+  IonItemDivider,
+  IonProgressBar,
+  IonSegment,
+  IonNote,
+  IonInput,
+  IonButton,
+  IonIcon,
+  IonSpinner,
+  IonTextarea,
+  IonText,
+  IonModal
+
+ } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   mailOutline, 
@@ -21,8 +52,35 @@ import { UserService } from '../../services/user.service';
   standalone: true,
   imports: [
     CommonModule,
-    IonicModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
+  IonSegmentButton,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonCardSubtitle,
+  IonTitle,
+  IonChip,
+  IonLabel,
+  IonContent,
+  IonList,
+  IonItem,
+  IonItemDivider,
+  IonProgressBar,
+  IonSegment,
+  IonNote,
+  IonInput,
+  IonButton,
+  IonIcon,
+  IonSpinner,
+  IonTextarea,
+  IonText,
+  IonModal
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'

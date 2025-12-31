@@ -2,7 +2,41 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonicModule, ToastController, AlertController, ModalController } from '@ionic/angular';
+import { 
+  ToastController, 
+    AlertController, 
+    ModalController,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonBackButton,
+    IonSegmentButton,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonCardSubtitle,
+    IonTitle,
+    IonChip,
+    IonLabel,
+    IonContent,
+    IonList,
+    IonItem,
+    IonItemDivider,
+    IonProgressBar,
+    IonSegment,
+    IonNote,
+    IonInput,
+    IonButton,
+    IonIcon,
+    IonSpinner,
+    IonTextarea,
+    IonText,
+    IonSkeletonText,
+    IonDatetimeButton,
+    IonModal
+ } from '@ionic/angular/standalone';
+
 import { ViewWillEnter } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { 
@@ -30,7 +64,35 @@ import { TrackingStatus, TrackingResponse, OrderStatusEnum } from '../../interfa
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule
+      IonHeader,
+      IonToolbar,
+      IonButtons,
+      IonBackButton,
+      IonSegmentButton,
+      IonCard,
+      IonCardHeader,
+      IonCardTitle,
+      IonCardContent,
+      IonCardSubtitle,
+      IonTitle,
+      IonDatetimeButton,
+      IonSkeletonText,
+      IonChip,
+      IonLabel,
+      IonContent,
+      IonList,
+      IonItem,
+      IonItemDivider,
+      IonProgressBar,
+      IonSegment,
+      IonNote,
+      IonInput,
+      IonButton,
+      IonIcon,
+      IonSpinner,
+      IonTextarea,
+      IonText,
+      IonModal
   ],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.scss'

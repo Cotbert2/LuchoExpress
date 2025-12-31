@@ -8,10 +8,37 @@ import { CustomerService, CreateCustomerRequest, CustomerResponse } from '../../
 import { OrderService, CreateOrderRequest, CreateOrderProductRequest, OrderResponse } from '../../services/order.service';
 import { UserResponse } from '../../interfaces/auth.interface';
 import { Subscription } from 'rxjs';
-import { ViewWillEnter } from '@ionic/angular';
 
 // Ionic imports
-import { IonicModule, ToastController, AlertController } from '@ionic/angular';
+import {  
+  ToastController,
+  AlertController,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
+  IonTitle,
+  IonChip,
+  IonLabel,
+  IonContent,
+  IonList,
+  IonItem,
+  IonItemDivider,
+  IonInput,
+  IonButton,
+  IonIcon,
+  IonProgressBar,
+  IonSegmentButton,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonCardSubtitle, ViewWillEnter,
+  IonSegment, IonNote,
+  IonSpinner,
+  IonTextarea
+
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   cartOutline, 
@@ -33,7 +60,31 @@ import {
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    IonicModule
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
+  IonSegmentButton,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonCardSubtitle,
+  IonTitle,
+  IonChip,
+  IonLabel,
+  IonContent,
+  IonList,
+  IonItem,
+  IonItemDivider,
+  IonProgressBar,
+  IonSegment,
+  IonNote,
+  IonInput,
+  IonButton,
+  IonIcon,
+  IonSpinner,
+  IonTextarea
   ],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss',

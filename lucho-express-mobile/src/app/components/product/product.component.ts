@@ -2,7 +2,39 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonicModule, ToastController } from '@ionic/angular';
+import {  
+  ToastController,
+   IonHeader,
+        IonToolbar,
+        IonButtons,
+        IonBackButton,
+        IonSegmentButton,
+        IonCard,
+        IonCardHeader,
+        IonCardTitle,
+        IonCardContent,
+        IonCardSubtitle,
+        IonTitle,
+        IonDatetimeButton,
+        IonSkeletonText,
+        IonChip,
+        IonLabel,
+        IonContent,
+        IonList,
+        IonItem,
+        IonItemDivider,
+        IonProgressBar,
+        IonSegment,
+        IonNote,
+        IonInput,
+        IonButton,
+        IonIcon,
+        IonSpinner,
+        IonTextarea,
+        IonText,
+        IonModal,
+        IonBadge
+ } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   cartOutline, 
@@ -15,13 +47,43 @@ import {
 import { CartService } from '../../services/cart.service';
 import { ProductsService } from '../../services/products.service';
 
+
 @Component({
   selector: 'app-product',
   standalone: true,
   imports: [
     CommonModule, 
-    IonicModule,
-    FormsModule
+    FormsModule,
+     IonHeader,
+          IonToolbar,
+          IonButtons,
+          IonBackButton,
+          IonSegmentButton,
+          IonCard,
+          IonCardHeader,
+          IonCardTitle,
+          IonCardContent,
+          IonCardSubtitle,
+          IonTitle,
+          IonDatetimeButton,
+          IonSkeletonText,
+          IonChip,
+          IonLabel,
+          IonContent,
+          IonList,
+          IonItem,
+          IonItemDivider,
+          IonProgressBar,
+          IonSegment,
+          IonNote,
+          IonInput,
+          IonButton,
+          IonIcon,
+          IonSpinner,
+          IonBadge,
+          IonTextarea,
+          IonText,
+          IonModal
   ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss'
