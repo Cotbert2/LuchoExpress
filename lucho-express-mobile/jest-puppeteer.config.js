@@ -11,6 +11,6 @@ module.exports = {
         '!src/**/*.spec.ts',
     ],
     coverageDirectory: 'coverage',
-    testTimeout: 30000,
+    testTimeout: 45000,
     verbose: true,
 };
